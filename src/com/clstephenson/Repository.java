@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public interface Repository<T> {
-    void add(T entity) throws SQLException, IOException;
+    int add(T entity) throws SQLException, IOException;
     boolean remove(T entity) throws SQLException;
     List<T> findAll() throws SQLException;
 
