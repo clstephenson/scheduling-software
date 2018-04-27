@@ -1,10 +1,9 @@
 package com.clstephenson;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +16,50 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
-    public void add(Address address) throws SQLException {
-
+    public int add(Address address, LoginSession session) throws SQLException, IOException {
+        CityRepository cityRepository = new CityRepository();
+        City city = cityRepository.findSingle(c -> c.getId() == address.getCity().getId());
+        int cityId;
+        if(city == null) {
+            cityId = cityRepository.add(address.getCity(), session);
+            address.getCity().setId(cityId); //add the newly generated ID to the address's city
+        } else {
+            cityId = city.getId();
+        }
+        if(cityId != 0) {
+            String currentUserName = session.getLoggedInUser().getUserName();
+            String sql = "INSERT INTO address " +
+                    "(address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, address.getAddressLine1());
+                statement.setString(2, address.getAddressLine2());
+                statement.setInt(3, cityId);
+                statement.setString(4, address.getZipCode());
+                statement.setString(5, address.getPhoneNumber());
+                statement.setObject(6, DateTimeUtil.getCurrentDateTimeForSQL());
+                statement.setString(7, currentUserName);
+                statement.setString(8, currentUserName);
+                statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+                if(rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException();
+                }
+            } catch (SQLException e) {
+                throw new SQLException(Localization.getString("error.db.addingaddress"), e);
+            }
+        } else {
+            // error - city could not be added, therefore address could not be added
+            throw new SQLException(Localization.getString("error.db.addingaddress"));
+        }
     }
 
     @Override
     public boolean remove(Address address) throws SQLException {
-        return false;
+        throw new NotImplementedException();
+        //todo implement Address::remove
     }
 
     @Override

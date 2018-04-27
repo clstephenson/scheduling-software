@@ -1,6 +1,5 @@
 package com.clstephenson;
 
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Localization {

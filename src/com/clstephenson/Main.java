@@ -5,10 +5,27 @@ import java.sql.SQLException;
 
 public class Main {
 
+    private static LoginSession session;
+
     public static void main(String[] args) throws IOException, SQLException {
 
-        System.out.println(new AddressRepository().findSingle(a -> a.getId() == 11));
-        System.out.println(new CustomerRepository().findSingle(a -> a.getId() == 11));
+        session = new LoginSession("test", "test");
+        if(session.isLoggedIn()) {
+            User currentUser = session.getLoggedInUser();
 
+            //testAddingCustomerToDatabase();
+
+
+        }
+    }
+
+    private static void testAddingCustomerToDatabase() throws IOException, SQLException {
+        Country country = new Country("My Country");
+        City city = new City("My City", country);
+        Address address = new Address("123 My Address", "", city, "85255", "112-556-5285");
+        Customer customer = new Customer("Chris Test", address, true);
+        CustomerRepository customerRepository = new CustomerRepository();
+        int custId = customerRepository.add(customer, session);
+        System.out.println(customerRepository.findSingle(c -> c.getId() == custId));
     }
 }

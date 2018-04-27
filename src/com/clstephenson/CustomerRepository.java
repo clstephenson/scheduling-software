@@ -14,16 +14,42 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
-    public void add(Customer customer) throws SQLException, IOException {
-        dbConnection.setAutoCommit(false);
+    public int add(Customer customer, LoginSession session) throws SQLException, IOException {
         AddressRepository addressRepository = new AddressRepository();
         Address address = addressRepository.findSingle(addr -> addr.getId() == customer.getAddress().getId());
+        int addressId;
         if(address == null) {
-            // todo insert address data into db and get autoinc ID
+            addressId = addressRepository.add(customer.getAddress(), session);
+            customer.getAddress().setId(addressId); //add the newly generated ID to the customer address
         } else {
-            // todo use address id as field in customer record
+            addressId = address.getId();
         }
-        // todo insert customer record into db
+        if(addressId != 0) {
+            String currentUserName = session.getLoggedInUser().getUserName();
+            String sql = "INSERT INTO customer (customerName, addressid, active, createDate, createdBy, lastUpdateBy) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+            try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, customer.getName());
+                statement.setInt(2, addressId);
+                statement.setInt(3, customer.isActive() ? 1 : 0);
+                statement.setObject(4, DateTimeUtil.getCurrentDateTimeForSQL());
+                statement.setString(5, currentUserName);
+                statement.setString(6, currentUserName);
+                statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+                if(rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException();
+                }
+            } catch (SQLException e) {
+                throw new SQLException(Localization.getString("error.db.addingcustomer"), e);
+            }
+        } else {
+            // error - address could not be added, therefore customer could not be added
+            throw new SQLException(Localization.getString("error.db.addingcustomer"));
+        }
+
     }
 
     @Override

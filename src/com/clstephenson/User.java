@@ -8,6 +8,12 @@ public class User {
 
     public User() {}
 
+    public User(String userName, String password, boolean isActive) {
+        this.userName = userName;
+        this.password = password;
+        this.isActive = isActive;
+    }
+
     public User(int id, String userName, String password, boolean isActive) {
         this.id = id;
         this.userName = userName;
