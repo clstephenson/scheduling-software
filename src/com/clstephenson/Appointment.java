@@ -15,6 +15,8 @@ public class Appointment {
     private LocalDateTime start;
     private LocalDateTime end;
 
+    public Appointment() {}
+
     public Appointment(int id, Customer customer, User user, String title, String description, String location,
                        String contact, String type, String url, LocalDateTime start, LocalDateTime end) {
         this.id = id;
@@ -116,5 +118,9 @@ public class Appointment {
 
     public void setEnd(LocalDateTime end) {
         this.end = end;
+    }
+
+    public boolean hasId() {
+        return this.id > 0;
     }
 }

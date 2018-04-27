@@ -53,6 +53,10 @@ public class User {
         isActive = active;
     }
 
+    public boolean hasId() {
+        return this.id > 0;
+    }
+
     public String toString() {
         return this.userName;
     }

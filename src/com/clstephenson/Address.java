@@ -77,6 +77,10 @@ public class Address {
         this.phoneNumber = phoneNumber;
     }
 
+    public boolean hasId() {
+        return this.id > 0;
+    }
+
     public String toString() {
         return String.format("[%d, %s, %s, %s, %s, %s]", this.id, this.addressLine1, this.addressLine2, this.city, this.zipCode, this.phoneNumber);
     }

@@ -31,6 +31,10 @@ public class Country {
         this.name = name;
     }
 
+    public boolean hasId() {
+        return this.id > 0;
+    }
+
     public String toString() {
         return String.format("[%d, %s]", this.id, this.name);
     }

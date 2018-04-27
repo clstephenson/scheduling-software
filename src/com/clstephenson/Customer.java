@@ -53,6 +53,10 @@ public class Customer {
         isActive = active;
     }
 
+    public boolean hasId() {
+        return this.id > 0;
+    }
+
     public String toString() {
         return String.format("[%d, %s, %s]", this.id, this.name, this.address);
     }
