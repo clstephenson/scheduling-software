@@ -1,5 +1,6 @@
-package com.clstephenson;
+package com.clstephenson.dataaccess;
 
+import com.clstephenson.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;

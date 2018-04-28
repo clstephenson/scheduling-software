@@ -1,5 +1,9 @@
-package com.clstephenson;
+package com.clstephenson.dataaccess;
 
+import com.clstephenson.Country;
+import com.clstephenson.DateTimeUtil;
+import com.clstephenson.Localization;
+import com.clstephenson.LoginSession;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;

@@ -1,4 +1,6 @@
-package com.clstephenson;
+package com.clstephenson.dataaccess;
+
+import com.clstephenson.*;
 
 import java.io.IOException;
 import java.sql.*;

@@ -1,6 +1,7 @@
-package com.clstephenson;
+package com.clstephenson.dataaccess;
 
 import com.clstephenson.AppConfiguration;
+import com.clstephenson.Localization;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.IOException;
