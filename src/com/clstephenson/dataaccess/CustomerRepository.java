@@ -34,7 +34,7 @@ public class CustomerRepository implements Repository<Customer> {
                 statement.setString(1, customer.getName());
                 statement.setInt(2, addressId);
                 statement.setInt(3, customer.isActive() ? 1 : 0);
-                statement.setObject(4, DateTimeUtil.getCurrentDateTimeForSQL());
+                statement.setObject(4, DateTimeUtil.getDateTimeForSQL());
                 statement.setString(5, currentUserName);
                 statement.setString(6, currentUserName);
                 statement.executeUpdate();
@@ -79,6 +79,11 @@ public class CustomerRepository implements Repository<Customer> {
             String message = Localization.getString("error.db.customerquery");
             throw new SQLException(message, e);
         }
+    }
+
+    @Override
+    public Customer findById(int id) throws SQLException{
+        return findSingle(customer -> customer.getId() == id);
     }
 
     private Customer mapResultSetToObject(ResultSet rs) throws SQLException {

@@ -25,7 +25,7 @@ public class CountryRepository implements Repository<Country> {
         String sql = "INSERT INTO country (country, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?)";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, country.getName());
-            statement.setObject(2, DateTimeUtil.getCurrentDateTimeForSQL());
+            statement.setObject(2, DateTimeUtil.getDateTimeForSQL());
             statement.setString(3, currentUserName);
             statement.setString(4, currentUserName);
             statement.executeUpdate();
@@ -60,6 +60,11 @@ public class CountryRepository implements Repository<Country> {
             String message = Localization.getString("error.db.countryquery");
             throw new SQLException(message, e);
         }
+    }
+
+    @Override
+    public Country findById(int id) throws SQLException{
+        return findSingle(country -> country.getId() == id);
     }
 
     private Country mapResultSetToObject(ResultSet rs) throws SQLException {

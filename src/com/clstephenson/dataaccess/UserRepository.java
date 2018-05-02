@@ -28,7 +28,7 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUserName());
             statement.setString(2, user.getPassword());
             statement.setInt(3, user.isActive() ? 1 : 0);
-            statement.setObject(4, DateTimeUtil.getCurrentDateTimeForSQL());
+            statement.setObject(4, DateTimeUtil.getDateTimeForSQL());
             statement.setString(5, currentUserName);
             statement.setString(6, currentUserName);
             statement.executeUpdate();
@@ -63,6 +63,11 @@ public class UserRepository implements Repository<User> {
             String message = Localization.getString("error.db.userquery");
             throw new SQLException(message, e);
         }
+    }
+
+    @Override
+    public User findById(int id) throws SQLException{
+        return findSingle(user -> user.getId() == id);
     }
 
     private User mapResultSetToObject(ResultSet rs) throws SQLException {

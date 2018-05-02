@@ -38,7 +38,7 @@ public class AddressRepository implements Repository<Address> {
                 statement.setInt(3, cityId);
                 statement.setString(4, address.getZipCode());
                 statement.setString(5, address.getPhoneNumber());
-                statement.setObject(6, DateTimeUtil.getCurrentDateTimeForSQL());
+                statement.setObject(6, DateTimeUtil.getDateTimeForSQL());
                 statement.setString(7, currentUserName);
                 statement.setString(8, currentUserName);
                 statement.executeUpdate();
@@ -77,6 +77,11 @@ public class AddressRepository implements Repository<Address> {
             String message = Localization.getString("error.db.addressquery");
             throw new SQLException(message, e);
         }
+    }
+
+    @Override
+    public Address findById(int id) throws SQLException{
+        return findSingle(address -> address.getId() == id);
     }
 
     private Address mapResultSetToObject(ResultSet rs) throws SQLException {

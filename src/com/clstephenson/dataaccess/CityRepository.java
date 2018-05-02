@@ -33,7 +33,7 @@ public class CityRepository implements Repository <City> {
             try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, city.getName());
                 statement.setInt(2, countryId);
-                statement.setObject(3, DateTimeUtil.getCurrentDateTimeForSQL());
+                statement.setObject(3, DateTimeUtil.getDateTimeForSQL());
                 statement.setString(4, currentUserName);
                 statement.setString(5, currentUserName);
                 statement.executeUpdate();
@@ -72,6 +72,11 @@ public class CityRepository implements Repository <City> {
             String message = Localization.getString("error.db.cityquery");
             throw new SQLException(message, e);
         }
+    }
+
+    @Override
+    public City findById(int id) throws SQLException{
+        return findSingle(city -> city.getId() == id);
     }
 
     private City mapResultSetToObject(ResultSet rs) throws SQLException {
