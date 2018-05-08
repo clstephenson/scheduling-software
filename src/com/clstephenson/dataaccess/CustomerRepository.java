@@ -66,7 +66,7 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
-    public List<Customer> findAll() throws SQLException{
+    public List<Customer> findAll() throws SQLException, IOException{
         String query = "SELECT * FROM customer_view";
         ArrayList<Customer> customers = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -82,7 +82,7 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
-    public Customer findById(int id) throws SQLException{
+    public Customer findById(int id) throws SQLException, IOException{
         return findSingle(customer -> customer.getId() == id);
     }
 

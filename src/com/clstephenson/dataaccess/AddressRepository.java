@@ -64,7 +64,7 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
-    public List<Address> findAll() throws SQLException {
+    public List<Address> findAll() throws SQLException, IOException {
         String query = "SELECT * FROM address_view";
         ArrayList<Address> addresses = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -80,7 +80,7 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
-    public Address findById(int id) throws SQLException{
+    public Address findById(int id) throws SQLException, IOException{
         return findSingle(address -> address.getId() == id);
     }
 

@@ -50,7 +50,7 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public List<User> findAll() throws SQLException {
+    public List<User> findAll() throws SQLException, IOException {
         String query = "SELECT userId, userName, password, active FROM user";
         ArrayList<User> users = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -66,7 +66,7 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public User findById(int id) throws SQLException{
+    public User findById(int id) throws SQLException, IOException{
         return findSingle(user -> user.getId() == id);
     }
 

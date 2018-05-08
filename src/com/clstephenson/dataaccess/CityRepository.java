@@ -59,7 +59,7 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
-    public List<City> findAll() throws SQLException {
+    public List<City> findAll() throws SQLException, IOException {
         String query = "SELECT cityid, city, countryid, country FROM city_view";
         ArrayList<City> cities = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -75,7 +75,7 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
-    public City findById(int id) throws SQLException{
+    public City findById(int id) throws SQLException, IOException{
         return findSingle(city -> city.getId() == id);
     }
 
