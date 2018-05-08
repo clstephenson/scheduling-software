@@ -1,32 +1,40 @@
 package com.clstephenson;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class Appointment {
     private int id;
     private Customer customer;
-    private User user;
-    private String title;
+    private AppointmentType appointmentType; //using title column in db
     private String description;
-    private String location;
-    private String contact;
-    private String type;
+    private AppointmentLocation appointmentLocation;
+    private String consultant; //using contact column in db
     private String url;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private ZonedDateTime start;
+    private ZonedDateTime end;
 
     public Appointment() {}
 
-    public Appointment(int id, Customer customer, User user, String title, String description, String location,
-                       String contact, String type, String url, LocalDateTime start, LocalDateTime end) {
+    public Appointment(Customer customer, AppointmentType type, String description, AppointmentLocation location,
+                       String consultant, String url, ZonedDateTime start, ZonedDateTime end) {
+        this.customer = customer;
+        this.appointmentType = type;
+        this.description = description;
+        this.appointmentLocation = location;
+        this.consultant = consultant;
+        this.url = url;
+        this.start = start;
+        this.end = end;
+    }
+
+    public Appointment(int id, Customer customer, AppointmentType type, String description, AppointmentLocation location,
+                       String consultant, String url, ZonedDateTime start, ZonedDateTime end) {
         this.id = id;
         this.customer = customer;
-        this.user = user;
-        this.title = title;
+        this.appointmentType = type;
         this.description = description;
-        this.location = location;
-        this.contact = contact;
-        this.type = type;
+        this.appointmentLocation = location;
+        this.consultant = consultant;
         this.url = url;
         this.start = start;
         this.end = end;
@@ -48,20 +56,12 @@ public class Appointment {
         this.customer = customer;
     }
 
-    public User getUser() {
-        return user;
+    public AppointmentType getAppointmentType() {
+        return appointmentType;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setAppointmentType(AppointmentType type) {
+        this.appointmentType = type;
     }
 
     public String getDescription() {
@@ -72,28 +72,20 @@ public class Appointment {
         this.description = description;
     }
 
-    public String getLocation() {
-        return location;
+    public AppointmentLocation getAppointmentLocation() {
+        return appointmentLocation;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setAppointmentLocation(AppointmentLocation location) {
+        this.appointmentLocation = location;
     }
 
-    public String getContact() {
-        return contact;
+    public String getConsultant() {
+        return consultant;
     }
 
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setConsultant(String consultant) {
+        this.consultant = consultant;
     }
 
     public String getUrl() {
@@ -104,23 +96,30 @@ public class Appointment {
         this.url = url;
     }
 
-    public LocalDateTime getStart() {
+    public ZonedDateTime getStart() {
         return start;
     }
 
-    public void setStart(LocalDateTime start) {
+    public void setStart(ZonedDateTime start) {
         this.start = start;
     }
 
-    public LocalDateTime getEnd() {
+    public ZonedDateTime getEnd() {
         return end;
     }
 
-    public void setEnd(LocalDateTime end) {
+    public void setEnd(ZonedDateTime end) {
         this.end = end;
     }
 
     public boolean hasId() {
         return this.id > 0;
+    }
+
+    public String toString() {
+        return String.format("[%d, %s, %s, %s, %s, %s, %s, %s, %s]", this.id, this.customer.getName(),
+                this.appointmentType.toString(), this.description, this.appointmentLocation.toString(), this.consultant,
+                this.url, this.start, this.end);
+        //todo change format string for start and end dates/times
     }
 }

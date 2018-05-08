@@ -6,7 +6,8 @@ public enum AppointmentType {
 
     private String type;
 
-    public String getType() {
+    @Override
+    public String toString() {
         return type;
     }
 

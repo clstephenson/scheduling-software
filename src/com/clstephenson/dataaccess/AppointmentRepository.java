@@ -1,13 +1,10 @@
 package com.clstephenson.dataaccess;
 
-import com.clstephenson.Address;
-import com.clstephenson.Appointment;
-import com.clstephenson.LoginSession;
+import com.clstephenson.*;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentRepository implements Repository<Appointment> {
@@ -19,22 +16,93 @@ public class AppointmentRepository implements Repository<Appointment> {
     }
 
     @Override
-    public int add(Appointment entity, LoginSession session) throws SQLException, IOException {
-        return 0;
+    public int add(Appointment appointment, LoginSession session) throws SQLException, IOException {
+        CustomerRepository customerRepository = new CustomerRepository();
+        Customer customer = customerRepository.findSingle(cust -> cust.getId() == appointment.getCustomer().getId());
+        int customerId;
+        if(customer == null) {
+            customerId = customerRepository.add(appointment.getCustomer(), session);
+            appointment.getCustomer().setId(customerId); //add the newly generated ID to the appointment's customer
+        } else {
+            customerId = customer.getId();
+        }
+        if(customerId != 0) {
+            String currentUserName = session.getLoggedInUser().getUserName();
+            String sql = "INSERT INTO appointment (customerId, title, description, location, contact, " +
+                    "url, start, end, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setInt(1, customerId);
+                statement.setString(2, appointment.getAppointmentType().name());
+                statement.setString(3, appointment.getDescription());
+                statement.setString(4, appointment.getAppointmentLocation().name());
+                statement.setString(5, appointment.getConsultant());
+                statement.setString(6, appointment.getUrl());
+                statement.setObject(7, DateTimeUtil.getDateTimeForSQL(appointment.getStart()));
+                statement.setObject(8, DateTimeUtil.getDateTimeForSQL(appointment.getEnd()));
+                statement.setObject(9, DateTimeUtil.getDateTimeForSQL());
+                statement.setString(10, currentUserName);
+                statement.setString(11, currentUserName);
+                statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+                if(rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException();
+                }
+            } catch (SQLException e) {
+                throw new SQLException(Localization.getString("error.db.addingappointment"), e);
+            }
+        } else {
+            // error - customer could not be added, therefore appointment could not be added
+            throw new SQLException(Localization.getString("error.db.addingappointment"));
+        }
+
     }
 
     @Override
-    public boolean remove(Appointment entity) throws SQLException {
-        return false;
+    public boolean remove(Appointment appointment) throws SQLException {
+        try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_appointment(?)}")) {
+            statement.setInt(1, appointment.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingappointment") + " = " + appointment.getId();
+            throw new SQLException(message, e);
+        }
     }
 
     @Override
-    public List<Appointment> findAll() throws SQLException {
-        return null;
+    public List<Appointment> findAll() throws SQLException, IOException {
+        String query = "SELECT * FROM appointment_view";
+        ArrayList<Appointment> appointments = new ArrayList<>();
+        try (Statement statement = dbConnection.createStatement()) {
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                appointments.add(mapResultSetToObject(rs));
+            }
+            return appointments;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.appointmentquery");
+            throw new SQLException(message, e);
+        }
     }
 
-    private Address mapResultSetToObject(ResultSet rs) throws SQLException {
-        return new Address();
+    @Override
+    public Appointment findById(int id) throws SQLException, IOException {
+        return findSingle(appointment -> appointment.getId() == id);
+    }
+
+    private Appointment mapResultSetToObject(ResultSet rs) throws SQLException, IOException {
+        Appointment appointment = new Appointment();
+        appointment.setId(rs.getInt("appointmentid"));
+        appointment.setCustomer(new CustomerRepository().findById(rs.getInt("customerId")));
+        appointment.setAppointmentType(AppointmentType.valueOf(rs.getString("title")));
+        appointment.setDescription(rs.getString("description"));
+        appointment.setAppointmentLocation(AppointmentLocation.valueOf(rs.getString("location")));
+        appointment.setConsultant(rs.getString("contact"));
+        appointment.setUrl(rs.getString("url"));
+        appointment.setStart(DateTimeUtil.getZonedDateTimeFromSQLTimestamp(rs.getTimestamp("start")));
+        appointment.setEnd(DateTimeUtil.getZonedDateTimeFromSQLTimestamp(rs.getTimestamp("end")));
+        return appointment;
     }
 
 }

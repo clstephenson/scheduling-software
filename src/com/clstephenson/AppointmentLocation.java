@@ -3,11 +3,13 @@ package com.clstephenson;
 public enum AppointmentLocation {
     PHOENIX ("Phoenix, Arizona"),
     NEW_YORK ("New York, New York"),
-    LONDON ("London, England");
+    LONDON ("London, England"),
+    ONLINE ("Online");
 
     private final String location;
 
-    public String getLocation() {
+    @Override
+    public String toString() {
         return location;
     }
 
