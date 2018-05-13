@@ -7,17 +7,19 @@ import java.sql.SQLException;
 import java.time.*;
 import java.util.List;
 
-public class Scheduler {
+public class ScheduleManager {
 
     public static Appointment scheduleAppointment(Customer customer, AppointmentType type, String description,
                                            AppointmentLocation location, String consultant, String url,
                                            ZonedDateTime start, ZonedDateTime end, LoginSession session)  throws IOException, SQLException {
         if(isAppointmentOverlapping(consultant, start, end)) {
             //todo throw custom exception
-            throw new RuntimeException("need custom exception here");
+            //throw new RuntimeException("need custom exception here");
+            return null;
         } else if (isAppointmentOutsideBusinessHours(start, end, location)) {
             //todo throw custom exception
-            throw new RuntimeException("need custom exception here");
+            //throw new RuntimeException("need custom exception here");
+            return null;
         } else {
             Appointment newAppointment = new Appointment();
             newAppointment.setCustomer(customer);
@@ -80,5 +82,14 @@ public class Scheduler {
             }
         }
         return false;
+    }
+
+    public static List<Appointment> getUserAppointmentsNextFifteenMinutes(String username) throws IOException, SQLException {
+        ZonedDateTime fifteenMinutesFromNow = ZonedDateTime.now().plusMinutes(15);
+        List<Appointment> userAppointmentsNextFifteenMinutes = new AppointmentRepository().find(
+                a -> a.getConsultant().equals(username) &&
+                            (a.getStart().isAfter(ZonedDateTime.now()) && a.getStart().isBefore(fifteenMinutesFromNow))
+        );
+        return userAppointmentsNextFifteenMinutes;
     }
 }
