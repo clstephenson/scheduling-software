@@ -41,9 +41,20 @@ public class CountryRepository implements Repository<Country> {
     }
 
     @Override
+    public boolean removeById(int id) throws SQLException {
+        String sql = "DELETE FROM country WHERE countryid=?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingcountry") + " = " + id;
+            throw new SQLException(message, e);
+        }
+    }
+
+    @Override
     public boolean remove(Country country) throws SQLException {
-        throw new NotImplementedException();
-        //todo implement Country::remove
+        return removeById(country.getId());
     }
 
     @Override

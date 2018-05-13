@@ -58,9 +58,20 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
+    public boolean removeById(int id) throws SQLException {
+        String sql = "DELETE FROM address WHERE addressid=?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingadress") + " = " + id;
+            throw new SQLException(message, e);
+        }
+    }
+
+    @Override
     public boolean remove(Address address) throws SQLException {
-        throw new NotImplementedException();
-        //todo implement Address::remove
+        return removeById(address.getId());
     }
 
     @Override

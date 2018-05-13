@@ -53,9 +53,20 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
-    public boolean remove(City entity) throws SQLException {
-        throw new NotImplementedException();
-        //todo implement City::remove
+    public boolean removeById(int id) throws SQLException {
+        String sql = "DELETE FROM city WHERE cityid=?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingcity") + " = " + id;
+            throw new SQLException(message, e);
+        }
+    }
+
+    @Override
+    public boolean remove(City city) throws SQLException {
+        return removeById(city.getId());
     }
 
     @Override

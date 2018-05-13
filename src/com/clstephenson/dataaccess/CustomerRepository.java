@@ -51,18 +51,22 @@ public class CustomerRepository implements Repository<Customer> {
             // error - address could not be added, therefore customer could not be added
             throw new SQLException(Localization.getString("error.db.addingcustomer"));
         }
+    }
 
+    @Override
+    public boolean removeById(int id) throws SQLException {
+        try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingcustomer") + " = " + id;
+            throw new SQLException(message, e);
+        }
     }
 
     @Override
     public boolean remove(Customer customer) throws SQLException {
-        try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
-            statement.setInt(1, customer.getId());
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            String message = Localization.getString("error.db.removingcustomer") + " = " + customer.getId();
-            throw new SQLException(message, e);
-        }
+        return removeById(customer.getId());
     }
 
     @Override

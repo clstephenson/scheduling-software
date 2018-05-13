@@ -44,9 +44,20 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public boolean remove(User user) {
-        throw new NotImplementedException();
-        //todo implement User::remove
+    public boolean removeById(int id) throws SQLException {
+        String sql = "DELETE FROM user WHERE userid=?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removinguser") + " = " + id;
+            throw new SQLException(message, e);
+        }
+    }
+
+    @Override
+    public boolean remove(User user) throws SQLException {
+        return removeById(user.getId());
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public interface Repository<T> {
     int add(T entity, LoginSession session) throws SQLException, IOException;
+    boolean removeById(int id) throws SQLException;
     boolean remove(T entity) throws SQLException;
     List<T> findAll() throws SQLException, IOException;
     T findById(int id) throws SQLException, IOException;

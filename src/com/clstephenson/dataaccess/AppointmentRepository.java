@@ -56,18 +56,23 @@ public class AppointmentRepository implements Repository<Appointment> {
             // error - customer could not be added, therefore appointment could not be added
             throw new SQLException(Localization.getString("error.db.addingappointment"));
         }
+    }
 
+    @Override
+    public boolean removeById(int id) throws SQLException {
+        String sql = "DELETE FROM appointment WHERE appointmentid=?";
+        try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.removingappointment") + " = " + id;
+            throw new SQLException(message, e);
+        }
     }
 
     @Override
     public boolean remove(Appointment appointment) throws SQLException {
-        try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_appointment(?)}")) {
-            statement.setInt(1, appointment.getId());
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            String message = Localization.getString("error.db.removingappointment") + " = " + appointment.getId();
-            throw new SQLException(message, e);
-        }
+        return removeById(appointment.getId());
     }
 
     @Override
