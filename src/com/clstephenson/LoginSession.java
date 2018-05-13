@@ -12,17 +12,16 @@ public class LoginSession {
 
     public LoginSession(String userName, String password) throws SQLException, IOException {
         UserRepository userRepository = new UserRepository();
-        List<User> users = userRepository.find(u ->
+        loggedInUser = userRepository.findSingle(u ->
             u.getUserName().equalsIgnoreCase(userName) &&
                     u.getPassword().equals(password) &&
                     u.isActive()
         );
-        if(users.size() > 0) {
-            loggedInUser = users.get(0);
-        } else {
-            loggedInUser = null;
-        }
         logAttempt(userName, isLoggedIn());
+        if(loggedInUser == null) {
+            throw new RuntimeException("Invalid login credentials");
+            //todo add custom exception
+        }
     }
 
     public void logout() {
