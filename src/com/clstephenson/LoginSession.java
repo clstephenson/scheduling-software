@@ -10,13 +10,17 @@ public class LoginSession {
 
     private User loggedInUser = null;
 
-    public LoginSession(String userName, String password) throws SQLException, IOException {
-        UserRepository userRepository = new UserRepository();
-        loggedInUser = userRepository.findSingle(u ->
-            u.getUserName().equalsIgnoreCase(userName) &&
-                    u.getPassword().equals(password) &&
-                    u.isActive()
-        );
+    public LoginSession(String userName, String password) {
+        try {
+            UserRepository userRepository = new UserRepository();
+            loggedInUser = userRepository.findSingle(u ->
+                    u.getUserName().equalsIgnoreCase(userName) &&
+                            u.getPassword().equals(password) &&
+                            u.isActive()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e); //todo fix exceptions
+        }
         logAttempt(userName, isLoggedIn());
         if(loggedInUser == null) {
             throw new RuntimeException("Invalid login credentials");
@@ -36,7 +40,12 @@ public class LoginSession {
         return loggedInUser;
     }
 
-    private void logAttempt(String userName, boolean isSuccessful) throws IOException {
-        LoginActivityLogger.logNewActivity(userName, isSuccessful);
+    private void logAttempt(String userName, boolean isSuccessful) {
+        try {
+            LoginActivityLogger.logNewActivity(userName, isSuccessful);
+        } catch (IOException e) {
+            throw new RuntimeException("Log entry could not be written to the file.", e);
+            //todo fix this exception
+        }
     }
 }

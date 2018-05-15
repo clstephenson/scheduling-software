@@ -11,12 +11,12 @@ public class CustomerRepository implements Repository<Customer> {
 
     private Connection dbConnection;
 
-    public CustomerRepository() throws IOException, SQLException {
+    public CustomerRepository() throws SQLException {
         dbConnection = new DBManager().getConnection();
     }
 
     @Override
-    public int add(Customer customer, LoginSession session) throws SQLException, IOException {
+    public int add(Customer customer, LoginSession session) throws SQLException {
         AddressRepository addressRepository = new AddressRepository();
         Address address = addressRepository.findSingle(addr -> addr.getId() == customer.getAddress().getId());
         int addressId;
@@ -70,7 +70,7 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
-    public List<Customer> findAll() throws SQLException, IOException{
+    public List<Customer> findAll() throws SQLException {
         String query = "SELECT * FROM customer_view";
         ArrayList<Customer> customers = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -86,7 +86,7 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
-    public Customer findById(int id) throws SQLException, IOException{
+    public Customer findById(int id) throws SQLException {
         return findSingle(customer -> customer.getId() == id);
     }
 

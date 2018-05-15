@@ -15,12 +15,12 @@ public class UserRepository implements Repository<User> {
 
     private Connection dbConnection;
 
-    public UserRepository() throws SQLException, IOException {
+    public UserRepository() throws SQLException {
         dbConnection = new DBManager().getConnection();
     }
 
     @Override
-    public int add(User user, LoginSession session) throws SQLException, IOException{
+    public int add(User user, LoginSession session) throws SQLException {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO user (userName, password, active, createDate, createBy, lastUpdatedBy) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -61,7 +61,7 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public List<User> findAll() throws SQLException, IOException {
+    public List<User> findAll() throws SQLException {
         String query = "SELECT userId, userName, password, active FROM user";
         ArrayList<User> users = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -77,7 +77,7 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public User findById(int id) throws SQLException, IOException{
+    public User findById(int id) throws SQLException {
         return findSingle(user -> user.getId() == id);
     }
 

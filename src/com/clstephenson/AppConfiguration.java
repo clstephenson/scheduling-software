@@ -20,7 +20,7 @@ public class AppConfiguration {
      * @return The value associated with the requested property key
      * @throws IOException
      */
-    public static String getConfigurationProperty(String propertyName) throws IOException {
+    public static String getConfigurationProperty(String propertyName) {
         if(appConfigurationInstance == null) {
             appConfigurationInstance = new AppConfiguration();
         }
@@ -31,7 +31,7 @@ public class AppConfiguration {
                     Localization.getString("config.notconfigured"));
     }
 
-    private AppConfiguration() throws IOException {
+    private AppConfiguration() {
         this.properties = new Properties();
 
         try(FileReader inputReader = new FileReader(CONFIG_PATH)) {
@@ -39,7 +39,8 @@ public class AppConfiguration {
         } catch (IOException e) {
             String message = Localization.getString("error.io.filenotfound") +
                     ": " + Paths.get(CONFIG_PATH).toAbsolutePath().normalize();
-            throw new IOException(message, e);
+            throw new RuntimeException(message, e);
+            //todo check exception handling
         }
     }
 

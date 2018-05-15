@@ -29,7 +29,7 @@ public class DBManager {
      * @return Current database connection managed by this instance.  If the connection was previously closed,
      * then it opens a new connection.
      */
-    public Connection getConnection() throws IOException, SQLException {
+    public Connection getConnection() throws SQLException {
         if(!isConnected()) {
             openNewConnection();
         }
@@ -49,7 +49,7 @@ public class DBManager {
         } catch (SQLException ex) {  } //ignore this
     }
 
-    private void openNewConnection() throws IOException, SQLException {
+    private void openNewConnection() throws SQLException {
         try {
             if(!isConnected()) {
                 this.connection = DriverManager.getConnection(
@@ -70,15 +70,15 @@ public class DBManager {
         return this.connection != null;
     }
 
-    private String getDatabasePassword() throws IOException {
+    private String getDatabasePassword() {
         return AppConfiguration.getConfigurationProperty("db.password");
     }
 
-    private String getDatabaseUser() throws IOException {
+    private String getDatabaseUser() {
         return AppConfiguration.getConfigurationProperty("db.user");
     }
 
-    private String getDatabaseConnectionString() throws IOException {
+    private String getDatabaseConnectionString() {
         return String.format(
                 "JDBC:mysql://%s:%s/%s",
                 AppConfiguration.getConfigurationProperty("db.server"),

@@ -11,13 +11,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public interface Repository<T> {
-    int add(T entity, LoginSession session) throws SQLException, IOException;
+    int add(T entity, LoginSession session) throws SQLException;
     boolean removeById(int id) throws SQLException;
     boolean remove(T entity) throws SQLException;
-    List<T> findAll() throws SQLException, IOException;
-    T findById(int id) throws SQLException, IOException;
+    List<T> findAll() throws SQLException;
+    T findById(int id) throws SQLException;
 
-    default List<T> find(Predicate<T> condition) throws SQLException, IOException {
+    default List<T> find(Predicate<T> condition) throws SQLException {
         List<T> list = this.findAll()
                 .stream()
                 .filter(condition)
@@ -25,7 +25,7 @@ public interface Repository<T> {
         return list.isEmpty() ? new ArrayList<>() : list;
     }
 
-    default T findSingle(Predicate<T> condition) throws SQLException, IOException {
+    default T findSingle(Predicate<T> condition) throws SQLException {
         List<T> list = this.find(condition);
         return list.isEmpty() ? null : list.get(0);
     }

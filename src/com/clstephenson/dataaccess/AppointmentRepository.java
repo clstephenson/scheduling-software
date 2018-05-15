@@ -11,12 +11,12 @@ public class AppointmentRepository implements Repository<Appointment> {
 
     private Connection dbConnection;
 
-    public AppointmentRepository() throws IOException, SQLException {
+    public AppointmentRepository() throws SQLException {
         dbConnection = new DBManager().getConnection();
     }
 
     @Override
-    public int add(Appointment appointment, LoginSession session) throws SQLException, IOException {
+    public int add(Appointment appointment, LoginSession session) throws SQLException {
         CustomerRepository customerRepository = new CustomerRepository();
         Customer customer = customerRepository.findSingle(cust -> cust.getId() == appointment.getCustomer().getId());
         int customerId;
@@ -76,7 +76,7 @@ public class AppointmentRepository implements Repository<Appointment> {
     }
 
     @Override
-    public List<Appointment> findAll() throws SQLException, IOException {
+    public List<Appointment> findAll() throws SQLException {
         String query = "SELECT * FROM appointment_view";
         ArrayList<Appointment> appointments = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -92,11 +92,11 @@ public class AppointmentRepository implements Repository<Appointment> {
     }
 
     @Override
-    public Appointment findById(int id) throws SQLException, IOException {
+    public Appointment findById(int id) throws SQLException {
         return findSingle(appointment -> appointment.getId() == id);
     }
 
-    private Appointment mapResultSetToObject(ResultSet rs) throws SQLException, IOException {
+    private Appointment mapResultSetToObject(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setId(rs.getInt("appointmentid"));
         appointment.setCustomer(new CustomerRepository().findById(rs.getInt("customerId")));

@@ -11,7 +11,7 @@ public class ScheduleManager {
 
     public static Appointment scheduleAppointment(Customer customer, AppointmentType type, String description,
                                            AppointmentLocation location, String consultant, String url,
-                                           ZonedDateTime start, ZonedDateTime end, LoginSession session)  throws IOException, SQLException {
+                                           ZonedDateTime start, ZonedDateTime end, LoginSession session)  throws SQLException {
         if(isAppointmentOverlapping(consultant, start, end)) {
             //todo throw custom exception
             //throw new RuntimeException("need custom exception here");
@@ -43,7 +43,7 @@ public class ScheduleManager {
     }
 
     private static boolean isAppointmentOutsideBusinessHours(ZonedDateTime start, ZonedDateTime end,
-                                                             AppointmentLocation location)  throws IOException {
+                                                             AppointmentLocation location) {
         // conditions for outside business hours
         // start time OR end time not between business.hours.start and business.hours.end
         LocalTime businessHoursStart = LocalTime.parse(
@@ -58,7 +58,7 @@ public class ScheduleManager {
     }
 
     private static boolean isAppointmentOverlapping(String consultant, ZonedDateTime start, ZonedDateTime end)
-            throws IOException, SQLException {
+            throws SQLException {
         AppointmentRepository appointmentRepository = new AppointmentRepository();
         List<Appointment> consultantAppointments = appointmentRepository.find(
                 appointment -> appointment.getConsultant().equals(consultant)
@@ -84,7 +84,7 @@ public class ScheduleManager {
         return false;
     }
 
-    public static List<Appointment> getUserAppointmentsNextFifteenMinutes(String username) throws IOException, SQLException {
+    public static List<Appointment> getUserAppointmentsNextFifteenMinutes(String username) throws SQLException {
         ZonedDateTime fifteenMinutesFromNow = ZonedDateTime.now().plusMinutes(15);
         List<Appointment> userAppointmentsNextFifteenMinutes = new AppointmentRepository().find(
                 a -> a.getConsultant().equals(username) &&

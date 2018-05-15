@@ -12,12 +12,12 @@ public class CityRepository implements Repository <City> {
 
     private Connection dbConnection;
 
-    public CityRepository() throws IOException, SQLException {
+    public CityRepository() throws SQLException {
         dbConnection = new DBManager().getConnection();
     }
 
     @Override
-    public int add(City city, LoginSession session) throws SQLException, IOException {
+    public int add(City city, LoginSession session) throws SQLException {
         CountryRepository countryRepository = new CountryRepository();
         Country country = countryRepository.findSingle(c -> c.getId() == city.getCountry().getId());
         int countryId;
@@ -70,7 +70,7 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
-    public List<City> findAll() throws SQLException, IOException {
+    public List<City> findAll() throws SQLException {
         String query = "SELECT cityid, city, countryid, country FROM city_view";
         ArrayList<City> cities = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -86,7 +86,7 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
-    public City findById(int id) throws SQLException, IOException{
+    public City findById(int id) throws SQLException {
         return findSingle(city -> city.getId() == id);
     }
 

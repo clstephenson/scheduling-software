@@ -15,12 +15,12 @@ public class CountryRepository implements Repository<Country> {
 
     private Connection dbConnection;
 
-    public CountryRepository() throws IOException, SQLException {
+    public CountryRepository() throws SQLException {
         dbConnection = new DBManager().getConnection();
     }
 
     @Override
-    public int add(Country country, LoginSession session) throws SQLException, IOException {
+    public int add(Country country, LoginSession session) throws SQLException {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO country (country, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?)";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -58,7 +58,7 @@ public class CountryRepository implements Repository<Country> {
     }
 
     @Override
-    public List<Country> findAll() throws SQLException, IOException {
+    public List<Country> findAll() throws SQLException {
         String query = "SELECT countryid, country FROM country";
         ArrayList<Country> countries = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -74,7 +74,7 @@ public class CountryRepository implements Repository<Country> {
     }
 
     @Override
-    public Country findById(int id) throws SQLException, IOException{
+    public Country findById(int id) throws SQLException {
         return findSingle(country -> country.getId() == id);
     }
 
