@@ -3,12 +3,17 @@ package com.clstephenson;
 import com.clstephenson.dataaccess.UserRepository;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.sql.SQLException;
 import java.util.List;
 
 public class LoginSession {
 
-    private User loggedInUser = null;
+    private User loggedInUser;
+
+    public LoginSession() {
+        
+    }
 
     public LoginSession(String userName, String password) {
         try {
@@ -23,8 +28,7 @@ public class LoginSession {
         }
         logAttempt(userName, isLoggedIn());
         if(loggedInUser == null) {
-            throw new RuntimeException("Invalid login credentials");
-            //todo add custom exception
+            throw new AccessControlException("Invalid login credentials");
         }
     }
 
