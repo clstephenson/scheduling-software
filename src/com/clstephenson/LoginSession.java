@@ -12,7 +12,7 @@ public class LoginSession {
     private User loggedInUser;
 
     public LoginSession() {
-        
+
     }
 
     public LoginSession(String userName, String password) {

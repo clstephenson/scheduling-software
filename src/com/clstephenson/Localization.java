@@ -16,4 +16,8 @@ public class Localization {
         }
         return resourceBundle.getString(key);
     }
+
+    public static ResourceBundle getResourceBundle() {
+        return resourceBundle;
+    }
 }
