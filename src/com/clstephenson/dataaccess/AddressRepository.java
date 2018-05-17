@@ -13,7 +13,7 @@ public class AddressRepository implements Repository<Address> {
     private Connection dbConnection;
 
     public AddressRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

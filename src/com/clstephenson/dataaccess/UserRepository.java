@@ -16,7 +16,7 @@ public class UserRepository implements Repository<User> {
     private Connection dbConnection;
 
     public UserRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

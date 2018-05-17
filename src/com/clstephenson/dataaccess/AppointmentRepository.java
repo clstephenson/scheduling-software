@@ -12,7 +12,7 @@ public class AppointmentRepository implements Repository<Appointment> {
     private Connection dbConnection;
 
     public AppointmentRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

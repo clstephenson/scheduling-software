@@ -12,7 +12,7 @@ public class CustomerRepository implements Repository<Customer> {
     private Connection dbConnection;
 
     public CustomerRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

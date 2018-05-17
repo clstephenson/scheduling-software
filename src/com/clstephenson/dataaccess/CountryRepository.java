@@ -16,7 +16,7 @@ public class CountryRepository implements Repository<Country> {
     private Connection dbConnection;
 
     public CountryRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

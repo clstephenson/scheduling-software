@@ -13,7 +13,7 @@ public class CityRepository implements Repository <City> {
     private Connection dbConnection;
 
     public CityRepository() throws SQLException {
-        dbConnection = new DBManager().getConnection();
+        dbConnection = DBManager.getConnection();
     }
 
     @Override

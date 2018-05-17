@@ -18,67 +18,59 @@ import java.util.List;
  * com.clstephenson.AppConfiguration.  The open connection should be closed using the closeConnection method.
  */
 public class DBManager {
-    private static List<Connection> openConnections;
-    private Connection connection;
-
-    static {
-        openConnections = new ArrayList<>();
-    }
+    private static Connection connection;
 
     /**
      * @return Current database connection managed by this instance.  If the connection was previously closed,
      * then it opens a new connection.
      */
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         if(!isConnected()) {
             openNewConnection();
         }
-        return this.connection;
+        return connection;
     }
 
     /**
      * Closes the open db connection if there is one.
      */
-    public void closeConnection() {
+    public static void closeConnection() {
         try {
             if(isConnected()) {
-                int connectionIndex = openConnections.indexOf(this.connection);
-                this.connection.close();
-                openConnections.remove(connectionIndex);
+                connection.close();
             }
         } catch (SQLException ex) {  } //ignore this
     }
 
-    private void openNewConnection() throws SQLException {
+    private static void openNewConnection() throws SQLException {
         try {
             if(!isConnected()) {
-                this.connection = DriverManager.getConnection(
-                        this.getDatabaseConnectionString(),
-                        this.getDatabaseUser(),
-                        this.getDatabasePassword()
+                connection = DriverManager.getConnection(
+                        getDatabaseConnectionString(),
+                        getDatabaseUser(),
+                        getDatabasePassword()
                 );
-                openConnections.add(this.connection);
             }
         } catch (SQLException e) {
             String message = Localization.getString("error.db.connection") +
-                    ": " + this.getDatabaseConnectionString();
+                    ": " + getDatabaseConnectionString();
             throw new SQLException(message, e);
         }
     }
 
-    private boolean isConnected() {
-        return this.connection != null;
+    private static boolean isConnected() {
+        return connection != null;
     }
 
-    private String getDatabasePassword() {
+    private static String getDatabasePassword() {
         return AppConfiguration.getConfigurationProperty("db.password");
     }
 
-    private String getDatabaseUser() {
+    private static String getDatabaseUser() {
         return AppConfiguration.getConfigurationProperty("db.user");
     }
 
-    private String getDatabaseConnectionString() {
+    private static String getDatabaseConnectionString() {
         return String.format(
                 "JDBC:mysql://%s:%s/%s",
                 AppConfiguration.getConfigurationProperty("db.server"),
