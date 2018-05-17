@@ -30,15 +30,16 @@ public class Main extends Application{
 
         System.out.println("Current Date/Time: " + ZonedDateTime.now());
 
-        //List<Appointment> appointmentsNextFifteenMinutes =
-       //         ScheduleManager.getUserAppointmentsNextFifteenMinutes(currentUser.getUserName());
+        List<Appointment> appointmentsNextFifteenMinutes =
+                ScheduleManager.getUserAppointmentsNextFifteenMinutes("test");
         System.out.println("**Appointments in next 15 minutes**");
-        //appointmentsNextFifteenMinutes.stream().forEach(System.out::println);
+        appointmentsNextFifteenMinutes.stream().forEach(System.out::println);
         System.out.println("**End of upcoming appointments**");
 
-        //testSchedulingNewAppointment();
+
 
         launch(args);
+        //testSchedulingNewAppointment();
     }
 
     @Override
@@ -59,7 +60,7 @@ public class Main extends Application{
     }
 
     //todo remove this method
-    private static void testSchedulingNewAppointment() throws SQLException {
+    public static void testSchedulingNewAppointment() throws SQLException {
         Customer customer = new CustomerRepository().findSingle(customer1 -> customer1.getId() == 6);
         AppointmentLocation location = AppointmentLocation.PHOENIX;
         LocalDate appointmentDate = LocalDate.now(location.getTimeZoneId());
@@ -70,7 +71,7 @@ public class Main extends Application{
                 AppointmentType.INITIAL_CONSULT,
                 "this is a description",
                 AppointmentLocation.PHOENIX,
-                session.getLoggedInUser().getUserName(),
+                "test",
                 "URL test",
                 ZonedDateTime.of(appointmentDate, appointmentStartTime, location.getTimeZoneId()),
                 ZonedDateTime.of(appointmentDate, appointmentEndTime, location.getTimeZoneId()),

@@ -9,10 +9,11 @@ public class Dialog {
         alert = new Alert(type);
     }
 
-    public Dialog(Alert.AlertType type, String title, String message) {
+    public Dialog(Alert.AlertType type, String title, String header, String message) {
         alert = new Alert(type);
         setTitle(title);
         setMessage(message);
+        setHeaderText(header);
     }
 
     public void setTitle(String title) {
@@ -21,6 +22,10 @@ public class Dialog {
 
     public void setMessage(String message) {
         alert.setContentText(message);
+    }
+
+    public void setHeaderText(String message) {
+        alert.setHeaderText(message);
     }
 
     public void showDialog(boolean wait) {

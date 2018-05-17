@@ -1,14 +1,14 @@
 package com.clstephenson.controller;
 
-import com.clstephenson.AppConfiguration;
-import com.clstephenson.Localization;
-import com.clstephenson.Main;
+import com.clstephenson.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 
 public class MainController {
 
@@ -26,11 +26,32 @@ public class MainController {
         }
         Scene scene = new Scene(root, 300, 300);
         Stage loginStage = new Stage();
-        loginStage.setTitle("Scheduling Application"); //todo localize the title
+        loginStage.setTitle(Localization.getString("ui.application.title"));
         loginStage.setResizable(false);
         loginStage.setScene(scene);
         while(Main.session == null || !Main.session.isLoggedIn()) {
             loginStage.showAndWait();
         }
+        try {
+            Main.testSchedulingNewAppointment();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        showUserAppointmentsDialog();
+    }
+
+    private void showUserAppointmentsDialog() {
+        String title = Localization.getString("ui.dialog.upcomingappointments");
+        StringBuilder message = new StringBuilder();
+        for(Appointment appt : Main.session.getLoggedInUser().getUserAppointmentsNextFifteenMinutes()) {
+            message.append(appt.toString());
+        }
+        String header;
+        if(message.length() == 0) {
+            header = Localization.getString("ui.dialog.upcomingappointmentsnone");
+        } else {
+            header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
+        }
+        new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
     }
 }

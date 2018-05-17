@@ -1,5 +1,9 @@
 package com.clstephenson;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String userName;
     private int id;
@@ -55,6 +59,17 @@ public class User {
 
     public boolean hasId() {
         return this.id > 0;
+    }
+
+    public List<Appointment> getUserAppointmentsNextFifteenMinutes() {
+        List<Appointment> appointments = new ArrayList<>();
+        try {
+            appointments = ScheduleManager.getUserAppointmentsNextFifteenMinutes(getUserName());
+            return appointments;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exceptions
+        }
     }
 
     public String toString() {
