@@ -84,12 +84,13 @@ public class ScheduleManager {
         return false;
     }
 
-    public static List<Appointment> getUserAppointmentsNextFifteenMinutes(String username) throws SQLException {
-        ZonedDateTime fifteenMinutesFromNow = ZonedDateTime.now().plusMinutes(15);
-        List<Appointment> userAppointmentsNextFifteenMinutes = new AppointmentRepository().find(
+    public static List<Appointment> getUserAppointmentsStartingSoon(String username, int startsWithinMinutes)
+            throws SQLException {
+        ZonedDateTime nowPlusMinutes = ZonedDateTime.now().plusMinutes(startsWithinMinutes);
+        List<Appointment> appointments = new AppointmentRepository().find(
                 a -> a.getConsultant().equals(username) &&
-                            (a.getStart().isAfter(ZonedDateTime.now()) && a.getStart().isBefore(fifteenMinutesFromNow))
+                            (a.getStart().isAfter(ZonedDateTime.now()) && a.getStart().isBefore(nowPlusMinutes))
         );
-        return userAppointmentsNextFifteenMinutes;
+        return appointments;
     }
 }

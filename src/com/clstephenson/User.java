@@ -61,10 +61,11 @@ public class User {
         return this.id > 0;
     }
 
-    public List<Appointment> getUserAppointmentsNextFifteenMinutes() {
+    public List<Appointment> getAppointmentsNextFifteenMinutes() {
         List<Appointment> appointments = new ArrayList<>();
+        final int startTimeframe = 15;
         try {
-            appointments = ScheduleManager.getUserAppointmentsNextFifteenMinutes(getUserName());
+            appointments = ScheduleManager.getUserAppointmentsStartingSoon(getUserName(), startTimeframe);
             return appointments;
         } catch (SQLException e) {
             throw new RuntimeException(e);

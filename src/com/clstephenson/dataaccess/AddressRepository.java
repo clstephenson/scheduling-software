@@ -64,7 +64,7 @@ public class AddressRepository implements Repository<Address> {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            String message = Localization.getString("error.db.removingadress") + " = " + id;
+            String message = Localization.getString("error.db.removingaddress") + " = " + id;
             throw new SQLException(message, e);
         }
     }

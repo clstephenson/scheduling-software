@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 
 public class MainController {
 
@@ -32,18 +31,18 @@ public class MainController {
         while(Main.session == null || !Main.session.isLoggedIn()) {
             loginStage.showAndWait();
         }
-        try {
-            Main.testSchedulingNewAppointment();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Main.testSchedulingNewAppointment();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
         showUserAppointmentsDialog();
     }
 
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-        for(Appointment appt : Main.session.getLoggedInUser().getUserAppointmentsNextFifteenMinutes()) {
+        for(Appointment appt : Main.session.getLoggedInUser().getAppointmentsNextFifteenMinutes()) {
             message.append(appt.toString());
         }
         String header;

@@ -1,6 +1,5 @@
 package com.clstephenson;
 
-import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,17 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.*;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class Main extends Application{
 
@@ -31,7 +23,7 @@ public class Main extends Application{
         System.out.println("Current Date/Time: " + ZonedDateTime.now());
 
         List<Appointment> appointmentsNextFifteenMinutes =
-                ScheduleManager.getUserAppointmentsNextFifteenMinutes("test");
+                ScheduleManager.getUserAppointmentsStartingSoon("test", 15);
         System.out.println("**Appointments in next 15 minutes**");
         appointmentsNextFifteenMinutes.stream().forEach(System.out::println);
         System.out.println("**End of upcoming appointments**");
