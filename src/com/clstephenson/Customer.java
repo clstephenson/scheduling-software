@@ -1,63 +1,68 @@
 package com.clstephenson;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Customer {
-    private int id;
-    private String name;
-    private Address address;
-    private boolean isActive;
+    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private SimpleStringProperty name = new SimpleStringProperty(this, "name");
+    private SimpleObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
+    private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
     public Customer() {}
 
     public Customer(String name, Address address, boolean isActive) {
-        this.name = name;
-        this.address = address;
-        this.isActive = isActive;
+        this.name.set(name);
+        this.address.set(address);
+        this.isActive.set(isActive);
     }
 
     public Customer(int id, String name, Address address, boolean isActive) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.isActive = isActive;
+        this.id.set(id);
+        this.name.set(name);
+        this.address.set(address);
+        this.isActive.set(isActive);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public Address getAddress() {
-        return address;
+        return address.get();
     }
 
     public void setAddress(Address address) {
-        this.address = address;
+        this.address.set(address);
     }
 
     public boolean isActive() {
-        return isActive;
+        return isActive.get();
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        isActive.set(active);
     }
 
     public boolean hasId() {
-        return this.id > 0;
+        return this.id.get() > 0;
     }
 
     public String toString() {
-        return String.format("[%d, %s, %s]", this.id, this.name, this.address);
+        return String.format("[%d, %s, %s]", this.id.get(), this.name.get(), this.address.get());
     }
 }

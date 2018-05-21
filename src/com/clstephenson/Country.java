@@ -1,41 +1,44 @@
 package com.clstephenson;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Country {
-    private int id;
-    private String name;
+    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private SimpleStringProperty name = new SimpleStringProperty(this, "name");
 
     public Country() {}
 
     public Country(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public Country(int id, String name) {
-        this.id = id;
-        this.name = name;
+        this.id.set(id);
+        this.name.set(name);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public boolean hasId() {
-        return this.id > 0;
+        return this.id.get() > 0;
     }
 
     public String toString() {
-        return String.format("[%d, %s]", this.id, this.name);
+        return String.format("[%d, %s]", this.id.get(), this.name.get());
     }
 }
