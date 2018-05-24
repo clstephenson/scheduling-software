@@ -9,15 +9,15 @@ public class DateTimeUtil {
     private static String sqlDateTimeFormatString = "YYYY-MM-d HH:mm:s";
 
     public static String getDateTimeForSQL() {
-        return ZonedDateTime.now().format(getFormatter());
+        return LocalDateTime.now().format(getFormatter());
     }
 
-    public static String getDateTimeForSQL(ZonedDateTime zonedDateTime) {
-        return zonedDateTime.format(getFormatter());
+    public static String getDateTimeForSQL(LocalDateTime localDateTime) {
+        return localDateTime.format(getFormatter());
     }
 
-    public static ZonedDateTime getZonedDateTimeFromSQLTimestamp(Timestamp timestamp) {
-        return ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+    public static LocalDateTime getZonedDateTimeFromSQLTimestamp(Timestamp timestamp) {
+        return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
     }
 
     private static DateTimeFormatter getFormatter() {

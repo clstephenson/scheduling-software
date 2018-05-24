@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.*;
@@ -27,8 +26,6 @@ public class Main extends Application{
         System.out.println("**Appointments in next 15 minutes**");
         appointmentsNextFifteenMinutes.stream().forEach(System.out::println);
         System.out.println("**End of upcoming appointments**");
-
-
 
         launch(args);
         //testSchedulingNewAppointment();
@@ -65,8 +62,8 @@ public class Main extends Application{
                 AppointmentLocation.PHOENIX,
                 "test",
                 "URL test",
-                ZonedDateTime.of(appointmentDate, appointmentStartTime, location.getTimeZoneId()),
-                ZonedDateTime.of(appointmentDate, appointmentEndTime, location.getTimeZoneId()),
+                LocalDateTime.of(appointmentDate, appointmentStartTime),
+                LocalDateTime.of(appointmentDate, appointmentEndTime),
                 session
         );
         System.out.println("Created Appointment: " + newAppointment);

@@ -10,8 +10,9 @@ import java.util.List;
 public class ScheduleManager {
 
     public static Appointment scheduleAppointment(Customer customer, AppointmentType type, String description,
-                                           AppointmentLocation location, String consultant, String url,
-                                           ZonedDateTime start, ZonedDateTime end, LoginSession session)  throws SQLException {
+                                                  AppointmentLocation location, String consultant, String url,
+                                                  LocalDateTime start, LocalDateTime end, LoginSession session)
+            throws SQLException {
         if(isAppointmentOverlapping(consultant, start, end)) {
             //todo throw custom exception
             //throw new RuntimeException("need custom exception here");
@@ -42,7 +43,7 @@ public class ScheduleManager {
         }
     }
 
-    private static boolean isAppointmentOutsideBusinessHours(ZonedDateTime start, ZonedDateTime end,
+    private static boolean isAppointmentOutsideBusinessHours(LocalDateTime start, LocalDateTime end,
                                                              AppointmentLocation location) {
         // conditions for outside business hours
         // start time OR end time not between business.hours.start and business.hours.end
@@ -57,7 +58,7 @@ public class ScheduleManager {
         }
     }
 
-    private static boolean isAppointmentOverlapping(String consultant, ZonedDateTime start, ZonedDateTime end)
+    private static boolean isAppointmentOverlapping(String consultant, LocalDateTime start, LocalDateTime end)
             throws SQLException {
         AppointmentRepository appointmentRepository = new AppointmentRepository();
         List<Appointment> consultantAppointments = appointmentRepository.find(
@@ -86,10 +87,10 @@ public class ScheduleManager {
 
     public static List<Appointment> getUserAppointmentsStartingSoon(String username, int startsWithinMinutes)
             throws SQLException {
-        ZonedDateTime nowPlusMinutes = ZonedDateTime.now().plusMinutes(startsWithinMinutes);
+        LocalDateTime nowPlusMinutes = LocalDateTime.now().plusMinutes(startsWithinMinutes);
         List<Appointment> appointments = new AppointmentRepository().find(
                 a -> a.getConsultant().equals(username) &&
-                            (a.getStart().isAfter(ZonedDateTime.now()) && a.getStart().isBefore(nowPlusMinutes))
+                            (a.getStart().isAfter(LocalDateTime.now()) && a.getStart().isBefore(nowPlusMinutes))
         );
         return appointments;
     }

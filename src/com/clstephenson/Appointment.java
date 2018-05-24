@@ -1,26 +1,24 @@
 package com.clstephenson;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 public class Appointment {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
-    private SimpleObjectProperty<Customer> customer = new SimpleObjectProperty<>(this, "customer");
-    private SimpleObjectProperty<AppointmentType> appointmentType = new SimpleObjectProperty<>(this, "appointmentType"); //using title column in db
-    private SimpleStringProperty description = new SimpleStringProperty(this, "description");
-    private SimpleObjectProperty<AppointmentLocation> appointmentLocation = new SimpleObjectProperty<>(this, "appointmentLocation");
-    private SimpleStringProperty consultant = new SimpleStringProperty(this, "consultant"); //using contact column in db
-    private SimpleStringProperty url = new SimpleStringProperty(this, "url");
-    private SimpleObjectProperty<ZonedDateTime> start = new SimpleObjectProperty<>(this, "start");
-    private SimpleObjectProperty<ZonedDateTime> end = new SimpleObjectProperty<>(this, "end");
+    private IntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private ObjectProperty<Customer> customer = new SimpleObjectProperty<>(this, "customer");
+    private ObjectProperty<AppointmentType> appointmentType = new SimpleObjectProperty<>(this, "appointmentType"); //using title column in db
+    private StringProperty description = new SimpleStringProperty(this, "description");
+    private ObjectProperty<AppointmentLocation> appointmentLocation = new SimpleObjectProperty<>(this, "appointmentLocation");
+    private StringProperty consultant = new SimpleStringProperty(this, "consultant"); //using contact column in db
+    private StringProperty url = new SimpleStringProperty(this, "url");
+    private ObjectProperty<LocalDateTime> start = new SimpleObjectProperty<>(this, "start");
+    private ObjectProperty<LocalDateTime> end = new SimpleObjectProperty<>(this, "end");
 
     public Appointment() {}
 
     public Appointment(Customer customer, AppointmentType type, String description, AppointmentLocation location,
-                       String consultant, String url, ZonedDateTime start, ZonedDateTime end) {
+                       String consultant, String url, LocalDateTime start, LocalDateTime end) {
         this.customer.set(customer);
         this.appointmentType.set(type);
         this.description.set(description);
@@ -32,7 +30,7 @@ public class Appointment {
     }
 
     public Appointment(int id, Customer customer, AppointmentType type, String description, AppointmentLocation location,
-                       String consultant, String url, ZonedDateTime start, ZonedDateTime end) {
+                       String consultant, String url, LocalDateTime start, LocalDateTime end) {
         this.id.set(id);
         this.customer.set(customer);
         this.appointmentType.set(type);
@@ -44,12 +42,20 @@ public class Appointment {
         this.end.set(end);
     }
 
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
     public int getId() {
         return id.get();
     }
 
     public void setId(int id) {
         this.id.set(id);
+    }
+
+    public ObjectProperty<Customer> customerProperty() {
+        return customer;
     }
 
     public Customer getCustomer() {
@@ -60,12 +66,20 @@ public class Appointment {
         this.customer.set(customer);
     }
 
+    public ObjectProperty<AppointmentType> appointmentTypeProperty() {
+        return appointmentType;
+    }
+
     public AppointmentType getAppointmentType() {
         return appointmentType.get();
     }
 
     public void setAppointmentType(AppointmentType type) {
         this.appointmentType.set(type);
+    }
+
+    public StringProperty descriptionProperty() {
+        return description;
     }
 
     public String getDescription() {
@@ -76,12 +90,20 @@ public class Appointment {
         this.description.set(description);
     }
 
+    public ObjectProperty<AppointmentLocation> appointmentLocationProperty() {
+        return appointmentLocation;
+    }
+
     public AppointmentLocation getAppointmentLocation() {
         return appointmentLocation.get();
     }
 
     public void setAppointmentLocation(AppointmentLocation location) {
         this.appointmentLocation.set(location);
+    }
+
+    public StringProperty consultantProperty() {
+        return consultant;
     }
 
     public String getConsultant() {
@@ -92,6 +114,10 @@ public class Appointment {
         this.consultant.set(consultant);
     }
 
+    public StringProperty urlProperty() {
+        return url;
+    }
+
     public String getUrl() {
         return url.get();
     }
@@ -100,19 +126,27 @@ public class Appointment {
         this.url.set(url);
     }
 
-    public ZonedDateTime getStart() {
+    public ObjectProperty<LocalDateTime> startProperty() {
+        return start;
+    }
+
+    public LocalDateTime getStart() {
         return start.get();
     }
 
-    public void setStart(ZonedDateTime start) {
+    public void setStart(LocalDateTime start) {
         this.start.set(start);
     }
 
-    public ZonedDateTime getEnd() {
+    public ObjectProperty<LocalDateTime> endProperty() {
+        return end;
+    }
+
+    public LocalDateTime getEnd() {
         return end.get();
     }
 
-    public void setEnd(ZonedDateTime end) {
+    public void setEnd(LocalDateTime end) {
         this.end.set(end);
     }
 
