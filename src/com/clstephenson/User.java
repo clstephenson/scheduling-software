@@ -1,8 +1,11 @@
 package com.clstephenson;
 
+import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ public class User {
     private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
     private SimpleStringProperty password = new SimpleStringProperty(this, "password");
     private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
+
+    private ObservableList<Appointment> userAppointments;
 
     public User() {}
 
@@ -63,6 +68,18 @@ public class User {
 
     public boolean hasId() {
         return this.id.get() > 0;
+    }
+
+    public ObservableList<Appointment> getUserAppointments() {
+        try {
+            userAppointments = FXCollections.observableArrayList(
+                    new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //todo fix exception
+        }
+        return userAppointments;
     }
 
     public List<Appointment> getAppointmentsNextFifteenMinutes() {
