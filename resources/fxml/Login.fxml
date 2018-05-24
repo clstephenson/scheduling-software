@@ -41,8 +41,8 @@
             <Label id="loginFormErrorDescription" fx:id="loginErrorDescriptionLabel" focusTraversable="false" layoutX="10.0" layoutY="268.0" styleClass="formFieldLabel" text="%ui.login.verifycredentials" />
             <ButtonBar prefHeight="40.0" prefWidth="200.0">
               <buttons>
-                  <Button id="loginFormLoginButton" fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginButtonClicked" styleClass="formButton" text="%ui.login.login" />
-                  <Button id="loginFormExitButton" fx:id="exitButton" mnemonicParsing="false" onAction="#handleExitButtonClicked" styleClass="formButton" text="%ui.exit" />
+                  <Button id="loginFormLoginButton" fx:id="loginButton" mnemonicParsing="false" styleClass="formButton" text="%ui.login.login" />
+                  <Button id="loginFormExitButton" fx:id="exitButton" mnemonicParsing="false" styleClass="formButton" text="%ui.exit" />
               </buttons>
             </ButtonBar>
          </children>

@@ -1,14 +1,11 @@
 package com.clstephenson.controller;
 
 import com.clstephenson.*;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import java.security.AccessControlException;
 
@@ -35,32 +32,30 @@ public class LoginController {
     private Label loginErrorDescriptionLabel;
 
     @FXML
-    void handleExitButtonClicked(ActionEvent event) {
-        System.exit(0);
+    private void initialize() {
+        loginErrorTitleLabel.setVisible(false);
+        loginErrorDescriptionLabel.setVisible(false);
+        setUpEventHandlers();
     }
 
-    @FXML
-    void handleLoginButtonClicked(ActionEvent event) {
+    private void setUpEventHandlers() {
+        exitButton.setOnAction(event -> FXHelper.exitApplication());
+        loginButton.setOnAction(event -> login());
+    }
+
+    void login() {
         String username = usernameField.getText();
         String password = passwordField.getText();
-        Node srcNode = (Node)event.getSource();
-        Stage srcStage = (Stage)srcNode.getScene().getWindow();
+        //Stage srcStage = FXHelper.getStageFromActionEvent(event);
         try {
             Main.session = new LoginSession(username, password);
             if(Main.session.isLoggedIn()) {
-                srcStage.close();
+                FXHelper.getStageFromNode(usernameField).close();
             }
         } catch (AccessControlException e) {
             loginErrorTitleLabel.setVisible(true);
             loginErrorDescriptionLabel.setVisible(true);
         }
-
-    }
-
-    @FXML
-    private void initialize() {
-        loginErrorTitleLabel.setVisible(false);
-        loginErrorDescriptionLabel.setVisible(false);
     }
 
 }
