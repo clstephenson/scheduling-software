@@ -63,6 +63,6 @@ public class Customer {
     }
 
     public String toString() {
-        return String.format("[%d, %s, %s]", this.id.get(), this.name.get(), this.address.get());
+        return getName();
     }
 }
