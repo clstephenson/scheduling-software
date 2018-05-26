@@ -125,8 +125,8 @@ public class MainController {
         dateColumn = new TableColumn<>("Date");
         startColumn = new TableColumn<>("Start");
         endColumn = new TableColumn<>("End");
-        appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn, descriptionColumn,
-                locationColumn, /*consultantColumn,*/ urlColumn);
+        appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn,
+                descriptionColumn, locationColumn, /*consultantColumn,*/ urlColumn);
     }
 
     private void setupTableCellDataBindings() {
@@ -177,7 +177,8 @@ public class MainController {
                     if(newValue != null) populateDetailsForm(newValue);
                 })
         );
-        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue));
+        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
+        revertButton.setOnAction(event -> populateDetailsForm(appointmentTable.getSelectionModel().getSelectedItem()));
     }
 
     private void initializeDetailsFields() {
@@ -201,17 +202,6 @@ public class MainController {
         endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
     }
 
-    private void populateAppointments() {
-        ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
-        if(allUserAppointments.isEmpty()) {
-            //todo message about no appointments for user
-            System.out.println("allUserAppointments is empty...");
-        } else {
-            appointmentTable.setItems(allUserAppointments);
-            appointmentTable.getSelectionModel().select(0);
-        }
-    }
-
     private void requestUserLogin() {
         Parent root = getLoginParent();
         Stage loginStage = getLoginStage(root);
@@ -229,6 +219,17 @@ public class MainController {
             statusLabel.setText(String.format("Logged in as:  %s", username));
         } else {
             statusLabel.setText("Not logged in");
+        }
+    }
+
+    private void populateAppointments() {
+        ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
+        if(allUserAppointments.isEmpty()) {
+            //todo message about no appointments for user
+            System.out.println("allUserAppointments is empty...");
+        } else {
+            appointmentTable.setItems(allUserAppointments);
+            appointmentTable.getSelectionModel().select(0);
         }
     }
 
