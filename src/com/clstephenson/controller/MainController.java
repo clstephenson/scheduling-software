@@ -2,14 +2,16 @@ package com.clstephenson.controller;
 
 import com.clstephenson.*;
 import com.clstephenson.Dialog;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -37,10 +39,47 @@ public class MainController {
     private MenuItem menuItemCurrentWeek;
 
     @FXML
-    private TableView<Appointment> monthTableView;
+    private DatePicker dateInput;
+
+    @FXML
+    private TextField startInput;
+
+    @FXML
+    private TextField endInput;
+
+    @FXML
+    private ComboBox<Customer> customerInput;
+
+    @FXML
+    private ChoiceBox<AppointmentLocation> locationInput;
+
+    @FXML
+    private ChoiceBox<AppointmentType> typeInput;
+
+    @FXML
+    private TextArea descriptionInput;
+
+    @FXML
+    private TextField urlInput;
+
+    @FXML
+    private TableView<Appointment> appointmentTable;
 
     @FXML
     private Label statusLabel;
+
+    @FXML
+    private Button revertButton;
+
+    @FXML
+    private Button saveButton;
+
+    @FXML
+    private Button newAppointmentButton;
+
+    @FXML
+    private Button newCustomerButton;
+
 
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
@@ -52,9 +91,13 @@ public class MainController {
     private TableColumn<Appointment, LocalDateTime> startColumn;
     private TableColumn<Appointment, LocalDateTime> endColumn;
 
+    private Customers customers;
+
     @FXML
     private void initialize() throws SQLException {
+        customers = new Customers();
         setUpAppointmentsTableView();
+        initializeDetailsFields();
         setUpEventHandlers();
         requestUserLogin();
 //        try {
@@ -62,8 +105,6 @@ public class MainController {
 //        } catch (SQLException e) {
 //            throw new RuntimeException(e);
 //        }
-        showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
-        populateAppointments();
     }
 
     private void setUpAppointmentsTableView() {
@@ -84,7 +125,7 @@ public class MainController {
         dateColumn = new TableColumn<>("Date");
         startColumn = new TableColumn<>("Start");
         endColumn = new TableColumn<>("End");
-        monthTableView.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn, descriptionColumn,
+        appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn, descriptionColumn,
                 locationColumn, /*consultantColumn,*/ urlColumn);
     }
 
@@ -122,7 +163,7 @@ public class MainController {
                 if(empty) {
                     setText(null);
                 } else {
-                    setText(item.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)));
+                    setText(item.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
                 }
             }
         });
@@ -130,16 +171,44 @@ public class MainController {
 
     private void setUpEventHandlers() {
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
-        menuItemLogout.setOnAction(event -> {throw new NotImplementedException();});
+        menuItemLogout.setOnAction(event -> handleLogout());
+        appointmentTable.getSelectionModel().selectedItemProperty().addListener(
+                ((observable, oldValue, newValue) -> {
+                    if(newValue != null) populateDetailsForm(newValue);
+                })
+        );
+        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue));
     }
 
-    private void populateAppointments() throws SQLException {
+    private void initializeDetailsFields() {
+        try {
+            customerInput.setItems(customers.getCustomers());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
+        typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
+    }
+
+    private void populateDetailsForm(Appointment appt) {
+        customerInput.setValue(appt.getCustomer());
+        descriptionInput.setText(appt.getDescription());
+        urlInput.setText(appt.getUrl());
+        typeInput.setValue(appt.getAppointmentType());
+        locationInput.setValue(appt.getAppointmentLocation());
+        dateInput.setValue(appt.getStart().toLocalDate());
+        startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
+        endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
+    }
+
+    private void populateAppointments() {
         ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
         if(allUserAppointments.isEmpty()) {
             //todo message about no appointments for user
             System.out.println("allUserAppointments is empty...");
         } else {
-            monthTableView.setItems(allUserAppointments);
+            appointmentTable.setItems(allUserAppointments);
+            appointmentTable.getSelectionModel().select(0);
         }
     }
 
@@ -150,6 +219,9 @@ public class MainController {
             loginStage.showAndWait();
         }
         updateStatusLabel(LoginSessionHelper.getUsername());
+        enableLogoutMenuItem();
+        showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
+        populateAppointments();
     }
 
     private void updateStatusLabel(String username) {
@@ -175,13 +247,36 @@ public class MainController {
     }
 
     private Stage getLoginStage(Parent root) {
-        Scene scene = new Scene(root, 300, 300);
+        final int LOGIN_FORM_WIDTH = 300;
+        final int LOGIN_FORM_HEIGHT = 200;
+        Scene scene = new Scene(root, LOGIN_FORM_WIDTH, LOGIN_FORM_HEIGHT);
         Stage loginStage = new Stage();
         loginStage.setTitle(Localization.getString("ui.application.title"));
         loginStage.setResizable(false);
+        loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setScene(scene);
         loginStage.setOnCloseRequest(event -> FXHelper.exitApplication());
         return loginStage;
+    }
+
+    private void handleLogout() {
+        try {
+            LoginSessionHelper.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        clearData();
+        disableLogoutMenuItem();
+        updateStatusLabel("");
+        requestUserLogin();
+    }
+
+    private void enableLogoutMenuItem() {
+        menuItemLogout.setDisable(false);
+    }
+
+    private void disableLogoutMenuItem() {
+        menuItemLogout.setDisable(true);
     }
 
     private void showUserAppointmentsDialog() {
@@ -198,4 +293,10 @@ public class MainController {
         }
         new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
     }
+
+    private void clearData() {
+        appointmentTable.setItems(FXCollections.observableArrayList());
+        initializeDetailsFields();
+    }
+
 }

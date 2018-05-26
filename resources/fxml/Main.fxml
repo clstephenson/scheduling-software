@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -8,10 +13,15 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
@@ -72,29 +82,122 @@
 
       </menus>
     </MenuBar>
-    <SplitPane dividerPositions="0.6370235934664247" focusTraversable="true" orientation="VERTICAL" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.5517241379310345" focusTraversable="true" orientation="VERTICAL" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-      <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0">
+      <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" SplitPane.resizableWithParent="false">
         <children>
                   <VBox layoutX="14.0" layoutY="14.0" prefHeight="551.0" prefWidth="728.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                <Label alignment="CENTER" style="&#10;" text="Appointment List" textAlignment="CENTER" wrapText="false">
-                           <font>
-                      <Font size="18.0" fx:id="x1" />
-                           </font>
-                           <textFill>
-                      <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
-                           </textFill></Label>
-                        <TableView fx:id="monthTableView" />
+                        <HBox>
+                           <children>
+                      <Label alignment="CENTER" style="&#10;" text="Appointment List" textAlignment="CENTER" wrapText="false">
+                                 <font>
+                            <Font size="18.0" fx:id="x1" />
+                                 </font>
+                                 <textFill>
+                            <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
+                                 </textFill>
+                              </Label>
+                           </children>
+                           <padding>
+                              <Insets left="15.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="appointmentTable" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
         </children>
       </AnchorPane>
-        <AnchorPane>
+        <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="250.0" SplitPane.resizableWithParent="false">
           <children>
-                  <VBox layoutX="14.0" layoutY="14.0">
+                  <VBox layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                  <Label alignment="CENTER" font="$x1" style="&#10;" text="Appointment Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                        <HBox>
+                           <children>
+                        <Label alignment="CENTER" font="$x1" style="&#10;" text="Appointment Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                           </children>
+                           <padding>
+                              <Insets left="15.0" />
+                           </padding>
+                        </HBox>
+                        <GridPane vgap="5.0" VBox.vgrow="NEVER">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="225.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                 <children>
+                                    <Label text="Date" />
+                                    <DatePicker fx:id="dateInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Start Time" />
+                                    <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="2">
+                                 <children>
+                                    <Label text="End Time" />
+                                    <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1">
+                                 <children>
+                                    <Label text="Customer" />
+                                    <ComboBox fx:id="customerInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="250.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Location" />
+                                    <ChoiceBox fx:id="locationInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="250.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <children>
+                                    <Label text="Type" />
+                                    <ChoiceBox fx:id="typeInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="250.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <children>
+                                    <Label text="URL" />
+                                    <TextField fx:id="urlInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="250.0" />
+                                 </children>
+                              </HBox>
+                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="2" GridPane.rowSpan="2147483647">
+                                   <children>
+                                       <Label alignment="CENTER_RIGHT" text="Description" />
+                                       <TextArea fx:id="descriptionInput" minHeight="-Infinity" prefHeight="125.0" prefWidth="250.0">
+                                             </TextArea>
+                                   </children>
+                               </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </GridPane>
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                          <buttons>
+                            <Button fx:id="revertButton" mnemonicParsing="false" text="Revert Changes" />
+                              <Button fx:id="saveButton" layoutX="1033.0" layoutY="18.0" mnemonicParsing="false" text="Save" />
+                              <Button fx:id="newAppointmentButton" layoutX="1033.0" layoutY="18.0" mnemonicParsing="false" text="New Appointment" />
+                              <Button fx:id="newCustomerButton" layoutX="974.0" layoutY="18.0" mnemonicParsing="false" text="New Customer" />
+                          </buttons>
+                           <padding>
+                              <Insets right="20.0" />
+                           </padding>
+                        </ButtonBar>
                      </children>
                   </VBox>
           </children>
