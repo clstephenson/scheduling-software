@@ -58,6 +58,24 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
+    public boolean update(Address address, LoginSession session) throws SQLException {
+        String sql = "UPDATE address set address=?, address2=?, cityId=?, postalCode=?, phone=?, lastUpdateBy=? " +
+                "WHERE addressid=?";
+        try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, address.getAddressLine1());
+            statement.setString(2, address.getAddressLine2());
+            statement.setInt(3, address.getCity().getId());
+            statement.setString(4, address.getZipCode());
+            statement.setString(5, address.getPhoneNumber());
+            statement.setString(6, session.getLoggedInUser().getUserName());
+            statement.setInt(7, address.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new SQLException(Localization.getString("error.db.updatingaddress"), e);
+        }
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         String sql = "DELETE FROM address WHERE addressid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {

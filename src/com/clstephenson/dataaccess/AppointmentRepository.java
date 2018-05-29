@@ -59,6 +59,27 @@ public class AppointmentRepository implements Repository<Appointment> {
     }
 
     @Override
+    public boolean update(Appointment appointment, LoginSession session) throws SQLException {
+        String sql = "UPDATE appointment set customerId=?, title=?, description=?, location=?, contact=?, url=?," +
+                "start=?, end=?, lastUpdateBy=? WHERE appointmentid=?";
+        try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setInt(1, appointment.getCustomer().getId());
+            statement.setString(2, appointment.getAppointmentType().name());
+            statement.setString(3, appointment.getDescription());
+            statement.setString(4, appointment.getAppointmentLocation().name());
+            statement.setString(5, appointment.getConsultant());
+            statement.setString(6, appointment.getUrl());
+            statement.setObject(7, DateTimeUtil.getDateTimeForSQL(appointment.getStart()));
+            statement.setObject(8, DateTimeUtil.getDateTimeForSQL(appointment.getEnd()));
+            statement.setString(9, session.getLoggedInUser().getUserName());
+            statement.setInt(10, appointment.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new SQLException(Localization.getString("error.db.updatingappointment"), e);
+        }
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         String sql = "DELETE FROM appointment WHERE appointmentid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {

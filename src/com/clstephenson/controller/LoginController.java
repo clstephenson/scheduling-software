@@ -11,25 +11,12 @@ import java.security.AccessControlException;
 
 public class LoginController {
 
-    //private LoginSession session;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private TextField usernameField;
-
-    @FXML
-    private Button loginButton;
-
-    @FXML
-    private Button exitButton;
-
-    @FXML
-    private Label loginErrorTitleLabel;
-
-    @FXML
-    private Label loginErrorDescriptionLabel;
+    @FXML private PasswordField passwordField;
+    @FXML private TextField usernameField;
+    @FXML private Button loginButton;
+    @FXML private Button exitButton;
+    @FXML private Label loginErrorTitleLabel;
+    @FXML private Label loginErrorDescriptionLabel;
 
     @FXML
     private void initialize() {

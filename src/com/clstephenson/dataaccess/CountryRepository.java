@@ -41,6 +41,19 @@ public class CountryRepository implements Repository<Country> {
     }
 
     @Override
+    public boolean update(Country country, LoginSession session) throws SQLException {
+        String sql = "UPDATE country set country=?, lastUpdateBy=? WHERE countryid=?";
+        try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, country.getName());
+            statement.setString(2, session.getLoggedInUser().getUserName());
+            statement.setInt(3, country.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new SQLException(Localization.getString("error.db.updatingcountry"), e);
+        }
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         String sql = "DELETE FROM country WHERE countryid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {

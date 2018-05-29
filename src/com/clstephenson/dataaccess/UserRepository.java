@@ -44,6 +44,11 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
+    public boolean update(User entity, LoginSession session) throws SQLException {
+        return false;
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         String sql = "DELETE FROM user WHERE userid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {

@@ -114,7 +114,19 @@
                      <children>
                         <HBox>
                            <children>
-                        <Label alignment="CENTER" font="$x1" style="&#10;" text="Appointment Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                        <Label alignment="CENTER" font="$x1" style="&#10;" text="Appointment Details" textAlignment="CENTER" textFill="$x2" wrapText="false">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin></Label>
+                              <Pane HBox.hgrow="ALWAYS" />
+                              <Label fx:id="changeStatusLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="(changes not yet saved)" textAlignment="CENTER" textFill="RED" wrapText="false">
+                                 <font>
+                                    <Font size="16.0" fx:id="x11" />
+                                 </font>
+                                 <padding>
+                                    <Insets right="20.0" />
+                                 </padding>
+                              </Label>
                            </children>
                            <padding>
                               <Insets left="15.0" />
@@ -136,18 +148,18 @@
                               <HBox alignment="CENTER_RIGHT" spacing="20.0">
                                  <children>
                                     <Label text="Date" />
-                                    <DatePicker fx:id="dateInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                    <DatePicker fx:id="dateInput" editable="false" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Label text="Start Time" />
+                                    <Label text="Start Time (hh:mm)" />
                                     <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="2">
                                  <children>
-                                    <Label text="End Time" />
+                                    <Label text="End Time (hh:mm)" />
                                     <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
                                  </children>
                               </HBox>
@@ -187,12 +199,13 @@
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
                         </GridPane>
-                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                        <ButtonBar>
                           <buttons>
                             <Button fx:id="revertButton" mnemonicParsing="false" text="Revert Changes" />
                               <Button fx:id="saveButton" layoutX="1033.0" layoutY="18.0" mnemonicParsing="false" text="Save" />
                               <Button fx:id="newAppointmentButton" layoutX="1033.0" layoutY="18.0" mnemonicParsing="false" text="New Appointment" />
                               <Button fx:id="newCustomerButton" layoutX="974.0" layoutY="18.0" mnemonicParsing="false" text="New Customer" />
+                              <Button fx:id="editCustomerButton" layoutX="974.0" layoutY="18.0" mnemonicParsing="false" text="Customer Details" />
                           </buttons>
                            <padding>
                               <Insets right="20.0" />

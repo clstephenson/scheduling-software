@@ -7,10 +7,14 @@ public class LoginSessionHelper {
     }
 
     public static User getCurrentUser() {
-        return Main.session.getLoggedInUser();
+        return getSession().getLoggedInUser();
+    }
+
+    public static LoginSession getSession() {
+        return Main.session;
     }
 
     public static void logout() {
-        Main.session.logout();
+        getSession().logout();
     }
 }

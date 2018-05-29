@@ -54,6 +54,21 @@ public class CustomerRepository implements Repository<Customer> {
     }
 
     @Override
+    public boolean update(Customer customer, LoginSession session) throws SQLException {
+        String sql = "UPDATE customer set customerName=?, addressId=?, active=?, lastUpdateBy=? WHERE customerid=?";
+        try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, customer.getName());
+            statement.setInt(2, customer.getAddress().getId());
+            statement.setInt(3, customer.isActive() ? 1 : 0);
+            statement.setString(4, session.getLoggedInUser().getUserName());
+            statement.setInt(5, customer.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new SQLException(Localization.getString("error.db.updatingcustomer"), e);
+        }
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
             statement.setInt(1, id);

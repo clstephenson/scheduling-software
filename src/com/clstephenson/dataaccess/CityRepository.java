@@ -53,6 +53,20 @@ public class CityRepository implements Repository <City> {
     }
 
     @Override
+    public boolean update(City city, LoginSession session) throws SQLException {
+        String sql = "UPDATE city set city=?, countryId=?, lastUpdateBy=? WHERE cityid=?";
+        try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
+            statement.setString(1, city.getName());
+            statement.setInt(2, city.getCountry().getId());
+            statement.setString(3, session.getLoggedInUser().getUserName());
+            statement.setInt(4, city.getId());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new SQLException(Localization.getString("error.db.updatingcity"), e);
+        }
+    }
+
+    @Override
     public boolean removeById(int id) throws SQLException {
         String sql = "DELETE FROM city WHERE cityid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
