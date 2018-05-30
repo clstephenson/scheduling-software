@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Optional;
 
 public class MainController {
 
@@ -152,6 +153,8 @@ public class MainController {
         );
         revertButton.setOnAction(event -> populateDetailsForm(appointmentTable.getSelectionModel().getSelectedItem()));
         saveButton.setOnAction(event -> saveAppointment(appointmentTable.getSelectionModel().getSelectedItem()));
+        newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
+        editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
     }
 
@@ -243,6 +246,15 @@ public class MainController {
         enableLogoutMenuItem();
         showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
         populateAppointments();
+    }
+
+    private void requestCustomerDetails(boolean isNewCustomer) {
+        if(isNewCustomer) {
+            FXHelper.showCustomerDetails(null);
+        } else {
+            Customer customer = appointmentTable.getSelectionModel().getSelectedItem().getCustomer();
+            FXHelper.showCustomerDetails(customer);
+        }
     }
 
     private void updateStatusLabel(String username) {

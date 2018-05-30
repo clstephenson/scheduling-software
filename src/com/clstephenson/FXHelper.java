@@ -1,5 +1,6 @@
 package com.clstephenson;
 
+import com.clstephenson.controller.CustomerController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class FXHelper {
     public static Stage getStageFromActionEvent(ActionEvent event) {
@@ -45,7 +47,7 @@ public class FXHelper {
             //todo fix this exception
         }
         Stage loginStage = getLoginStage(root);
-        while(Main.session == null || !Main.session.isLoggedIn()) {
+        while(LoginSessionHelper.getSession() == null || !LoginSessionHelper.getSession().isLoggedIn()) {
             loginStage.showAndWait();
         }
     }
@@ -61,5 +63,35 @@ public class FXHelper {
         loginStage.setScene(scene);
         loginStage.setOnCloseRequest(event -> FXHelper.exitApplication());
         return loginStage;
+    }
+
+    public static void showCustomerDetails(Customer customer) {
+        Parent root;
+        try {
+            String fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Customer.fxml";
+            FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            loader.setResources(Localization.getResourceBundle());
+            root = loader.load();
+            if(customer != null) {
+                ((CustomerController)loader.getController()).initData(customer);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Could not load Customer.fxml", e);
+            //todo fix this exception
+        }
+        Stage customerStage = getCustomerStage(root);
+        customerStage.showAndWait();
+    }
+
+    private static Stage getCustomerStage(Parent root) {
+        final int CUSTOMER_FORM_WIDTH = 360;
+        final int CUSTOMER_FORM_HEIGHT = 400;
+        Scene scene = new Scene(root, CUSTOMER_FORM_WIDTH, CUSTOMER_FORM_HEIGHT);
+        Stage customerStage = new Stage();
+        customerStage.setTitle(Localization.getString("ui.application.title"));
+        customerStage.setResizable(false);
+        customerStage.initModality(Modality.APPLICATION_MODAL);
+        customerStage.setScene(scene);
+        return customerStage;
     }
 }
