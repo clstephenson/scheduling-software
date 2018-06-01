@@ -10,7 +10,6 @@ import java.sql.SQLException;
 public class Customers {
 
     private SimpleListProperty<Customer> customers;
-    //private ObservableList<Customer> customers = FXCollections.observableArrayList();
 
     public Customers() throws SQLException {
         customers = new SimpleListProperty<>(FXCollections.observableArrayList());

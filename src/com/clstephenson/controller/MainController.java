@@ -64,6 +64,11 @@ public class MainController {
     private boolean isNewSelection = false;
     private boolean isCustomerChanged = false;
 
+    /**
+     * public method is exposed to allow the CustomerController to specify whether the customer data
+     * has been saved/changed.
+     * @param isCustomerChanged
+     */
     public void setIsCustomerChanged(boolean isCustomerChanged) {
         this.isCustomerChanged = isCustomerChanged;
     }
@@ -75,11 +80,6 @@ public class MainController {
         initializeDetailsFields();
         setUpEventHandlers();
         requestUserLogin();
-//        try {
-//            Main.testSchedulingNewAppointment();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
     private void setUpAppointmentsTableView() {
@@ -114,34 +114,6 @@ public class MainController {
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endProperty());
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
-    }
-
-    private void formatDateCell(TableColumn column) {
-        column.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                if(empty) {
-                    setText(null);
-                } else {
-                    setText(item.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
-                }
-            }
-        });
-    }
-
-    private void formatTimeCell(TableColumn column) {
-        column.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                if(empty) {
-                    setText(null);
-                } else {
-                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
-                }
-            }
-        });
     }
 
     private void setUpEventHandlers() {
@@ -333,6 +305,34 @@ public class MainController {
     private void clearData() {
         appointmentTable.setItems(FXCollections.observableArrayList());
         initializeDetailsFields();
+    }
+
+    private void formatDateCell(TableColumn column) {
+        column.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText(null);
+                } else {
+                    setText(item.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
+                }
+            }
+        });
+    }
+
+    private void formatTimeCell(TableColumn column) {
+        column.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText(null);
+                } else {
+                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
+                }
+            }
+        });
     }
 
 }

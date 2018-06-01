@@ -31,7 +31,6 @@ public class FXHelper {
     }
 
     public static void exitApplication() {
-        System.out.println("close application requested...");
         Platform.exit();
         System.exit(0);
     }
