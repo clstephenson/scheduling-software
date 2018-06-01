@@ -1,11 +1,11 @@
 package com.clstephenson;
 
 import com.clstephenson.dataaccess.UserRepository;
+import com.clstephenson.datamodels.User;
 
 import java.io.IOException;
 import java.security.AccessControlException;
 import java.sql.SQLException;
-import java.util.List;
 
 public class LoginSession {
 

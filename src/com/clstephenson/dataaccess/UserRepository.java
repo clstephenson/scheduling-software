@@ -3,10 +3,8 @@ package com.clstephenson.dataaccess;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
-import com.clstephenson.User;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import com.clstephenson.datamodels.User;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

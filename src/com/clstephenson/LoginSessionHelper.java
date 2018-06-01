@@ -1,5 +1,7 @@
 package com.clstephenson;
 
+import com.clstephenson.datamodels.User;
+
 public class LoginSessionHelper {
 
     public static String getUsername() {

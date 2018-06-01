@@ -1,12 +1,9 @@
 package com.clstephenson.controller;
 
 import com.clstephenson.*;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import com.clstephenson.datamodels.Customer;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
-import java.security.AccessControlException;
 
 public class CustomerController {
 

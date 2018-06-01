@@ -3,26 +3,20 @@ package com.clstephenson.controller;
 import com.clstephenson.*;
 import com.clstephenson.Dialog;
 import com.clstephenson.dataaccess.AppointmentRepository;
-import com.clstephenson.dataaccess.CustomerRepository;
+import com.clstephenson.datamodels.Appointment;
+import com.clstephenson.datamodels.Customer;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Optional;
 
 public class MainController {
 

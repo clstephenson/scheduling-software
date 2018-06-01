@@ -1,6 +1,7 @@
 package com.clstephenson;
 
 import com.clstephenson.dataaccess.CustomerRepository;
+import com.clstephenson.datamodels.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,7 +15,6 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.*;
 import java.util.List;
-import java.util.Locale;
 
 public class Main extends Application{
 

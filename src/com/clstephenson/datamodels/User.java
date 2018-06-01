@@ -1,5 +1,6 @@
-package com.clstephenson;
+package com.clstephenson.datamodels;
 
+import com.clstephenson.ScheduleManager;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;

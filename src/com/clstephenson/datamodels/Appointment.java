@@ -1,10 +1,10 @@
-package com.clstephenson;
+package com.clstephenson.datamodels;
 
+import com.clstephenson.AppointmentLocation;
+import com.clstephenson.AppointmentType;
 import javafx.beans.property.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class Appointment {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");

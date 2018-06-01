@@ -2,6 +2,7 @@ package com.clstephenson;
 
 import com.clstephenson.controller.CustomerController;
 import com.clstephenson.controller.MainController;
+import com.clstephenson.datamodels.Customer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.nio.file.Paths;
-import java.util.Optional;
 
 public class FXHelper {
     public static Stage getStageFromActionEvent(ActionEvent event) {

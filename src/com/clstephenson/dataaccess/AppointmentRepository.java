@@ -1,8 +1,9 @@
 package com.clstephenson.dataaccess;
 
 import com.clstephenson.*;
+import com.clstephenson.datamodels.Appointment;
+import com.clstephenson.datamodels.Customer;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.clstephenson;
+package com.clstephenson.datamodels;
 
 import javafx.beans.property.*;
 

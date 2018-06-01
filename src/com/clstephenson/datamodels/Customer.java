@@ -1,5 +1,6 @@
-package com.clstephenson;
+package com.clstephenson.datamodels;
 
+import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.beans.property.*;
 

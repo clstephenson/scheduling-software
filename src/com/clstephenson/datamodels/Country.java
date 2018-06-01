@@ -1,25 +1,23 @@
-package com.clstephenson;
+package com.clstephenson.datamodels;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
-public class City {
+public class Country {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
-    private ObjectProperty<Country> country = new SimpleObjectProperty<>(this, "country");
 
-    public City() {
-        this.country.set(new Country());
-    }
+    public Country() {}
 
-    public City(String name, Country country) {
+    public Country(String name) {
         this.name.set(name);
-        this.country.set(country);
     }
 
-    public City(int id, String name, Country country) {
+    public Country(int id, String name) {
         this.id.set(id);
         this.name.set(name);
-        this.country.set(country);
     }
 
     public IntegerProperty idProperty() {
@@ -28,10 +26,6 @@ public class City {
 
     public StringProperty nameProperty() {
         return name;
-    }
-
-    public ObjectProperty<Country> countryProperty() {
-        return country;
     }
 
     public int getId() {
@@ -50,19 +44,11 @@ public class City {
         this.name.set(name);
     }
 
-    public Country getCountry() {
-        return country.get();
-    }
-
-    public void setCountry(Country country) {
-        this.country.set(country);
-    }
-
     public boolean hasId() {
         return this.id.get() > 0;
     }
 
     public String toString() {
-        return String.format("[%d, %s, %s]", this.id.get(), this.name.get(), this.country.get());
+        return String.format("[%d, %s]", this.id.get(), this.name.get());
     }
 }
