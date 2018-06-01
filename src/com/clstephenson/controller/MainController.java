@@ -62,6 +62,11 @@ public class MainController {
     private Customers customers;
     private boolean isDirtyAppointmentDetails = false;
     private boolean isNewSelection = false;
+    private boolean isCustomerChanged = false;
+
+    public void setIsCustomerChanged(boolean isCustomerChanged) {
+        this.isCustomerChanged = isCustomerChanged;
+    }
 
     @FXML
     private void initialize() throws SQLException {
@@ -151,8 +156,8 @@ public class MainController {
                     }
                 })
         );
-        revertButton.setOnAction(event -> populateDetailsForm(appointmentTable.getSelectionModel().getSelectedItem()));
-        saveButton.setOnAction(event -> saveAppointment(appointmentTable.getSelectionModel().getSelectedItem()));
+        revertButton.setOnAction(event -> populateDetailsForm(getSelectedAppointment()));
+        saveButton.setOnAction(event -> saveAppointment(getSelectedAppointment()));
         newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
         editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
@@ -217,15 +222,19 @@ public class MainController {
     }
 
     private void initializeDetailsFields() {
+        reloadCustomersList();
+        locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
+        typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
+
+        setIsDataChanged(false);
+    }
+
+    private void reloadCustomersList() {
         try {
             customerInput.setItems(customers.getCustomers());
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
-        typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
-
-        setIsDataChanged(false);
     }
 
     private void populateDetailsForm(Appointment appt) {
@@ -250,11 +259,21 @@ public class MainController {
 
     private void requestCustomerDetails(boolean isNewCustomer) {
         if(isNewCustomer) {
-            FXHelper.showCustomerDetails(null);
+            FXHelper.showCustomerDetails(this, null);
         } else {
-            Customer customer = appointmentTable.getSelectionModel().getSelectedItem().getCustomer();
-            FXHelper.showCustomerDetails(customer);
+            Customer customer = getSelectedAppointment().getCustomer();
+            FXHelper.showCustomerDetails(this, customer);
         }
+        if(isCustomerChanged) {
+            populateAppointments();
+            reloadCustomersList();
+            populateDetailsForm(getSelectedAppointment());
+            isCustomerChanged = false;
+        }
+    }
+
+    private Appointment getSelectedAppointment() {
+        return appointmentTable.getSelectionModel().getSelectedItem();
     }
 
     private void updateStatusLabel(String username) {

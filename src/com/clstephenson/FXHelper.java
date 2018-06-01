@@ -1,6 +1,7 @@
 package com.clstephenson;
 
 import com.clstephenson.controller.CustomerController;
+import com.clstephenson.controller.MainController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -65,13 +66,14 @@ public class FXHelper {
         return loginStage;
     }
 
-    public static void showCustomerDetails(Customer customer) {
+    public static void showCustomerDetails(MainController mainController, Customer customer) {
         Parent root;
         try {
             String fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Customer.fxml";
             FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             loader.setResources(Localization.getResourceBundle());
             root = loader.load();
+            CustomerController.injectMainController(mainController);
             if(customer != null) {
                 ((CustomerController)loader.getController()).initData(customer);
             }

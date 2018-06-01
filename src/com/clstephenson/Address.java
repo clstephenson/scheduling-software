@@ -1,18 +1,18 @@
 package com.clstephenson;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 public class Address {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
-    private SimpleStringProperty addressLine1 = new SimpleStringProperty(this, "addressLine1");
-    private SimpleStringProperty addressLine2 = new SimpleStringProperty(this, "addressLine2");
-    private SimpleObjectProperty<City> city = new SimpleObjectProperty<>(this, "city");
-    private SimpleStringProperty zipCode = new SimpleStringProperty(this, "zipCode");
-    private SimpleStringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
+    private IntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private StringProperty addressLine1 = new SimpleStringProperty(this, "addressLine1");
+    private StringProperty addressLine2 = new SimpleStringProperty(this, "addressLine2");
+    private ObjectProperty<City> city = new SimpleObjectProperty<>(this, "city");
+    private StringProperty zipCode = new SimpleStringProperty(this, "zipCode");
+    private StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
 
-    public Address() {}
+    public Address() {
+        this.city.set(new City());
+    }
 
     public Address(String addressLine1, String addressLine2, City city, String zipCode, String phoneNumber) {
 
@@ -31,6 +31,30 @@ public class Address {
         this.city.set(city);
         this.zipCode.set(zipCode);
         this.phoneNumber.set(phoneNumber);
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public StringProperty addressLine1Property() {
+        return addressLine1;
+    }
+
+    public StringProperty addressLine2Property() {
+        return addressLine2;
+    }
+
+    public ObjectProperty<City> cityProperty() {
+        return city;
+    }
+
+    public StringProperty zipCodeProperty() {
+        return zipCode;
+    }
+
+    public StringProperty phoneNumberProperty() {
+        return phoneNumber;
     }
 
     public int getId() {

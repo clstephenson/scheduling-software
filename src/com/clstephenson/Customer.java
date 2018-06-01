@@ -1,17 +1,19 @@
 package com.clstephenson;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import com.clstephenson.dataaccess.CustomerRepository;
+import javafx.beans.property.*;
+
+import java.sql.SQLException;
 
 public class Customer {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
-    private SimpleStringProperty name = new SimpleStringProperty(this, "name");
-    private SimpleObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
-    private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
+    private IntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private StringProperty name = new SimpleStringProperty(this, "name");
+    private ObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
+    private BooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
-    public Customer() {}
+    public Customer() {
+        this.address.set(new Address());
+    }
 
     public Customer(String name, Address address, boolean isActive) {
         this.name.set(name);
@@ -24,6 +26,22 @@ public class Customer {
         this.name.set(name);
         this.address.set(address);
         this.isActive.set(isActive);
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    public ObjectProperty<Address> addressProperty() {
+        return address;
+    }
+
+    public BooleanProperty isActiveProperty() {
+        return isActive;
     }
 
     public int getId() {
@@ -64,5 +82,25 @@ public class Customer {
 
     public String toString() {
         return getName();
+    }
+
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        try {
+            CustomerRepository repository = new CustomerRepository();
+            if(this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if(resultId > 0) this.id.set(resultId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //todo do something with exception
+            return false;
+        }
+        return result || resultId > 0;
+
     }
 }

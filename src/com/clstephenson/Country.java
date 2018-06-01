@@ -1,11 +1,13 @@
 package com.clstephenson;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Country {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
-    private SimpleStringProperty name = new SimpleStringProperty(this, "name");
+    private IntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private StringProperty name = new SimpleStringProperty(this, "name");
 
     public Country() {}
 
@@ -16,6 +18,14 @@ public class Country {
     public Country(int id, String name) {
         this.id.set(id);
         this.name.set(name);
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public StringProperty nameProperty() {
+        return name;
     }
 
     public int getId() {

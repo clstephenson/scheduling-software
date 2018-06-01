@@ -54,6 +54,7 @@ public class CityRepository implements Repository <City> {
 
     @Override
     public boolean update(City city, LoginSession session) throws SQLException {
+        new CountryRepository().update(city.getCountry(), session);
         String sql = "UPDATE city set city=?, countryId=?, lastUpdateBy=? WHERE cityid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, city.getName());

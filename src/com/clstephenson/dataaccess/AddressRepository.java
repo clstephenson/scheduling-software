@@ -59,6 +59,7 @@ public class AddressRepository implements Repository<Address> {
 
     @Override
     public boolean update(Address address, LoginSession session) throws SQLException {
+        new CityRepository().update(address.getCity(), session);
         String sql = "UPDATE address set address=?, address2=?, cityId=?, postalCode=?, phone=?, lastUpdateBy=? " +
                 "WHERE addressid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {

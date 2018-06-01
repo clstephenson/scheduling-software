@@ -1,15 +1,15 @@
 package com.clstephenson;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 public class City {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
-    private SimpleStringProperty name = new SimpleStringProperty(this, "name");
-    private SimpleObjectProperty<Country> country = new SimpleObjectProperty<>(this, "country");
+    private IntegerProperty id = new SimpleIntegerProperty(this, "id");
+    private StringProperty name = new SimpleStringProperty(this, "name");
+    private ObjectProperty<Country> country = new SimpleObjectProperty<>(this, "country");
 
-    public City() {}
+    public City() {
+        this.country.set(new Country());
+    }
 
     public City(String name, Country country) {
         this.name.set(name);
@@ -20,6 +20,18 @@ public class City {
         this.id.set(id);
         this.name.set(name);
         this.country.set(country);
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    public ObjectProperty<Country> countryProperty() {
+        return country;
     }
 
     public int getId() {

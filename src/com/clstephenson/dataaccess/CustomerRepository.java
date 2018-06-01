@@ -55,6 +55,7 @@ public class CustomerRepository implements Repository<Customer> {
 
     @Override
     public boolean update(Customer customer, LoginSession session) throws SQLException {
+        new AddressRepository().update(customer.getAddress(), session);
         String sql = "UPDATE customer set customerName=?, addressId=?, active=?, lastUpdateBy=? WHERE customerid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, customer.getName());
