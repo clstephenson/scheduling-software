@@ -56,6 +56,7 @@ public class Main extends Application{
         primaryStage.setTitle("Scheduling Application"); //todo localize the title
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
+        FXHelper.addStylesheet(scene);
         primaryStage.show();
     }
 

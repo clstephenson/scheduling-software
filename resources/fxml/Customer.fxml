@@ -64,13 +64,13 @@
               </rowConstraints>
                <children>
                   <Label text="Name" />
-                  <TextField fx:id="nameInput" GridPane.columnIndex="1" />
-                  <TextField fx:id="address1Input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="address2Input" layoutX="310.0" layoutY="53.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="cityInput" layoutX="310.0" layoutY="90.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <TextField fx:id="postalCodeInput" layoutX="310.0" layoutY="127.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <TextField fx:id="countryInput" layoutX="310.0" layoutY="164.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <TextField fx:id="phoneInput" layoutX="310.0" layoutY="201.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <TextField fx:id="nameInput" promptText="required" GridPane.columnIndex="1" />
+                  <TextField fx:id="address1Input" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="address2Input" layoutX="310.0" layoutY="53.0" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="cityInput" layoutX="310.0" layoutY="90.0" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="postalCodeInput" layoutX="310.0" layoutY="127.0" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <TextField fx:id="countryInput" layoutX="310.0" layoutY="164.0" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <TextField fx:id="phoneInput" layoutX="310.0" layoutY="201.0" promptText="required" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <CheckBox fx:id="activeInput" mnemonicParsing="false" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   <Label layoutX="10.0" layoutY="20.0" text="Address Line 1" GridPane.rowIndex="1" />
                   <Label layoutX="10.0" layoutY="57.0" text="Address Line 2" GridPane.rowIndex="2" />

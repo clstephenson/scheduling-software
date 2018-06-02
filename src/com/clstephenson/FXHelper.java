@@ -3,6 +3,7 @@ package com.clstephenson;
 import com.clstephenson.controller.CustomerController;
 import com.clstephenson.controller.MainController;
 import com.clstephenson.datamodels.Customer;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -52,6 +53,19 @@ public class FXHelper {
         }
     }
 
+    public static void addStylesheet(Scene scene) {
+        scene.getStylesheets().add(Main.class.getResource("/styles.css").toExternalForm());
+    }
+
+    public static void addErrorClass(Node node) {
+        if(node.getStyleClass().stream().noneMatch(c -> c.equals("error")))
+            node.getStyleClass().add("error");
+    }
+
+    public static void removeErrorClass(Node node) {
+        node.getStyleClass().remove("error");
+    }
+
     private static Stage getLoginStage(Parent root) {
         final int LOGIN_FORM_WIDTH = 300;
         final int LOGIN_FORM_HEIGHT = 200;
@@ -61,6 +75,7 @@ public class FXHelper {
         loginStage.setResizable(false);
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setScene(scene);
+        addStylesheet(scene);
         loginStage.setOnCloseRequest(event -> FXHelper.exitApplication());
         return loginStage;
     }
@@ -93,6 +108,7 @@ public class FXHelper {
         customerStage.setResizable(false);
         customerStage.initModality(Modality.APPLICATION_MODAL);
         customerStage.setScene(scene);
+        addStylesheet(scene);
         return customerStage;
     }
 }

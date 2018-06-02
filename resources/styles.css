@@ -1,0 +1,14 @@
+
+.error {
+    -fx-border-color: red;
+    -fx-border-width: 1px;
+    -fx-background-color: lightpink;
+    -fx-effect: dropshadow(gaussian, red, 10, .1, 0, 0);
+}
+
+Button {
+    -fx-border-color: gray;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3;
+}
