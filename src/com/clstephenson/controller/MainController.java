@@ -227,7 +227,7 @@ public class MainController {
         if(isNewCustomer) {
             FXHelper.showCustomerDetails(this, null);
         } else {
-            Customer customer = getSelectedAppointment().getCustomer();
+            Customer customer = customerInput.getValue(); // getSelectedAppointment().getCustomer();
             FXHelper.showCustomerDetails(this, customer);
         }
         if(isCustomerChanged) {
