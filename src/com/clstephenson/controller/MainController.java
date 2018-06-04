@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Optional;
 
 public class MainController {
 
@@ -39,6 +40,7 @@ public class MainController {
     @FXML private Button revertButton;
     @FXML private Button saveButton;
     @FXML private Button newAppointmentButton;
+    @FXML private Button deleteAppointmentButton;
     @FXML private Button newCustomerButton;
     @FXML private Button editCustomerButton;
     @FXML private Label changeStatusLabel;
@@ -124,9 +126,26 @@ public class MainController {
         );
         revertButton.setOnAction(event -> populateDetailsForm(getSelectedAppointment()));
         saveButton.setOnAction(event -> saveAppointment(getSelectedAppointment()));
+        deleteAppointmentButton.setOnAction(event -> deleteAppointment());
         newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
         editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
+    }
+
+    private void deleteAppointment() {
+        Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Delete Confirmation");
+        dialog.setHeaderText("ARE YOU SURE?");
+        dialog.setMessage("This will delete the currently selected appointment.  " +
+                "Are you sure you want to do this?");
+        Optional<ButtonType> optResult = dialog.showDialog(true);
+        if(optResult.get() == ButtonType.OK) {
+            if (getSelectedAppointment().remove()) {
+                reloadAppointmentAndCustomerData();
+            } else {
+                //todo customer could not be deleted
+            }
+        }
     }
 
     private void addDetailsFormListeners() {
@@ -231,9 +250,7 @@ public class MainController {
             FXHelper.showCustomerDetails(this, customer);
         }
         if(isCustomerChanged) {
-            populateAppointments();
-            reloadCustomersList();
-            populateDetailsForm(getSelectedAppointment());
+            reloadAppointmentAndCustomerData();
             isCustomerChanged = false;
         }
     }
@@ -294,6 +311,12 @@ public class MainController {
             header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
         }
         new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
+    }
+
+    private void reloadAppointmentAndCustomerData() {
+        populateAppointments();
+        reloadCustomersList();
+        populateDetailsForm(getSelectedAppointment());
     }
 
     private void clearData() {

@@ -2,8 +2,10 @@ package com.clstephenson.datamodels;
 
 import com.clstephenson.AppointmentLocation;
 import com.clstephenson.AppointmentType;
+import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.*;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class Appointment {
@@ -154,6 +156,23 @@ public class Appointment {
 
     public boolean hasId() {
         return this.id.get() > 0;
+    }
+
+    public boolean remove() {
+        boolean result = false;
+        if(this.id.get() > 0) {
+            try {
+                AppointmentRepository repository = new AppointmentRepository();
+                if(repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                //todo do something with exception
+            }
+        }
+        return result;
     }
 
     public String toString() {
