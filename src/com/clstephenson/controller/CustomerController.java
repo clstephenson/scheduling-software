@@ -6,9 +6,12 @@ import com.clstephenson.datamodels.Customer;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.Optional;
+
 public class CustomerController {
 
     @FXML private Button saveButton;
+    @FXML private Button deleteButton;
     @FXML private Button cancelButton;
     @FXML private TextField nameInput;
     @FXML private TextField address1Input;
@@ -30,6 +33,7 @@ public class CustomerController {
     private void initialize() {
         if(customer == null) {
             customer = new Customer();
+            deleteButton.setVisible(false);
         }
         setFieldBindings();
         setUpEventHandlers();
@@ -37,6 +41,7 @@ public class CustomerController {
 
     public void initData(Customer customer) {
         this.customer = customer;
+        deleteButton.setVisible(true);
         setFieldBindings();
     }
 
@@ -60,6 +65,7 @@ public class CustomerController {
         countryInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, countryInput));
         phoneInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, phoneInput));
         cancelButton.setOnAction(event -> close());
+        deleteButton.setOnAction(event -> deleteCustomer());
         saveButton.setOnAction(event -> saveCustomer());
     }
 
@@ -67,15 +73,29 @@ public class CustomerController {
         FXHelper.getStageFromNode(cancelButton).close();
     }
 
-    private void saveCustomer() {
+    private void deleteCustomer() {
+        Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("Delete Confirmation");
+        dialog.setHeaderText("ARE YOU SURE?");
+        dialog.setMessage("Deleting this customer will also delete all appointments associated with the customer.  " +
+                "Are you sure you want to do this?");
+        Optional<ButtonType> optResult = dialog.showDialog(true);
+        if(optResult.get() == ButtonType.OK) {
+            if (customer.remove()) {
+                mainController.setIsCustomerChanged(true);
+                close();
+            } else {
+                //todo customer could not be deleted
+            }
+        }
+    }
 
+    private void saveCustomer() {
         if(validateCustomer() && customer.save()) {
             mainController.setIsCustomerChanged(true);
             close();
         }
     }
-
-
 
     private boolean validateCustomer() {
         boolean requiredFieldsFilled = Validation.validateNotEmptyOrNull(nameInput.getText(), nameInput)

@@ -1,6 +1,9 @@
 package com.clstephenson;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
+import java.util.Optional;
 
 public class Dialog {
     private Alert alert;
@@ -28,11 +31,12 @@ public class Dialog {
         alert.setHeaderText(message);
     }
 
-    public void showDialog(boolean wait) {
+    public Optional<ButtonType> showDialog(boolean wait) {
         if(wait) {
-            alert.showAndWait();
+            return alert.showAndWait();
         } else {
             alert.show();
         }
+        return Optional.empty();
     }
 }
