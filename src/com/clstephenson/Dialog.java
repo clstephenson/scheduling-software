@@ -8,6 +8,14 @@ import java.util.Optional;
 public class Dialog {
     private Alert alert;
 
+    public static void showValidationError(String msg) {
+        String title = "Data Validation Error";
+        String header = "Please fill in required fields.";
+        String message = msg == null || msg.isEmpty() ? "All fields are required." : msg;
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
+        dialog.showDialog(true);
+    }
+
     public Dialog(Alert.AlertType type) {
         alert = new Alert(type);
     }

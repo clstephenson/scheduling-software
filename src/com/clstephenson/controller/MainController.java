@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.util.Duration;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -56,6 +57,7 @@ public class MainController {
     private TableColumn<Appointment, LocalDateTime> endColumn;
 
     private Customers customers;
+    private boolean isNewAppointment = false;
     private boolean isDirtyAppointmentDetails = false;
     private boolean isNewSelection = false;
     private boolean isCustomerChanged = false;
@@ -120,16 +122,30 @@ public class MainController {
                     if(newValue != null) {
                         isNewSelection = true; //keeps listeners from firing when details form populates on new selection
                         populateDetailsForm(newValue);
+                        isNewAppointment = false;
                         isNewSelection = false;
                     }
                 })
         );
         revertButton.setOnAction(event -> populateDetailsForm(getSelectedAppointment()));
-        saveButton.setOnAction(event -> saveAppointment(getSelectedAppointment()));
+        saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
+        newAppointmentButton.setOnAction(event -> createNewAppointment());
         newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
         editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
+    }
+
+    private void handleSaveAppointment() {
+        if(validateAppointmentFields() && saveAppointment()) {
+            reloadAppointmentAndCustomerData();
+        }
+    }
+
+    private void createNewAppointment() {
+        initializeDetailsFields();
+        setIsAppointmentChanged(true);
+        isNewAppointment = true;
     }
 
     private void deleteAppointment() {
@@ -148,19 +164,76 @@ public class MainController {
         }
     }
 
-    private void addDetailsFormListeners() {
-        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
-        customerInput.valueProperty().addListener(observable -> setIsDataChanged(true));
-        descriptionInput.textProperty().addListener(observable -> setIsDataChanged(true));
-        typeInput.valueProperty().addListener(observable -> setIsDataChanged(true));
-        locationInput.valueProperty().addListener(observable -> setIsDataChanged(true));
-        urlInput.textProperty().addListener(observable -> setIsDataChanged(true));
-        dateInput.valueProperty().addListener(observable -> setIsDataChanged(true));
-        startInput.textProperty().addListener(observable -> setIsDataChanged(true));
-        endInput.textProperty().addListener(observable -> setIsDataChanged(true));
+    private boolean saveAppointment() {
+        boolean isSuccessful = false;
+        Appointment appointment;
+        if(isNewAppointment) {
+            appointment = new Appointment();
+            appointment.setConsultant(LoginSessionHelper.getUsername());
+        } else {
+            appointment = getSelectedAppointment();
+        }
+        appointment.setCustomer(customerInput.getValue());
+        appointment.setDescription(descriptionInput.getText());
+        appointment.setUrl(urlInput.getText());
+        appointment.setAppointmentType(typeInput.getValue());
+        appointment.setAppointmentLocation(locationInput.getValue());
+        appointment.setStart(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(startInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
+        appointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
+        try {
+            AppointmentRepository appointmentRepository = new AppointmentRepository();
+            if(isNewAppointment) {
+                appointment.setId(appointmentRepository.add(appointment, LoginSessionHelper.getSession()));
+                if(appointment.getId() > 0) isSuccessful = true;
+                isNewAppointment = false;
+            } else {
+                if(appointmentRepository.update(appointment, LoginSessionHelper.getSession())) isSuccessful = true;
+                setIsAppointmentChanged(false);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // todo do something with this exception
+        }
+        return isSuccessful;
     }
 
-    private void setIsDataChanged(boolean isChanged) {
+    private boolean validateAppointmentFields() {
+        boolean requiredFieldsFilled = Validation.validateNotEmptyOrNull(descriptionInput.getText(), descriptionInput)
+                & Validation.validateNotEmptyOrNull(urlInput.getText(), urlInput)
+                & Validation.validateNotEmptyOrNull(startInput.getText(), startInput)
+                & Validation.validateNotEmptyOrNull(endInput.getText(), endInput);
+
+        boolean dataFormatsOk = true; /*Validation.validateAlphaNumericString(nameInput.getText(), nameInput)
+                & Validation.validateAddress(address1Input.getText(), address1Input)
+                & Validation.validateAddress(address2Input.getText(), address2Input)
+                & Validation.validateAlphaNumericString(cityInput.getText(), cityInput)
+                & Validation.validateZipCode(postalCodeInput.getText(), postalCodeInput)
+                & Validation.validateAlphaNumericString(countryInput.getText(), countryInput)
+                & Validation.validatePhoneNumber(phoneInput.getText(), phoneInput);*/
+
+        if(!requiredFieldsFilled) {
+            Dialog.showValidationError(null);
+        }
+        return requiredFieldsFilled && dataFormatsOk;
+    }
+
+    private void addDetailsFormListeners() {
+        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
+        customerInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        descriptionInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        descriptionInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, descriptionInput));
+        typeInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        locationInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        urlInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        urlInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, urlInput));
+        dateInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        startInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        startInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, startInput));
+        endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        endInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, endInput));
+    }
+
+    private void setIsAppointmentChanged(boolean isChanged) {
         if(!isChanged) {
             // no changes to save
             isDirtyAppointmentDetails = false;
@@ -187,36 +260,24 @@ public class MainController {
         }
     }
 
-    private void saveAppointment(Appointment selectedAppointment) {
-        selectedAppointment.setCustomer(customerInput.getValue());
-        selectedAppointment.setDescription(descriptionInput.getText());
-        selectedAppointment.setUrl(urlInput.getText());
-        selectedAppointment.setAppointmentType(typeInput.getValue());
-        selectedAppointment.setAppointmentLocation(locationInput.getValue());
-        selectedAppointment.setStart(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(startInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-        selectedAppointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-        try {
-            AppointmentRepository appointmentRepository = new AppointmentRepository();
-            if(appointmentRepository.update(selectedAppointment, LoginSessionHelper.getSession())) {
-                setIsDataChanged(false);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // todo do something with this exception
-        }
-    }
-
     private void initializeDetailsFields() {
         reloadCustomersList();
         locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
         typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
-
-        setIsDataChanged(false);
+        customerInput.getSelectionModel().selectFirst();
+        descriptionInput.clear();
+        urlInput.clear();
+        typeInput.getSelectionModel().selectFirst();
+        locationInput.getSelectionModel().selectFirst();
+        dateInput.setValue(LocalDate.now());
+        startInput.clear();
+        endInput.clear();
+        setIsAppointmentChanged(false);
     }
 
     private void reloadCustomersList() {
         try {
-            customerInput.setItems(customers.getCustomers());
+            customerInput.setItems(customers.getCustomers().sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName())));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -231,7 +292,7 @@ public class MainController {
         dateInput.setValue(appt.getStart().toLocalDate());
         startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
         endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        setIsDataChanged(false);
+        setIsAppointmentChanged(false);
     }
 
     private void requestUserLogin() {

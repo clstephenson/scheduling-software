@@ -154,13 +154,13 @@
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="1">
                                  <children>
                                     <Label text="Start Time (hh:mm)" />
-                                    <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                    <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" promptText="HH:mm" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="2">
                                  <children>
                                     <Label text="End Time (hh:mm)" />
-                                    <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" />
+                                    <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" promptText="HH:mm" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1">

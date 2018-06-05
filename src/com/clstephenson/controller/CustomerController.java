@@ -115,11 +115,7 @@ public class CustomerController {
                 & Validation.validatePhoneNumber(phoneInput.getText(), phoneInput);*/
 
         if(!requiredFieldsFilled) {
-            String title = "Data Validation Error";
-            String header = "Please fill in required fields.";
-            String message = "All fields are required.";
-            Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
-            dialog.showDialog(true);
+            Dialog.showValidationError(null);
         }
         return requiredFieldsFilled && dataFormatsOk;
     }
