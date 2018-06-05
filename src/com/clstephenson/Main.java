@@ -1,6 +1,5 @@
 package com.clstephenson;
 
-import com.clstephenson.dataaccess.CustomerRepository;
 import com.clstephenson.datamodels.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -35,7 +34,6 @@ public class Main extends Application{
         System.out.println("**End of upcoming appointments**");
 
         launch(args);
-        //testSchedulingNewAppointment();
     }
 
     @Override
@@ -87,37 +85,5 @@ public class Main extends Application{
                 //do nothing here
             }
         }
-    }
-
-    //todo remove this method
-    public static void testSchedulingNewAppointment() throws SQLException {
-        Customer customer = new CustomerRepository().findSingle(customer1 -> customer1.getId() == 6);
-        AppointmentLocation location = AppointmentLocation.PHOENIX;
-        LocalDate appointmentDate = LocalDate.now(location.getTimeZoneId());
-        LocalTime appointmentStartTime = LocalTime.now(location.getTimeZoneId()).plusMinutes(10);
-        LocalTime appointmentEndTime = appointmentStartTime.plusMinutes(30);
-        Appointment newAppointment = ScheduleManager.scheduleAppointment(
-                customer,
-                AppointmentType.INITIAL_CONSULT,
-                "this is a description",
-                AppointmentLocation.PHOENIX,
-                "test",
-                "URL test",
-                LocalDateTime.of(appointmentDate, appointmentStartTime),
-                LocalDateTime.of(appointmentDate, appointmentEndTime),
-                session
-        );
-        System.out.println("Created Appointment: " + newAppointment);
-    }
-
-    //todo remove this method
-    private static void testAddingCustomerToDatabase() throws SQLException {
-        Country country = new Country("My Country");
-        City city = new City("My City", country);
-        Address address = new Address("123 My Address", "", city, "85255", "112-556-5285");
-        Customer customer = new Customer("Chris Test", address, true);
-        CustomerRepository customerRepository = new CustomerRepository();
-        int custId = customerRepository.add(customer, session);
-        System.out.println(customerRepository.findSingle(c -> c.getId() == custId));
     }
 }

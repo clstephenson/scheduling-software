@@ -1,8 +1,8 @@
 package com.clstephenson;
 
 public enum AppointmentType {
-    INITIAL_CONSULT ("Initial Consultation"),
-    FOLLOW_UP ("Follow-Up");
+    INTRO ("Initial Introduction"),
+    CONSULT ("Consultation");
 
     private String type;
 
