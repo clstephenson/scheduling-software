@@ -98,9 +98,18 @@
                             <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
                                  </textFill>
                               </Label>
+                              <Pane HBox.hgrow="ALWAYS" />
+                              <Label fx:id="dateTimeLabel" id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
+                                 <font>
+                                    <Font size="18.0" fx:id="x12" />
+                                 </font>
+                                 <textFill>
+                                    <Color blue="0.624" green="0.624" red="0.624" fx:id="x21" />
+                                 </textFill>
+                              </Label>
                            </children>
                            <padding>
-                              <Insets left="15.0" />
+                              <Insets left="15.0" right="15.0" />
                            </padding>
                         </HBox>
                         <TableView fx:id="appointmentTable" VBox.vgrow="ALWAYS" />

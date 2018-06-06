@@ -6,6 +6,7 @@ import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,6 +20,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainController {
 
@@ -45,12 +49,12 @@ public class MainController {
     @FXML private Button newCustomerButton;
     @FXML private Button editCustomerButton;
     @FXML private Label changeStatusLabel;
+    @FXML private Label dateTimeLabel;
 
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
     private TableColumn<Appointment, String> descriptionColumn;
     private TableColumn<Appointment, AppointmentLocation> locationColumn;
-    //private TableColumn<Appointment, String> consultantColumn;
     private TableColumn<Appointment, String> urlColumn;
     private TableColumn<Appointment, LocalDateTime> dateColumn;
     private TableColumn<Appointment, LocalDateTime> startColumn;
@@ -93,7 +97,6 @@ public class MainController {
         typeColumn = new TableColumn<>("Type");
         descriptionColumn = new TableColumn<>("Description");
         locationColumn = new TableColumn<>("Location");
-        //consultantColumn = new TableColumn<>("Consultant");
         urlColumn = new TableColumn<>("URL");
         dateColumn = new TableColumn<>("Date");
         startColumn = new TableColumn<>("Start");
@@ -107,7 +110,6 @@ public class MainController {
         typeColumn.setCellValueFactory(cellData -> cellData.getValue().appointmentTypeProperty());
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         locationColumn.setCellValueFactory(cellData -> cellData.getValue().appointmentLocationProperty());
-        //consultantColumn.setCellValueFactory(cellData -> cellData.getValue().consultantProperty());
         urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endProperty());
@@ -231,6 +233,13 @@ public class MainController {
         startInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, startInput));
         endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
         endInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, endInput));
+//        endInput.setTextFormatter(new TextFormatter<>(change -> {
+//            if(change.getControlText()change.getCaretPosition() == 2) {
+//                change.setText(change.getText() + ":");
+//                change.setCaretPosition(3);
+//            }
+//            return change;
+//        }));
     }
 
     private void setIsAppointmentChanged(boolean isChanged) {
