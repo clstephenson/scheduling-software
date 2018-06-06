@@ -5,6 +5,7 @@ import com.clstephenson.Dialog;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
+import com.clstephenson.datamodels.User;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -30,8 +31,9 @@ public class MainController {
     @FXML private MenuItem menuItemNewCustomer;
     @FXML private MenuItem menuItemLogout;
     @FXML private MenuItem menuItemExit;
-    @FXML private MenuItem menuItemCurrentMonth;
-    @FXML private MenuItem menuItemCurrentWeek;
+    @FXML private RadioMenuItem menuItemViewMonth;
+    @FXML private RadioMenuItem menuItemViewWeek;
+    @FXML private RadioMenuItem menuItemViewAll;
     @FXML private DatePicker dateInput;
     @FXML private TextField startInput;
     @FXML private TextField endInput;
@@ -119,6 +121,9 @@ public class MainController {
     private void setUpEventHandlers() {
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
+        menuItemViewAll.getToggleGroup().selectedToggleProperty().addListener(observable -> reloadAppointmentAndCustomerData());
+        //menuItemViewMonth.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
+        //menuItemViewWeek.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if(newValue != null) {
@@ -132,7 +137,9 @@ public class MainController {
         revertButton.setOnAction(event -> populateDetailsForm(getSelectedAppointment()));
         saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
+        menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
+        menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
         newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
         editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
@@ -309,7 +316,7 @@ public class MainController {
         updateStatusLabel(LoginSessionHelper.getUsername());
         enableLogoutMenuItem();
         showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
-        populateAppointments();
+        reloadAppointmentAndCustomerData();
     }
 
     private void requestCustomerDetails(boolean isNewCustomer) {
@@ -337,15 +344,37 @@ public class MainController {
         }
     }
 
-    private void populateAppointments() {
-        ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
-        if(allUserAppointments.isEmpty()) {
+    private void reloadAppointmentAndCustomerData() {
+        populateAppointments(getAppointmentsByView());
+        reloadCustomersList();
+        populateDetailsForm(getSelectedAppointment());
+    }
+
+    private void populateAppointments(ObservableList<Appointment> appointments) {
+        //ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
+        if(appointments.isEmpty()) {
             //todo message about no appointments for user
-            System.out.println("allUserAppointments is empty...");
+            System.out.println("appointments is empty...");
         } else {
-            appointmentTable.setItems(allUserAppointments);
+            appointmentTable.setItems(appointments);
             appointmentTable.getSelectionModel().select(0);
         }
+    }
+
+    private ObservableList<Appointment> getAppointmentsByView() {
+        User user = LoginSessionHelper.getCurrentUser();
+        ObservableList<Appointment> appointments;
+        LocalDate now = LocalDate.now();
+        Toggle t = menuItemViewAll.getToggleGroup().getSelectedToggle();
+        if(t.equals(menuItemViewWeek)){
+            appointments = user.getUserAppointments(); //todo fix this
+        } else if (t.equals(menuItemViewMonth)) {
+            appointments = user.getUserAppointments(a ->
+                    a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
+        } else {
+            appointments = user.getUserAppointments();
+        }
+        return appointments;
     }
 
     private void handleLogout() {
@@ -381,12 +410,6 @@ public class MainController {
             header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
         }
         new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
-    }
-
-    private void reloadAppointmentAndCustomerData() {
-        populateAppointments();
-        reloadCustomersList();
-        populateDetailsForm(getSelectedAppointment());
     }
 
     private void clearData() {

@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class User {
     private SimpleStringProperty userName = new SimpleStringProperty(this, "userName");
@@ -81,6 +82,10 @@ public class User {
             //todo fix exception
         }
         return userAppointments;
+    }
+
+    public ObservableList<Appointment> getUserAppointments(Predicate<Appointment> predicate) {
+        return getUserAppointments().filtered(predicate);
     }
 
     public List<Appointment> getAppointmentsNextFifteenMinutes() {

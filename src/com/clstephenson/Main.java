@@ -68,7 +68,7 @@ public class Main extends Application{
         executorService.scheduleAtFixedRate(() -> Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd/YY HH:mm:s"));
+                String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd/YY HH:mm:ss"));
                 targetLabel.setText(dateTime);
             }
         }), 0L, 1000L, TimeUnit.MILLISECONDS);

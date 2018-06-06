@@ -10,11 +10,13 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -60,17 +62,25 @@
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="View">
+                <fx:define>
+                    <ToggleGroup fx:id="viewToggleGroup"/>
+                </fx:define>
                <items>
-                  <MenuItem fx:id="menuItemCurrentMonth" mnemonicParsing="false" text="Current Month">
+                  <RadioMenuItem fx:id="menuItemViewAll" toggleGroup="$viewToggleGroup" mnemonicParsing="false" selected="true" text="All Appointments">
+                     <accelerator>
+                        <KeyCodeCombination alt="DOWN" code="A" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </RadioMenuItem>
+                  <RadioMenuItem fx:id="menuItemViewMonth" toggleGroup="$viewToggleGroup" mnemonicParsing="false" text="Current Month">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="M" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
-                  </MenuItem>
-                  <MenuItem fx:id="menuItemCurrentWeek" mnemonicParsing="false" text="Current Week">
+                  </RadioMenuItem>
+                  <RadioMenuItem fx:id="menuItemViewWeek" toggleGroup="$viewToggleGroup" mnemonicParsing="false" text="Current Week">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
-                  </MenuItem>
+                  </RadioMenuItem>
                </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Reports">
@@ -99,7 +109,7 @@
                                  </textFill>
                               </Label>
                               <Pane HBox.hgrow="ALWAYS" />
-                              <Label fx:id="dateTimeLabel" id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
+                              <Label id="dateTimeLabel" fx:id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
                                  <font>
                                     <Font size="18.0" fx:id="x12" />
                                  </font>
