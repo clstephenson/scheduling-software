@@ -7,11 +7,14 @@ import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
 import javafx.animation.FadeTransition;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.sql.SQLException;
@@ -21,11 +24,14 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MainController {
+
+//    private enum View {
+//        ALL,
+//        WEEK,
+//        MONTH
+//    }
 
     @FXML private MenuItem menuItemNewAppointment;
     @FXML private MenuItem menuItemNewCustomer;
@@ -34,6 +40,7 @@ public class MainController {
     @FXML private RadioMenuItem menuItemViewMonth;
     @FXML private RadioMenuItem menuItemViewWeek;
     @FXML private RadioMenuItem menuItemViewAll;
+    @FXML private ToggleGroup viewToggleGroup;
     @FXML private DatePicker dateInput;
     @FXML private TextField startInput;
     @FXML private TextField endInput;
@@ -52,6 +59,8 @@ public class MainController {
     @FXML private Button editCustomerButton;
     @FXML private Label changeStatusLabel;
     @FXML private Label dateTimeLabel;
+    @FXML private Label viewLabel;
+    @FXML private ProgressIndicator progressIndicator;
 
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
@@ -121,9 +130,10 @@ public class MainController {
     private void setUpEventHandlers() {
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
-        menuItemViewAll.getToggleGroup().selectedToggleProperty().addListener(observable -> reloadAppointmentAndCustomerData());
-        //menuItemViewMonth.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
-        //menuItemViewWeek.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
+        //viewToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> setAppointmentView(newValue));
+        menuItemViewMonth.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewMonth.getId()));
+        menuItemViewWeek.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewWeek.getId()));
+        menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if(newValue != null) {
@@ -316,7 +326,7 @@ public class MainController {
         updateStatusLabel(LoginSessionHelper.getUsername());
         enableLogoutMenuItem();
         showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
-        reloadAppointmentAndCustomerData();
+        setAppointmentView("menuItemViewAll");
     }
 
     private void requestCustomerDetails(boolean isNewCustomer) {
@@ -344,6 +354,22 @@ public class MainController {
         }
     }
 
+    private void setAppointmentView(String selectedView) { //View view) {
+        if(selectedView.equals("menuItemViewMonth")) {
+            viewLabel.setText("This Month's Appointments");
+        } else if(selectedView.equals("menuItemViewWeek")) {
+            viewLabel.setText("This Weeks's Appointments");
+        } else {
+            viewLabel.setText("All Appointments");
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                reloadAppointmentAndCustomerData();
+            }
+        });
+    }
+
     private void reloadAppointmentAndCustomerData() {
         populateAppointments(getAppointmentsByView());
         reloadCustomersList();
@@ -365,10 +391,10 @@ public class MainController {
         User user = LoginSessionHelper.getCurrentUser();
         ObservableList<Appointment> appointments;
         LocalDate now = LocalDate.now();
-        Toggle t = menuItemViewAll.getToggleGroup().getSelectedToggle();
-        if(t.equals(menuItemViewWeek)){
-            appointments = user.getUserAppointments(); //todo fix this
-        } else if (t.equals(menuItemViewMonth)) {
+        if(menuItemViewWeek.isSelected()){
+            appointments = user.getUserAppointments(a ->
+                    DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
+        } else if (menuItemViewMonth.isSelected()) {
             appointments = user.getUserAppointments(a ->
                     a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
         } else {

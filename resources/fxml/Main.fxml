@@ -10,6 +10,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
@@ -62,21 +63,21 @@
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="View">
-                <fx:define>
-                    <ToggleGroup fx:id="viewToggleGroup"/>
-                </fx:define>
                <items>
-                  <RadioMenuItem fx:id="menuItemViewAll" toggleGroup="$viewToggleGroup" mnemonicParsing="false" selected="true" text="All Appointments">
+                  <RadioMenuItem id="menuItemViewAll" fx:id="menuItemViewAll" mnemonicParsing="false" selected="true" text="All Appointments">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="A" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="viewToggleGroup" />
+                     </toggleGroup>
                   </RadioMenuItem>
-                  <RadioMenuItem fx:id="menuItemViewMonth" toggleGroup="$viewToggleGroup" mnemonicParsing="false" text="Current Month">
+                  <RadioMenuItem id="menuItemViewMonth" fx:id="menuItemViewMonth" mnemonicParsing="false" text="Current Month" toggleGroup="$viewToggleGroup">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="M" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </RadioMenuItem>
-                  <RadioMenuItem fx:id="menuItemViewWeek" toggleGroup="$viewToggleGroup" mnemonicParsing="false" text="Current Week">
+                  <RadioMenuItem id="menuItemViewWeek" fx:id="menuItemViewWeek" mnemonicParsing="false" text="Current Week" toggleGroup="$viewToggleGroup">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -100,7 +101,7 @@
                      <children>
                         <HBox>
                            <children>
-                      <Label alignment="CENTER" style="&#10;" text="Appointment List" textAlignment="CENTER" wrapText="false">
+                      <Label fx:id="viewLabel" alignment="CENTER" style="&#10;" text="Appointment List" textAlignment="CENTER" wrapText="false">
                                  <font>
                             <Font size="18.0" fx:id="x1" />
                                  </font>
@@ -108,7 +109,10 @@
                             <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
                                  </textFill>
                               </Label>
-                              <Pane HBox.hgrow="ALWAYS" />
+                              <Pane HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <ProgressIndicator fx:id="progressIndicator" visible="false" />
+                                 </children></Pane>
                               <Label id="dateTimeLabel" fx:id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
                                  <font>
                                     <Font size="18.0" fx:id="x12" />

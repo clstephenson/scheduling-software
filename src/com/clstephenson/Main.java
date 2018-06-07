@@ -1,5 +1,6 @@
 package com.clstephenson;
 
+import com.clstephenson.controller.MainController;
 import com.clstephenson.datamodels.*;
 import javafx.application.Application;
 import javafx.application.Platform;

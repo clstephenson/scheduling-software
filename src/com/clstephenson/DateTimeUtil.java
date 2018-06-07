@@ -3,6 +3,8 @@ package com.clstephenson;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 
 public class DateTimeUtil {
 
@@ -18,6 +20,10 @@ public class DateTimeUtil {
 
     public static LocalDateTime getZonedDateTimeFromSQLTimestamp(Timestamp timestamp) {
         return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+    }
+
+    public static int getWeekOfYear(LocalDate date) {
+        return date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
     }
 
     private static DateTimeFormatter getFormatter() {
