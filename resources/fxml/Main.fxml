@@ -86,7 +86,7 @@
             </Menu>
           <Menu mnemonicParsing="false" text="Reports">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Report 1" />
+                  <MenuItem fx:id="menuNumApptTypesByMonth" mnemonicParsing="false" text="Appointment Types by Month" />
                   <MenuItem mnemonicParsing="false" text="Report 2" />
                </items>
           </Menu>

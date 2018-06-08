@@ -37,6 +37,7 @@ public class MainController {
     @FXML private MenuItem menuItemNewCustomer;
     @FXML private MenuItem menuItemLogout;
     @FXML private MenuItem menuItemExit;
+    @FXML private MenuItem menuNumApptTypesByMonth;
     @FXML private RadioMenuItem menuItemViewMonth;
     @FXML private RadioMenuItem menuItemViewWeek;
     @FXML private RadioMenuItem menuItemViewAll;
@@ -130,7 +131,6 @@ public class MainController {
     private void setUpEventHandlers() {
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
-        //viewToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> setAppointmentView(newValue));
         menuItemViewMonth.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewMonth.getId()));
         menuItemViewWeek.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewWeek.getId()));
         menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
@@ -147,6 +147,7 @@ public class MainController {
         revertButton.setOnAction(event -> populateDetailsForm(getSelectedAppointment()));
         saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
+        menuNumApptTypesByMonth.setOnAction(event -> ReportNumApptTypesByMonth.showReport());
         menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
         menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
