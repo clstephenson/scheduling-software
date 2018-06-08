@@ -85,14 +85,4 @@ public class ScheduleManager {
         }
         return false;
     }
-
-    public static List<Appointment> getUserAppointmentsStartingSoon(String username, int startsWithinMinutes)
-            throws SQLException {
-        LocalDateTime nowPlusMinutes = LocalDateTime.now().plusMinutes(startsWithinMinutes);
-        List<Appointment> appointments = new AppointmentRepository().find(
-                a -> a.getConsultant().equals(username) &&
-                            (a.getStart().isAfter(LocalDateTime.now()) && a.getStart().isBefore(nowPlusMinutes))
-        );
-        return appointments;
-    }
 }

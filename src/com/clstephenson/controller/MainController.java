@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 public class MainController {
@@ -427,7 +428,8 @@ public class MainController {
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-        for(Appointment appt : LoginSessionHelper.getCurrentUser().getAppointmentsNextFifteenMinutes()) {
+        for(Appointment appt :
+                LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15)) {
             message.append(appt.toString());
         }
         String header;

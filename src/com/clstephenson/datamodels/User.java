@@ -9,8 +9,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public class User {
@@ -88,16 +92,9 @@ public class User {
         return getUserAppointments().filtered(predicate);
     }
 
-    public List<Appointment> getAppointmentsNextFifteenMinutes() {
-        List<Appointment> appointments = new ArrayList<>();
-        final int startTimeframe = 15;
-        try {
-            appointments = ScheduleManager.getUserAppointmentsStartingSoon(getUserName(), startTimeframe);
-            return appointments;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exceptions
-        }
+    public List<Appointment> getUserFutureAppointments(TemporalUnit temporalUnit, int numUnits) {
+        LocalDateTime end = LocalDateTime.now().plus(numUnits, temporalUnit);
+        return getUserAppointments(a -> a.getStart().isAfter(LocalDateTime.now()) && a.getStart().isBefore(end));
     }
 
     public String toString() {
