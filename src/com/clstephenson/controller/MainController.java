@@ -7,14 +7,11 @@ import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
 import javafx.animation.FadeTransition;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.sql.SQLException;
@@ -40,6 +37,8 @@ public class MainController {
     private MenuItem menuNumApptTypesByMonth;
     @FXML
     private MenuItem menuUserSchedule;
+    @FXML
+    private MenuItem menuExportCustomers;
     @FXML
     private RadioMenuItem menuItemViewMonth;
     @FXML
@@ -176,6 +175,7 @@ public class MainController {
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
         menuNumApptTypesByMonth.setOnAction(event -> ReportNumApptTypesByMonth.showReport());
         menuUserSchedule.setOnAction(event -> new ReportUserSchedule(LoginSessionHelper.getCurrentUser()));
+        menuExportCustomers.setOnAction(event -> new ReportCustomers());
         menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
         menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
