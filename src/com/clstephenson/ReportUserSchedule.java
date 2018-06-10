@@ -26,7 +26,7 @@ public class ReportUserSchedule {
     }
 
     private void generateReport() {
-        LocalDate now = LocalDate.now().plusDays(2);
+        LocalDate now = LocalDate.now();
         File f = new File(String.format("schedule_%s_%s.txt", this.user, now.format(DateTimeFormatter.ISO_LOCAL_DATE)));
         try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
             out.write(String.format("%s's Schedule for %s", this.user, now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"))));
