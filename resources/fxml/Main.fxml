@@ -87,7 +87,7 @@
           <Menu mnemonicParsing="false" text="Reports">
                <items>
                   <MenuItem fx:id="menuNumApptTypesByMonth" mnemonicParsing="false" text="Appointment Types by Month" />
-                  <MenuItem mnemonicParsing="false" text="Report 2" />
+                  <MenuItem fx:id="menuUserSchedule" mnemonicParsing="false" text="Today's Schedule" />
                </items>
           </Menu>
 

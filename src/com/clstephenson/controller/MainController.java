@@ -28,41 +28,66 @@ import java.util.Optional;
 
 public class MainController {
 
-//    private enum View {
-//        ALL,
-//        WEEK,
-//        MONTH
-//    }
-
-    @FXML private MenuItem menuItemNewAppointment;
-    @FXML private MenuItem menuItemNewCustomer;
-    @FXML private MenuItem menuItemLogout;
-    @FXML private MenuItem menuItemExit;
-    @FXML private MenuItem menuNumApptTypesByMonth;
-    @FXML private RadioMenuItem menuItemViewMonth;
-    @FXML private RadioMenuItem menuItemViewWeek;
-    @FXML private RadioMenuItem menuItemViewAll;
-    @FXML private ToggleGroup viewToggleGroup;
-    @FXML private DatePicker dateInput;
-    @FXML private TextField startInput;
-    @FXML private TextField endInput;
-    @FXML private ComboBox<Customer> customerInput;
-    @FXML private ChoiceBox<AppointmentLocation> locationInput;
-    @FXML private ChoiceBox<AppointmentType> typeInput;
-    @FXML private TextArea descriptionInput;
-    @FXML private TextField urlInput;
-    @FXML private TableView<Appointment> appointmentTable;
-    @FXML private Label statusLabel;
-    @FXML private Button revertButton;
-    @FXML private Button saveButton;
-    @FXML private Button newAppointmentButton;
-    @FXML private Button deleteAppointmentButton;
-    @FXML private Button newCustomerButton;
-    @FXML private Button editCustomerButton;
-    @FXML private Label changeStatusLabel;
-    @FXML private Label dateTimeLabel;
-    @FXML private Label viewLabel;
-    @FXML private ProgressIndicator progressIndicator;
+    @FXML
+    private MenuItem menuItemNewAppointment;
+    @FXML
+    private MenuItem menuItemNewCustomer;
+    @FXML
+    private MenuItem menuItemLogout;
+    @FXML
+    private MenuItem menuItemExit;
+    @FXML
+    private MenuItem menuNumApptTypesByMonth;
+    @FXML
+    private MenuItem menuUserSchedule;
+    @FXML
+    private RadioMenuItem menuItemViewMonth;
+    @FXML
+    private RadioMenuItem menuItemViewWeek;
+    @FXML
+    private RadioMenuItem menuItemViewAll;
+    @FXML
+    private ToggleGroup viewToggleGroup;
+    @FXML
+    private DatePicker dateInput;
+    @FXML
+    private TextField startInput;
+    @FXML
+    private TextField endInput;
+    @FXML
+    private ComboBox<Customer> customerInput;
+    @FXML
+    private ChoiceBox<AppointmentLocation> locationInput;
+    @FXML
+    private ChoiceBox<AppointmentType> typeInput;
+    @FXML
+    private TextArea descriptionInput;
+    @FXML
+    private TextField urlInput;
+    @FXML
+    private TableView<Appointment> appointmentTable;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Button revertButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button newAppointmentButton;
+    @FXML
+    private Button deleteAppointmentButton;
+    @FXML
+    private Button newCustomerButton;
+    @FXML
+    private Button editCustomerButton;
+    @FXML
+    private Label changeStatusLabel;
+    @FXML
+    private Label dateTimeLabel;
+    @FXML
+    private Label viewLabel;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
@@ -82,6 +107,7 @@ public class MainController {
     /**
      * public method is exposed to allow the CustomerController to specify whether the customer data
      * has been saved/changed.
+     *
      * @param isCustomerChanged
      */
     public void setIsCustomerChanged(boolean isCustomerChanged) {
@@ -137,7 +163,7 @@ public class MainController {
         menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
-                    if(newValue != null) {
+                    if (newValue != null) {
                         isNewSelection = true; //keeps listeners from firing when details form populates on new selection
                         populateDetailsForm(newValue);
                         isNewAppointment = false;
@@ -149,6 +175,7 @@ public class MainController {
         saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
         menuNumApptTypesByMonth.setOnAction(event -> ReportNumApptTypesByMonth.showReport());
+        menuUserSchedule.setOnAction(event -> new ReportUserSchedule(LoginSessionHelper.getCurrentUser()));
         menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
         menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
@@ -158,7 +185,7 @@ public class MainController {
     }
 
     private void handleSaveAppointment() {
-        if(validateAppointmentFields() && saveAppointment()) {
+        if (validateAppointmentFields() && saveAppointment()) {
             reloadAppointmentAndCustomerData();
         }
     }
@@ -176,7 +203,7 @@ public class MainController {
         dialog.setMessage("This will delete the currently selected appointment.  " +
                 "Are you sure you want to do this?");
         Optional<ButtonType> optResult = dialog.showDialog(true);
-        if(optResult.get() == ButtonType.OK) {
+        if (optResult.get() == ButtonType.OK) {
             if (getSelectedAppointment().remove()) {
                 reloadAppointmentAndCustomerData();
             } else {
@@ -188,7 +215,7 @@ public class MainController {
     private boolean saveAppointment() {
         boolean isSuccessful = false;
         Appointment appointment;
-        if(isNewAppointment) {
+        if (isNewAppointment) {
             appointment = new Appointment();
             appointment.setConsultant(LoginSessionHelper.getUsername());
         } else {
@@ -203,12 +230,12 @@ public class MainController {
         appointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
         try {
             AppointmentRepository appointmentRepository = new AppointmentRepository();
-            if(isNewAppointment) {
+            if (isNewAppointment) {
                 appointment.setId(appointmentRepository.add(appointment, LoginSessionHelper.getSession()));
-                if(appointment.getId() > 0) isSuccessful = true;
+                if (appointment.getId() > 0) isSuccessful = true;
                 isNewAppointment = false;
             } else {
-                if(appointmentRepository.update(appointment, LoginSessionHelper.getSession())) isSuccessful = true;
+                if (appointmentRepository.update(appointment, LoginSessionHelper.getSession())) isSuccessful = true;
                 setIsAppointmentChanged(false);
             }
         } catch (SQLException e) {
@@ -232,7 +259,7 @@ public class MainController {
                 & Validation.validateAlphaNumericString(countryInput.getText(), countryInput)
                 & Validation.validatePhoneNumber(phoneInput.getText(), phoneInput);*/
 
-        if(!requiredFieldsFilled) {
+        if (!requiredFieldsFilled) {
             Dialog.showValidationError(null);
         }
         return requiredFieldsFilled && dataFormatsOk;
@@ -262,7 +289,7 @@ public class MainController {
     }
 
     private void setIsAppointmentChanged(boolean isChanged) {
-        if(!isChanged) {
+        if (!isChanged) {
             // no changes to save
             isDirtyAppointmentDetails = false;
             showNeedsSavingMessage(false);
@@ -332,13 +359,13 @@ public class MainController {
     }
 
     private void requestCustomerDetails(boolean isNewCustomer) {
-        if(isNewCustomer) {
+        if (isNewCustomer) {
             FXHelper.showCustomerDetails(this, null);
         } else {
             Customer customer = customerInput.getValue(); // getSelectedAppointment().getCustomer();
             FXHelper.showCustomerDetails(this, customer);
         }
-        if(isCustomerChanged) {
+        if (isCustomerChanged) {
             reloadAppointmentAndCustomerData();
             isCustomerChanged = false;
         }
@@ -349,7 +376,7 @@ public class MainController {
     }
 
     private void updateStatusLabel(String username) {
-        if(username.length() > 0) {
+        if (username.length() > 0) {
             statusLabel.setText(String.format("Logged in as:  %s", username));
         } else {
             statusLabel.setText("Not logged in");
@@ -357,9 +384,9 @@ public class MainController {
     }
 
     private void setAppointmentView(String selectedView) { //View view) {
-        if(selectedView.equals("menuItemViewMonth")) {
+        if (selectedView.equals("menuItemViewMonth")) {
             viewLabel.setText("This Month's Appointments");
-        } else if(selectedView.equals("menuItemViewWeek")) {
+        } else if (selectedView.equals("menuItemViewWeek")) {
             viewLabel.setText("This Weeks's Appointments");
         } else {
             viewLabel.setText("All Appointments");
@@ -380,7 +407,7 @@ public class MainController {
 
     private void populateAppointments(ObservableList<Appointment> appointments) {
         //ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
-        if(appointments.isEmpty()) {
+        if (appointments.isEmpty()) {
             //todo message about no appointments for user
             System.out.println("appointments is empty...");
         } else {
@@ -393,7 +420,7 @@ public class MainController {
         User user = LoginSessionHelper.getCurrentUser();
         ObservableList<Appointment> appointments;
         LocalDate now = LocalDate.now();
-        if(menuItemViewWeek.isSelected()){
+        if (menuItemViewWeek.isSelected()) {
             appointments = user.getUserAppointments(a ->
                     DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
         } else if (menuItemViewMonth.isSelected()) {
@@ -428,12 +455,12 @@ public class MainController {
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-        for(Appointment appt :
+        for (Appointment appt :
                 LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15)) {
             message.append(appt.toString());
         }
         String header;
-        if(message.length() == 0) {
+        if (message.length() == 0) {
             header = Localization.getString("ui.dialog.upcomingappointmentsnone");
         } else {
             header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
@@ -451,7 +478,7 @@ public class MainController {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
-                if(empty) {
+                if (empty) {
                     setText(null);
                 } else {
                     setText(item.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
@@ -465,7 +492,7 @@ public class MainController {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
-                if(empty) {
+                if (empty) {
                     setText(null);
                 } else {
                     setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));

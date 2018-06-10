@@ -1,11 +1,8 @@
 package com.clstephenson;
 
-import com.clstephenson.controller.MainController;
-import com.clstephenson.datamodels.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -16,26 +13,36 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.time.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Main extends Application{
+public class Main extends Application {
 
     public static LoginSession session;
     private static ServerSocket socket;
     private static ScheduledExecutorService executorService;
 
     public static void main(String[] args) throws SQLException {
-
         //TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
         //Locale.setDefault(Locale.ITALY);
         Platform.setImplicitExit(true);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> cleanupResources()));
         launch(args);
+    }
+
+    private static void cleanupResources() {
+        // close the open socket if it exists
+        if (socket != null) {
+            try {
+                executorService.shutdownNow();
+                socket.close();
+            } catch (Exception notImportant) {
+                //do nothing here
+            }
+        }
     }
 
     @Override
@@ -63,18 +70,6 @@ public class Main extends Application{
         primaryStage.show();
     }
 
-    private static void startDateTimeThread(FXMLLoader loader) {
-        Label targetLabel = (Label)loader.getNamespace().get("dateTimeLabel");
-        executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(() -> Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd/YY HH:mm:ss"));
-                targetLabel.setText(dateTime);
-            }
-        }), 0L, 1000L, TimeUnit.MILLISECONDS);
-    }
-
     /**
      * Uses a server socket to make sure only one instance of the application is running. If the socket cannot be
      * created, it means the socket is already present from another running instance.
@@ -92,16 +87,16 @@ public class Main extends Application{
         }
     }
 
-    private static void cleanupResources() {
-        // close the open socket if it exists
-        if(socket != null) {
-            try {
-                executorService.shutdownNow();
-                socket.close();
-            } catch (Exception notImportant) {
-                //do nothing here
+    private static void startDateTimeThread(FXMLLoader loader) {
+        Label targetLabel = (Label) loader.getNamespace().get("dateTimeLabel");
+        executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(() -> Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd/YY HH:mm:ss"));
+                targetLabel.setText(dateTime);
             }
-        }
+        }), 0L, 1000L, TimeUnit.MILLISECONDS);
     }
 
     @Override
