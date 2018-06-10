@@ -10,6 +10,7 @@ import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Duration;
@@ -127,7 +128,7 @@ public class MainController {
         setupTableCellDataBindings();
         formatDateCell(dateColumn);
         formatTimeCell(startColumn);
-        formatTimeCell(endColumn);
+        //formatTimeCell(endColumn);
     }
 
     private void initializeTableColumns() {
@@ -140,7 +141,7 @@ public class MainController {
         startColumn = new TableColumn<>("Start");
         endColumn = new TableColumn<>("End");
         appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn,
-                descriptionColumn, locationColumn, /*consultantColumn,*/ urlColumn);
+                descriptionColumn, locationColumn, urlColumn);
     }
 
     private void setupTableCellDataBindings() {
@@ -149,9 +150,25 @@ public class MainController {
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         locationColumn.setCellValueFactory(cellData -> cellData.getValue().appointmentLocationProperty());
         urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
+        dateColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endProperty());
-        dateColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
+
+        endColumn.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
+            @Override
+            public void updateItem(final LocalDateTime item, final boolean empty) {
+                super.updateItem(item, empty);
+                if (this.getTableRow().getStyleClass().contains("completedAppointment")) {
+                    this.getTableRow().getStyleClass().remove("completedAppointment");
+                }
+                if (item != null) {
+                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
+                    if (item.compareTo(LocalDateTime.now()) < 0) {
+                        this.getTableRow().getStyleClass().add("completedAppointment");
+                    }
+                }
+            }
+        });
     }
 
     private void setUpEventHandlers() {
@@ -391,6 +408,8 @@ public class MainController {
         } else {
             viewLabel.setText("All Appointments");
         }
+
+        //reload the table data using a different thread so the UI/mouse doesn't freeze during the update.
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -405,18 +424,18 @@ public class MainController {
         populateDetailsForm(getSelectedAppointment());
     }
 
-    private void populateAppointments(ObservableList<Appointment> appointments) {
-        //ObservableList<Appointment> allUserAppointments = LoginSessionHelper.getCurrentUser().getUserAppointments();
+    private void populateAppointments(SortedList<Appointment> appointments) {
         if (appointments.isEmpty()) {
             //todo message about no appointments for user
             System.out.println("appointments is empty...");
         } else {
+            appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
             appointmentTable.setItems(appointments);
             appointmentTable.getSelectionModel().select(0);
         }
     }
 
-    private ObservableList<Appointment> getAppointmentsByView() {
+    private SortedList<Appointment> getAppointmentsByView() {
         User user = LoginSessionHelper.getCurrentUser();
         ObservableList<Appointment> appointments;
         LocalDate now = LocalDate.now();
@@ -429,7 +448,7 @@ public class MainController {
         } else {
             appointments = user.getUserAppointments();
         }
-        return appointments;
+        return new SortedList<>(appointments);
     }
 
     private void handleLogout() {

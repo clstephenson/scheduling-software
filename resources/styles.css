@@ -12,3 +12,12 @@ Button {
     -fx-border-width: 1px;
     -fx-border-radius: 3;
 }
+
+.completedAppointment .text {
+    -fx-strikethrough: true;
+    -fx-fill: lightgray;
+}
+
+.completedAppointment:selected .text {
+    -fx-fill: white;
+}
