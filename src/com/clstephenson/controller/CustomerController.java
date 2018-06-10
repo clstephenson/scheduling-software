@@ -1,8 +1,11 @@
 package com.clstephenson.controller;
 
-import com.clstephenson.*;
 import com.clstephenson.Dialog;
+import com.clstephenson.FXHelper;
 import com.clstephenson.datamodels.Customer;
+import com.clstephenson.validation.PhoneNumberValidation;
+import com.clstephenson.validation.Validator;
+import com.clstephenson.validation.ZipCodeValidation;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -57,13 +60,13 @@ public class CustomerController {
     }
 
     private void setUpEventHandlers() {
-        nameInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, nameInput));
-        address1Input.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, address1Input));
-        address2Input.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, address2Input));
-        cityInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, cityInput));
-        postalCodeInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, postalCodeInput));
-        countryInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, countryInput));
-        phoneInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, phoneInput));
+//        nameInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, nameInput));
+//        address1Input.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, address1Input));
+//        address2Input.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, address2Input));
+//        cityInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, cityInput));
+//        postalCodeInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, postalCodeInput));
+//        countryInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, countryInput));
+//        phoneInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, phoneInput));
         cancelButton.setOnAction(event -> close());
         deleteButton.setOnAction(event -> deleteCustomer());
         saveButton.setOnAction(event -> saveCustomer());
@@ -98,25 +101,34 @@ public class CustomerController {
     }
 
     private boolean validateCustomer() {
-        boolean requiredFieldsFilled = Validation.validateNotEmptyOrNull(nameInput.getText(), nameInput)
-                & Validation.validateNotEmptyOrNull(address1Input.getText(), address1Input)
-                & Validation.validateNotEmptyOrNull(address2Input.getText(), address2Input)
-                & Validation.validateNotEmptyOrNull(cityInput.getText(), cityInput)
-                & Validation.validateNotEmptyOrNull(postalCodeInput.getText(), postalCodeInput)
-                & Validation.validateNotEmptyOrNull(countryInput.getText(), countryInput)
-                & Validation.validateNotEmptyOrNull(phoneInput.getText(), phoneInput);
+        Validator v = new Validator();
+        v.getValidations().add(new ZipCodeValidation(postalCodeInput.getText(), "Zip Code", postalCodeInput, "error"));
+        v.getValidations().add(new PhoneNumberValidation(phoneInput.getText(), "Phone Number", phoneInput, "error"));
 
-        boolean dataFormatsOk = true; /*Validation.validateAlphaNumericString(nameInput.getText(), nameInput)
-                & Validation.validateAddress(address1Input.getText(), address1Input)
-                & Validation.validateAddress(address2Input.getText(), address2Input)
-                & Validation.validateAlphaNumericString(cityInput.getText(), cityInput)
-                & Validation.validateZipCode(postalCodeInput.getText(), postalCodeInput)
-                & Validation.validateAlphaNumericString(countryInput.getText(), countryInput)
-                & Validation.validatePhoneNumber(phoneInput.getText(), phoneInput);*/
-
-        if(!requiredFieldsFilled) {
-            Dialog.showValidationError(null);
+        if (v.validateAll().isPresent()) {
+            Dialog.showValidationError(v.getMessage());
+            return false;
         }
-        return requiredFieldsFilled && dataFormatsOk;
+        return true;
+//        boolean requiredFieldsFilled = Validation.validateNotEmptyOrNull(nameInput.getText(), nameInput)
+//                & Validation.validateNotEmptyOrNull(address1Input.getText(), address1Input)
+//                & Validation.validateNotEmptyOrNull(address2Input.getText(), address2Input)
+//                & Validation.validateNotEmptyOrNull(cityInput.getText(), cityInput)
+//                & Validation.validateNotEmptyOrNull(postalCodeInput.getText(), postalCodeInput)
+//                & Validation.validateNotEmptyOrNull(countryInput.getText(), countryInput)
+//                & Validation.validateNotEmptyOrNull(phoneInput.getText(), phoneInput);
+//
+//        boolean dataFormatsOk = true; /*Validation.validateAlphaNumericString(nameInput.getText(), nameInput)
+//                & Validation.validateAddress(address1Input.getText(), address1Input)
+//                & Validation.validateAddress(address2Input.getText(), address2Input)
+//                & Validation.validateAlphaNumericString(cityInput.getText(), cityInput)
+//                & Validation.validateZipCode(postalCodeInput.getText(), postalCodeInput)
+//                & Validation.validateAlphaNumericString(countryInput.getText(), countryInput)
+//                & Validation.validatePhoneNumber(phoneInput.getText(), phoneInput);*/
+
+//        if(!requiredFieldsFilled) {
+//            Dialog.showValidationError(null);
+//        }
+        //return requiredFieldsFilled && dataFormatsOk;
     }
 }
