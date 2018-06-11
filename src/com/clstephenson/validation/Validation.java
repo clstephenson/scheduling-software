@@ -1,26 +1,24 @@
 package com.clstephenson.validation;
 
-import javafx.scene.Node;
+import javafx.scene.control.TextInputControl;
 
 import java.util.Optional;
 
 public abstract class Validation {
 
-    private String inputToValidate;
+    private TextInputControl inputToValidate;
     private String fieldName;
-    private Node sourceControl;
     private String cssClass;
     private String message;
 
-    Validation(String input, String fieldName) {
-        this.inputToValidate = input;
+    Validation(TextInputControl fieldToValidate, String fieldName) {
+        this.inputToValidate = fieldToValidate;
         this.fieldName = fieldName;
     }
 
-    Validation(String input, String fieldName, Node sourceControl, String cssClass) {
-        this.inputToValidate = input;
+    Validation(TextInputControl fieldToValidate, String fieldName, String cssClass) {
+        this.inputToValidate = fieldToValidate;
         this.fieldName = fieldName;
-        this.sourceControl = sourceControl;
         this.cssClass = cssClass;
     }
 
@@ -32,11 +30,11 @@ public abstract class Validation {
         this.cssClass = cssClass;
     }
 
-    String getInputToValidate() {
+    TextInputControl getInputToValidate() {
         return inputToValidate;
     }
 
-    void setInputToValidate(String inputToValidate) {
+    void setInputToValidate(TextInputControl inputToValidate) {
         this.inputToValidate = inputToValidate;
     }
 
@@ -48,14 +46,6 @@ public abstract class Validation {
         this.fieldName = fieldName;
     }
 
-    Node getSourceControl() {
-        return this.sourceControl;
-    }
-
-    void setSourceControl(Node sourceControl) {
-        this.sourceControl = sourceControl;
-    }
-
     String getMessage() {
         return message;
     }
@@ -64,12 +54,13 @@ public abstract class Validation {
         this.message = message;
     }
 
-    void changeSourceControlStyle() {
-        if (this.sourceControl != null && this.cssClass != null) {
-            if (this.message.isEmpty()) {
-                this.sourceControl.getStyleClass().remove(this.cssClass);
+    void changeTextControlCss() {
+        if (this.inputToValidate != null && this.cssClass != null) {
+            if (this.message == null || this.message.isEmpty()) {
+                this.inputToValidate.getStyleClass().remove(this.cssClass);
+                //fixme this should not remove css class for subsequent validation errors on the same control
             } else {
-                this.sourceControl.getStyleClass().add(this.cssClass);
+                this.inputToValidate.getStyleClass().add(this.cssClass);
             }
         }
     }

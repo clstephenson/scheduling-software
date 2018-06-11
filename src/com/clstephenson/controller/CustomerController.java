@@ -1,11 +1,10 @@
 package com.clstephenson.controller;
 
+import com.clstephenson.AppConfiguration;
 import com.clstephenson.Dialog;
 import com.clstephenson.FXHelper;
 import com.clstephenson.datamodels.Customer;
-import com.clstephenson.validation.PhoneNumberValidation;
-import com.clstephenson.validation.Validator;
-import com.clstephenson.validation.ZipCodeValidation;
+import com.clstephenson.validation.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -27,6 +26,7 @@ public class CustomerController {
 
     private Customer customer;
     private static MainController mainController;
+    private String validationErrorCssClass;
 
     public static void injectMainController(MainController controller) {
         mainController = controller;
@@ -38,6 +38,7 @@ public class CustomerController {
             customer = new Customer();
             deleteButton.setVisible(false);
         }
+        validationErrorCssClass = AppConfiguration.getConfigurationProperty("form.validation.error.css");
         setFieldBindings();
         setUpEventHandlers();
     }
@@ -102,8 +103,14 @@ public class CustomerController {
 
     private boolean validateCustomer() {
         Validator v = new Validator();
-        v.getValidations().add(new ZipCodeValidation(postalCodeInput.getText(), "Zip Code", postalCodeInput, "error"));
-        v.getValidations().add(new PhoneNumberValidation(phoneInput.getText(), "Phone Number", phoneInput, "error"));
+        v.getValidations().add(new ZipCodeValidation(postalCodeInput, "Zip Code", validationErrorCssClass));
+        v.getValidations().add(new PhoneNumberValidation(phoneInput, "Phone Number", validationErrorCssClass));
+        v.getValidations().add(new AlphaNumericValidation(nameInput, "Name", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(nameInput, "Name", validationErrorCssClass, 0, 45));
+        v.getValidations().add(new AlphaNumericValidation(address1Input, "Address", validationErrorCssClass));
+        v.getValidations().add(new AlphaNumericValidation(address2Input, "Address", validationErrorCssClass));
+        v.getValidations().add(new AlphaNumericValidation(cityInput, "City", validationErrorCssClass));
+        v.getValidations().add(new AlphaNumericValidation(countryInput, "Country", validationErrorCssClass));
 
         if (v.validateAll().isPresent()) {
             Dialog.showValidationError(v.getMessage());

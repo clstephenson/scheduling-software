@@ -25,7 +25,7 @@ public class Validator {
                 message.append(v.getMessage());
                 message.append(System.lineSeparator());
             }
-            v.changeSourceControlStyle();
+            v.changeTextControlCss();
         }
         return Optional.ofNullable(getMessage());
     }

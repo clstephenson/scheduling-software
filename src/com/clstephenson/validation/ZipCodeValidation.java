@@ -1,23 +1,28 @@
 package com.clstephenson.validation;
 
-import javafx.scene.Node;
+import javafx.scene.control.TextInputControl;
 
 import java.util.Optional;
 
 public class ZipCodeValidation extends Validation {
 
-    public ZipCodeValidation(String input, String fieldName) {
-        super(input, fieldName);
+    private final String PATTERN = "^[0-9]{5}(-[0-9]{4})*$";
+
+    public ZipCodeValidation(TextInputControl inputToValidate, String fieldName) {
+        super(inputToValidate, fieldName);
     }
 
-    public ZipCodeValidation(String input, String fieldName, Node sourceControl, String cssClass) {
-        super(input, fieldName, sourceControl, cssClass);
+    public ZipCodeValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
+        super(inputToValidate, fieldName, cssClass);
     }
 
     @Override
     public Optional<String> validate() {
-        if ((super.getInputToValidate() == null) || !super.getInputToValidate().matches("^[0-9]{5}(-[0-9]{4})*$")) {
-            super.setMessage(super.getFieldName() + " must be in the format matching 12345 or 12345-1234");
+        if (super.getInputToValidate() != null) {
+            String text = super.getInputToValidate().getText();
+            if (text == null || !text.matches(PATTERN)) {
+                super.setMessage(String.format("%s must be in the format matching 12345 or 12345-1234", super.getFieldName()));
+            }
         }
         return Optional.ofNullable(super.getMessage());
     }
