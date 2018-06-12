@@ -106,13 +106,17 @@ public class CustomerController {
         v.getValidations().add(new ZipCodeValidation(postalCodeInput, "Zip Code", validationErrorCssClass));
         v.getValidations().add(new PhoneNumberValidation(phoneInput, "Phone Number", validationErrorCssClass));
         v.getValidations().add(new AlphaNumericValidation(nameInput, "Name", validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(nameInput, "Name", validationErrorCssClass, 0, 45));
-        v.getValidations().add(new AlphaNumericValidation(address1Input, "Address", validationErrorCssClass));
-        v.getValidations().add(new AlphaNumericValidation(address2Input, "Address", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(nameInput, "Name", validationErrorCssClass, 1, 45));
+        v.getValidations().add(new TextLengthValidation(address1Input, "Address Line 1", validationErrorCssClass, 1, 50));
+        v.getValidations().add(new StreetAddressValidation(address1Input, "Address Line 1", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(address2Input, "Address Line 2", validationErrorCssClass, 1, 50));
+        v.getValidations().add(new StreetAddressValidation(address2Input, "Address Line 2", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(cityInput, "City", validationErrorCssClass, 1, 50));
         v.getValidations().add(new AlphaNumericValidation(cityInput, "City", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(countryInput, "Country", validationErrorCssClass, 1, 50));
         v.getValidations().add(new AlphaNumericValidation(countryInput, "Country", validationErrorCssClass));
 
-        if (v.validateAll().isPresent()) {
+        if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
             Dialog.showValidationError(v.getMessage());
             return false;
         }

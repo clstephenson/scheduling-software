@@ -4,15 +4,15 @@ import javafx.scene.control.TextInputControl;
 
 import java.util.Optional;
 
-public class AlphaNumericValidation extends Validation {
+public class StreetAddressValidation extends Validation {
 
-    private final String PATTERN = "^[0-9a-zA-Z -]+$";
+    private final String PATTERN = "^[0-9a-zA-Z -#.,]+$";
 
-    public AlphaNumericValidation(TextInputControl inputToValidate, String fieldName) {
+    public StreetAddressValidation(TextInputControl inputToValidate, String fieldName) {
         super(inputToValidate, fieldName);
     }
 
-    public AlphaNumericValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
+    public StreetAddressValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
         super(inputToValidate, fieldName, cssClass);
     }
 
@@ -21,7 +21,7 @@ public class AlphaNumericValidation extends Validation {
         if (super.getInputToValidate() != null) {
             String text = super.getInputToValidate().getText();
             if (text == null || !text.matches(PATTERN)) {
-                super.setMessage(String.format("%s must not contain any special characters other than spaces or dashes", super.getFieldName()));
+                super.setMessage(String.format("%s contains invalid characters", super.getFieldName()));
             }
         }
         return Optional.ofNullable(super.getMessage());

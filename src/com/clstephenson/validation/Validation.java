@@ -54,16 +54,32 @@ public abstract class Validation {
         this.message = message;
     }
 
-    void changeTextControlCss() {
-        if (this.inputToValidate != null && this.cssClass != null) {
-            if (this.message == null || this.message.isEmpty()) {
-                this.inputToValidate.getStyleClass().remove(this.cssClass);
-                //fixme this should not remove css class for subsequent validation errors on the same control
-            } else {
-                this.inputToValidate.getStyleClass().add(this.cssClass);
+    void addStyleClass() {
+        if (inputToValidate != null && cssClass != null) {
+            if (!inputToValidate.getStyleClass().contains(cssClass)) {
+                inputToValidate.getStyleClass().add(cssClass);
             }
         }
     }
+
+    void clearStyleClass() {
+        if (inputToValidate != null && cssClass != null) {
+            if (inputToValidate.getStyleClass().contains(cssClass)) {
+                inputToValidate.getStyleClass().remove(cssClass);
+            }
+        }
+    }
+
+//    void changeTextControlCss() {
+//        if (this.inputToValidate != null && this.cssClass != null) {
+//            if (this.message == null || this.message.isEmpty()) {
+//                this.inputToValidate.getStyleClass().remove(this.cssClass);
+//                //fixme this should not remove css class for subsequent validation errors on the same control
+//            } else {
+//                this.inputToValidate.getStyleClass().add(this.cssClass);
+//            }
+//        }
+//    }
 
     abstract Optional<String> validate();
 }

@@ -13,7 +13,7 @@ public class Dialog {
         String header = "Please correct the following errors.";
         String message = msg == null || msg.isEmpty() ? "All fields are required." : msg;
         Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
-        dialog.setSize(600, 300);
+        dialog.setSize(500, 300);
         dialog.showDialog(true);
     }
 
