@@ -70,16 +70,5 @@ public abstract class Validation {
         }
     }
 
-//    void changeTextControlCss() {
-//        if (this.inputToValidate != null && this.cssClass != null) {
-//            if (this.message == null || this.message.isEmpty()) {
-//                this.inputToValidate.getStyleClass().remove(this.cssClass);
-//                //fixme this should not remove css class for subsequent validation errors on the same control
-//            } else {
-//                this.inputToValidate.getStyleClass().add(this.cssClass);
-//            }
-//        }
-//    }
-
     abstract Optional<String> validate();
 }

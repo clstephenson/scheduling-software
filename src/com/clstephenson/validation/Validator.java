@@ -36,8 +36,6 @@ public class Validator {
                     validation.clearStyleClass();
                 }
             }
-
-            //validation.changeTextControlCss();
         }
         return Optional.ofNullable(getMessage());
     }
