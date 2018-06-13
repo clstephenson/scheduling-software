@@ -10,9 +10,10 @@ public class Dialog {
 
     public static void showValidationError(String msg) {
         String title = "Data Validation Error";
-        String header = "Please fill in required fields.";
+        String header = "Please correct the following errors.";
         String message = msg == null || msg.isEmpty() ? "All fields are required." : msg;
         Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
+        dialog.setSize(500, 300);
         dialog.showDialog(true);
     }
 
@@ -37,6 +38,11 @@ public class Dialog {
 
     public void setHeaderText(String message) {
         alert.setHeaderText(message);
+    }
+
+    public void setSize(double width, double height) {
+        alert.setResizable(true);
+        alert.getDialogPane().setPrefSize(width, height);
     }
 
     public Optional<ButtonType> showDialog(boolean wait) {

@@ -1,6 +1,8 @@
 package com.clstephenson.controller;
 
-import com.clstephenson.*;
+import com.clstephenson.FXHelper;
+import com.clstephenson.LoginSession;
+import com.clstephenson.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,7 +35,6 @@ public class LoginController {
     void login() {
         String username = usernameField.getText();
         String password = passwordField.getText();
-        //Stage srcStage = FXHelper.getStageFromActionEvent(event);
         try {
             Main.session = new LoginSession(username, password);
             if(Main.session.isLoggedIn()) {
