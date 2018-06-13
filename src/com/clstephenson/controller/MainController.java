@@ -6,10 +6,7 @@ import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
-import com.clstephenson.validation.AlphaNumericValidation;
-import com.clstephenson.validation.TextLengthValidation;
-import com.clstephenson.validation.UrlValidation;
-import com.clstephenson.validation.Validator;
+import com.clstephenson.validation.*;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -271,9 +268,10 @@ public class MainController {
     private boolean validateAppointmentFields() {
         Validator v = new Validator();
         //v.getValidations().add(new AlphaNumericValidation(dateInput, "Date", validationErrorCssClass));
-        v.getValidations().add(new AlphaNumericValidation(startInput, "Start Time", validationErrorCssClass));
-        v.getValidations().add(new AlphaNumericValidation(endInput, "End Time", validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 1, 255));
+        v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
+        v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
+        v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
         v.getValidations().add(new UrlValidation(urlInput, "URL", validationErrorCssClass));
         v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
 
@@ -288,16 +286,12 @@ public class MainController {
         customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
         customerInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         descriptionInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        //descriptionInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, descriptionInput));
         typeInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         locationInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         urlInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        //urlInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, urlInput));
         dateInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         startInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        // startInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, startInput));
         endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        //endInput.textProperty().addListener((observable, oldValue, newValue) -> Validation.validateNotEmptyOrNull(newValue, endInput));
 //        endInput.setTextFormatter(new TextFormatter<>(change -> {
 //            if(change.getControlText()change.getCaretPosition() == 2) {
 //                change.setText(change.getText() + ":");

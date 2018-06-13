@@ -127,7 +127,7 @@ public class Appointment {
     }
 
     public void setUrl(String url) {
-        this.url.set(url);
+        this.url.set(url.isEmpty() ? " " : url);
     }
 
     public ObjectProperty<LocalDateTime> startProperty() {

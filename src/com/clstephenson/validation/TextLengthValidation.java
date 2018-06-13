@@ -25,7 +25,7 @@ public class TextLengthValidation extends Validation {
     public Optional<String> validate() {
         if (super.getInputToValidate() != null) {
             int length = super.getInputToValidate().getLength();
-            if (length <= minLength || length > maxLength) {
+            if (length < minLength || length > maxLength) {
                 super.setMessage(String.format("%s must be between %d and %d characters in length", super.getFieldName(), minLength, maxLength));
             }
         }

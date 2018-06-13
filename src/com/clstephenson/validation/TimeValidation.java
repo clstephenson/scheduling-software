@@ -4,16 +4,15 @@ import javafx.scene.control.TextInputControl;
 
 import java.util.Optional;
 
-public class UrlValidation extends Validation {
+public class TimeValidation extends Validation {
 
-    //matches empty string or the url pattern
-    private final String PATTERN = "^$|^(http://www\\.|https://www\\.|http://|https://)?[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$";
+    private final String PATTERN = "^\\d{2}:\\d{2}$";
 
-    public UrlValidation(TextInputControl inputToValidate, String fieldName) {
+    public TimeValidation(TextInputControl inputToValidate, String fieldName) {
         super(inputToValidate, fieldName);
     }
 
-    public UrlValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
+    public TimeValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
         super(inputToValidate, fieldName, cssClass);
     }
 
@@ -22,7 +21,7 @@ public class UrlValidation extends Validation {
         if (super.getInputToValidate() != null) {
             String text = super.getInputToValidate().getText();
             if (text == null || !text.matches(PATTERN)) {
-                super.setMessage(String.format("%s is not a properly formatted URL", super.getFieldName()));
+                super.setMessage(String.format("%s must match the format of hh:mm using 24-hour time", super.getFieldName()));
             }
         }
         return Optional.ofNullable(super.getMessage());
