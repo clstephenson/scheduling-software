@@ -9,7 +9,9 @@ public class Country {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
 
-    public Country() {}
+    public Country() {
+        this.name.set("");
+    }
 
     public Country(String name) {
         this.name.set(name);

@@ -4,16 +4,16 @@ import javafx.scene.control.TextInputControl;
 
 import java.util.Optional;
 
-public class UrlValidation extends Validation {
+public class UrlNotRequiredValidation extends Validation {
 
     //matches empty string or the url pattern
-    private final String PATTERN = "^(http://www\\.|https://www\\.|http://|https://)?[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$";
+    private final String PATTERN = "^$|^(http://www\\.|https://www\\.|http://|https://)?[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$";
 
-    public UrlValidation(TextInputControl inputToValidate, String fieldName) {
+    public UrlNotRequiredValidation(TextInputControl inputToValidate, String fieldName) {
         super(inputToValidate, fieldName);
     }
 
-    public UrlValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
+    public UrlNotRequiredValidation(TextInputControl inputToValidate, String fieldName, String cssClass) {
         super(inputToValidate, fieldName, cssClass);
     }
 

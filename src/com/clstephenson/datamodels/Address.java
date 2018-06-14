@@ -11,7 +11,11 @@ public class Address {
     private StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
 
     public Address() {
+        this.addressLine1.set("");
+        this.addressLine2.set("");
         this.city.set(new City());
+        this.zipCode.set("");
+        this.phoneNumber.set("");
     }
 
     public Address(String addressLine1, String addressLine2, City city, String zipCode, String phoneNumber) {
@@ -78,7 +82,7 @@ public class Address {
     }
 
     public void setAddressLine2(String addressLine2) {
-        this.addressLine2.set(addressLine2);
+        this.addressLine2.set(addressLine2.isEmpty() ? " " : addressLine2);
     }
 
     public City getCity() {

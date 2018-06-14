@@ -1,6 +1,5 @@
 package com.clstephenson.datamodels;
 
-import com.clstephenson.ScheduleManager;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -10,11 +9,8 @@ import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public class User {
@@ -25,7 +21,10 @@ public class User {
 
     private ObservableList<Appointment> userAppointments;
 
-    public User() {}
+    public User() {
+        this.userName.set("");
+        this.password.set("");
+    }
 
     public User(String userName, String password, boolean isActive) {
         this.userName.set(userName);

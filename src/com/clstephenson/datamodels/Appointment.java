@@ -2,6 +2,7 @@ package com.clstephenson.datamodels;
 
 import com.clstephenson.AppointmentLocation;
 import com.clstephenson.AppointmentType;
+import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.*;
 
@@ -19,7 +20,11 @@ public class Appointment {
     private ObjectProperty<LocalDateTime> start = new SimpleObjectProperty<>(this, "start");
     private ObjectProperty<LocalDateTime> end = new SimpleObjectProperty<>(this, "end");
 
-    public Appointment() {}
+    public Appointment() {
+        this.description.set("");
+        this.consultant.set("");
+        this.url.set("");
+    }
 
     public Appointment(Customer customer, AppointmentType type, String description, AppointmentLocation location,
                        String consultant, String url, LocalDateTime start, LocalDateTime end) {
@@ -156,6 +161,24 @@ public class Appointment {
 
     public boolean hasId() {
         return this.id.get() > 0;
+    }
+
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        try {
+            AppointmentRepository repository = new AppointmentRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //todo do something with exception
+        }
+        return result || resultId > 0;
     }
 
     public boolean remove() {

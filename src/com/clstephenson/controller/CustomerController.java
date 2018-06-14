@@ -102,8 +102,8 @@ public class CustomerController {
         v.getValidations().add(new TextLengthValidation(nameInput, "Name", validationErrorCssClass, 1, 45));
         v.getValidations().add(new TextLengthValidation(address1Input, "Address Line 1", validationErrorCssClass, 1, 50));
         v.getValidations().add(new StreetAddressValidation(address1Input, "Address Line 1", validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(address2Input, "Address Line 2", validationErrorCssClass, 1, 50));
-        v.getValidations().add(new StreetAddressValidation(address2Input, "Address Line 2", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(address2Input, "Address Line 2", validationErrorCssClass, 0, 50));
+        v.getValidations().add(new StreetAddressNotRequiredValidation(address2Input, "Address Line 2", validationErrorCssClass));
         v.getValidations().add(new TextLengthValidation(cityInput, "City", validationErrorCssClass, 1, 50));
         v.getValidations().add(new AlphaNumericValidation(cityInput, "City", validationErrorCssClass));
         v.getValidations().add(new TextLengthValidation(countryInput, "Country", validationErrorCssClass, 1, 50));

@@ -13,6 +13,7 @@ public class Customer {
     private BooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
     public Customer() {
+        this.name.set("");
         this.address.set(new Address());
     }
 

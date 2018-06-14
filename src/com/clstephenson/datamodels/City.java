@@ -8,6 +8,7 @@ public class City {
     private ObjectProperty<Country> country = new SimpleObjectProperty<>(this, "country");
 
     public City() {
+        this.name.set("");
         this.country.set(new Country());
     }
 

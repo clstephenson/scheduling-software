@@ -2,7 +2,6 @@ package com.clstephenson.controller;
 
 import com.clstephenson.*;
 import com.clstephenson.Dialog;
-import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
@@ -233,7 +232,6 @@ public class MainController {
     }
 
     private boolean saveAppointment() {
-        boolean isSuccessful = false;
         Appointment appointment;
         if (isNewAppointment) {
             appointment = new Appointment();
@@ -248,31 +246,17 @@ public class MainController {
         appointment.setAppointmentLocation(locationInput.getValue());
         appointment.setStart(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(startInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
         appointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-        try {
-            AppointmentRepository appointmentRepository = new AppointmentRepository();
-            if (isNewAppointment) {
-                appointment.setId(appointmentRepository.add(appointment, LoginSessionHelper.getSession()));
-                if (appointment.getId() > 0) isSuccessful = true;
-                isNewAppointment = false;
-            } else {
-                if (appointmentRepository.update(appointment, LoginSessionHelper.getSession())) isSuccessful = true;
-                setIsAppointmentChanged(false);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // todo do something with this exception
-        }
-        return isSuccessful;
+
+        return appointment.save();
     }
 
     private boolean validateAppointmentFields() {
         Validator v = new Validator();
-        //v.getValidations().add(new AlphaNumericValidation(dateInput, "Date", validationErrorCssClass));
         v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
         v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
         v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
         v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
-        v.getValidations().add(new UrlValidation(urlInput, "URL", validationErrorCssClass));
+        v.getValidations().add(new UrlNotRequiredValidation(urlInput, "URL", validationErrorCssClass));
         v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
 
         if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
