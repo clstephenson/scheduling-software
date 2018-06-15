@@ -8,6 +8,7 @@ import javafx.beans.property.*;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class Appointment {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
