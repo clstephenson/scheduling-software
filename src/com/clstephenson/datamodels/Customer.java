@@ -12,6 +12,10 @@ public class Customer {
     private ObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
     private BooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
+    public static Customer getCustomerById(int id) {
+        return new CustomerRepository().findById(id);
+    }
+
     public Customer() {
         this.name.set("");
         this.address.set(new Address());

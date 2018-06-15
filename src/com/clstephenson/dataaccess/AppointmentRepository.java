@@ -18,15 +18,12 @@ public class AppointmentRepository implements Repository<Appointment> {
 
     @Override
     public int add(Appointment appointment, LoginSession session) throws SQLException {
-        CustomerRepository customerRepository = new CustomerRepository();
-        Customer customer = customerRepository.findSingle(cust -> cust.getId() == appointment.getCustomer().getId());
-        int customerId;
+        Customer customer = Customer.getCustomerById(appointment.getCustomer().getId());
         if(customer == null) {
-            customerId = customerRepository.add(appointment.getCustomer(), session);
-            appointment.getCustomer().setId(customerId); //add the newly generated ID to the appointment's customer
-        } else {
-            customerId = customer.getId();
+            //add the customer to the DB
+            appointment.getCustomer().save();
         }
+        int customerId = customer.getId();
         if(customerId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO appointment (customerId, title, description, location, contact, " +
@@ -121,7 +118,8 @@ public class AppointmentRepository implements Repository<Appointment> {
     private Appointment mapResultSetToObject(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setId(rs.getInt("appointmentid"));
-        appointment.setCustomer(new CustomerRepository().findById(rs.getInt("customerId")));
+        //appointment.setCustomer(new CustomerRepository().findById(rs.getInt("customerId")));
+        appointment.setCustomer(Customer.getCustomerById(rs.getInt("customerId")));
         appointment.setAppointmentType(AppointmentType.valueOf(rs.getString("title")));
         appointment.setDescription(rs.getString("description"));
         appointment.setAppointmentLocation(AppointmentLocation.valueOf(rs.getString("location")));
