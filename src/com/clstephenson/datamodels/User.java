@@ -1,6 +1,7 @@
 package com.clstephenson.datamodels;
 
 import com.clstephenson.dataaccess.AppointmentRepository;
+import com.clstephenson.dataaccess.UserRepository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,6 +21,20 @@ public class User {
     private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
     private ObservableList<Appointment> userAppointments;
+
+    public static User getActiveUser(String username, String password) {
+        try {
+            UserRepository userRepository = new UserRepository();
+            return userRepository.findSingle(u ->
+                    u.getUserName().equalsIgnoreCase(username) &&
+                            u.getPassword().equals(password) &&
+                            u.isActive()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exceptions
+        }
+    }
 
     public User() {
         this.userName.set("");

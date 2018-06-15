@@ -1,31 +1,16 @@
 package com.clstephenson;
 
-import com.clstephenson.dataaccess.UserRepository;
 import com.clstephenson.datamodels.User;
 
 import java.io.IOException;
 import java.security.AccessControlException;
-import java.sql.SQLException;
 
 public class LoginSession {
 
     private User loggedInUser;
 
-    public LoginSession() {
-
-    }
-
-    public LoginSession(String userName, String password) {
-        try {
-            UserRepository userRepository = new UserRepository();
-            loggedInUser = userRepository.findSingle(u ->
-                    u.getUserName().equalsIgnoreCase(userName) &&
-                            u.getPassword().equals(password) &&
-                            u.isActive()
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e); //todo fix exceptions
-        }
+    public LoginSession(String userName, String password) throws AccessControlException {
+        loggedInUser = User.getActiveUser(userName, password);
         logAttempt(userName, isLoggedIn());
         if(loggedInUser == null) {
             throw new AccessControlException("Invalid login credentials");
