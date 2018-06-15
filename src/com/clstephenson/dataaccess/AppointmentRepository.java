@@ -38,8 +38,8 @@ public class AppointmentRepository implements Repository<Appointment> {
                 statement.setString(4, appointment.getAppointmentLocation().name());
                 statement.setString(5, appointment.getConsultant());
                 statement.setString(6, appointment.getUrl());
-                statement.setObject(7, DateTimeUtil.getDateTimeForSQL(appointment.getStart()));
-                statement.setObject(8, DateTimeUtil.getDateTimeForSQL(appointment.getEnd()));
+                statement.setObject(7, DateTimeUtil.getTimestampFromLocalDateTime(appointment.getStart()));
+                statement.setObject(8, DateTimeUtil.getTimestampFromLocalDateTime(appointment.getEnd()));
                 statement.setObject(9, DateTimeUtil.getDateTimeForSQL());
                 statement.setString(10, currentUserName);
                 statement.setString(11, currentUserName);
@@ -70,8 +70,8 @@ public class AppointmentRepository implements Repository<Appointment> {
             statement.setString(4, appointment.getAppointmentLocation().name());
             statement.setString(5, appointment.getConsultant());
             statement.setString(6, appointment.getUrl());
-            statement.setObject(7, DateTimeUtil.getDateTimeForSQL(appointment.getStart()));
-            statement.setObject(8, DateTimeUtil.getDateTimeForSQL(appointment.getEnd()));
+            statement.setObject(7, DateTimeUtil.getTimestampFromLocalDateTime(appointment.getStart()));
+            statement.setObject(8, DateTimeUtil.getTimestampFromLocalDateTime(appointment.getEnd()));
             statement.setString(9, session.getLoggedInUser().getUserName());
             statement.setInt(10, appointment.getId());
             return statement.executeUpdate() > 0;
@@ -127,8 +127,8 @@ public class AppointmentRepository implements Repository<Appointment> {
         appointment.setAppointmentLocation(AppointmentLocation.valueOf(rs.getString("location")));
         appointment.setConsultant(rs.getString("contact"));
         appointment.setUrl(rs.getString("url"));
-        appointment.setStart(DateTimeUtil.getZonedDateTimeFromSQLTimestamp(rs.getTimestamp("start")));
-        appointment.setEnd(DateTimeUtil.getZonedDateTimeFromSQLTimestamp(rs.getTimestamp("end")));
+        appointment.setStart(DateTimeUtil.getZonedDateTimeFromTimestamp(rs.getTimestamp("start")));
+        appointment.setEnd(DateTimeUtil.getZonedDateTimeFromTimestamp(rs.getTimestamp("end")));
         return appointment;
     }
 
