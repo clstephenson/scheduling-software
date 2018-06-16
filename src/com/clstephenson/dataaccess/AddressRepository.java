@@ -1,6 +1,8 @@
 package com.clstephenson.dataaccess;
 
-import com.clstephenson.*;
+import com.clstephenson.DateTimeUtil;
+import com.clstephenson.Localization;
+import com.clstephenson.LoginSession;
 import com.clstephenson.datamodels.Address;
 import com.clstephenson.datamodels.City;
 import com.clstephenson.datamodels.Country;
@@ -13,8 +15,13 @@ public class AddressRepository implements Repository<Address> {
 
     private Connection dbConnection;
 
-    public AddressRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public AddressRepository() {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exception handling
+        }
     }
 
     @Override
@@ -111,8 +118,13 @@ public class AddressRepository implements Repository<Address> {
     }
 
     @Override
-    public Address findById(int id) throws SQLException {
-        return findSingle(address -> address.getId() == id);
+    public Address findById(int id) {
+        try {
+            return findSingle(address -> address.getId() == id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exception handling
+        }
     }
 
     private Address mapResultSetToObject(ResultSet rs) throws SQLException {

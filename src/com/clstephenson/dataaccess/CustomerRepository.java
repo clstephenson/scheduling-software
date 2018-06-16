@@ -27,15 +27,12 @@ public class CustomerRepository implements Repository<Customer> {
 
     @Override
     public int add(Customer customer, LoginSession session) throws SQLException {
-        AddressRepository addressRepository = new AddressRepository();
-        Address address = addressRepository.findSingle(addr -> addr.getId() == customer.getAddress().getId());
-        int addressId;
+        Address address = Address.getAddressById(customer.getAddress().getId());
         if(address == null) {
-            addressId = addressRepository.add(customer.getAddress(), session);
-            customer.getAddress().setId(addressId); //add the newly generated ID to the customer address
-        } else {
-            addressId = address.getId();
+            //add the address to the DB
+            customer.getAddress().save();
         }
+        int addressId = address.getId();
         if(addressId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO customer (customerName, addressid, active, createDate, createdBy, lastUpdateBy) " +
@@ -65,7 +62,7 @@ public class CustomerRepository implements Repository<Customer> {
 
     @Override
     public boolean update(Customer customer, LoginSession session) throws SQLException {
-        new AddressRepository().update(customer.getAddress(), session);
+        customer.getAddress().save();
         String sql = "UPDATE customer set customerName=?, addressId=?, active=?, lastUpdateBy=? WHERE customerid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, customer.getName());
