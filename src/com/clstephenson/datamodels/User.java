@@ -1,13 +1,13 @@
 package com.clstephenson.datamodels;
 
 import com.clstephenson.dataaccess.AppointmentRepository;
+import com.clstephenson.dataaccess.UserRepository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
@@ -20,6 +20,15 @@ public class User {
     private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
     private ObservableList<Appointment> userAppointments;
+
+    public static User getActiveUser(String username, String password) {
+        UserRepository userRepository = new UserRepository();
+        return userRepository.findSingle(u ->
+                u.getUserName().equalsIgnoreCase(username) &&
+                        u.getPassword().equals(password) &&
+                        u.isActive()
+        );
+    }
 
     public User() {
         this.userName.set("");
@@ -76,14 +85,9 @@ public class User {
     }
 
     public ObservableList<Appointment> getUserAppointments() {
-        try {
-            userAppointments = FXCollections.observableArrayList(
-                    new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //todo fix exception
-        }
+        userAppointments = FXCollections.observableArrayList(
+                new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
+        );
         return userAppointments;
     }
 

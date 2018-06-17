@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.dataaccess.AddressRepository;
 import javafx.beans.property.*;
 
 public class Address {
@@ -9,6 +11,10 @@ public class Address {
     private ObjectProperty<City> city = new SimpleObjectProperty<>(this, "city");
     private StringProperty zipCode = new SimpleStringProperty(this, "zipCode");
     private StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
+
+    public static Address getAddressById(int id) {
+        return new AddressRepository().findById(id);
+    }
 
     public Address() {
         this.addressLine1.set("");
@@ -111,6 +117,31 @@ public class Address {
 
     public boolean hasId() {
         return this.id.get() > 0;
+    }
+
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        AddressRepository repository = new AddressRepository();
+        if (this.id.get() > 0) {
+            result = repository.update(this, LoginSessionHelper.getSession());
+        } else {
+            resultId = repository.add(this, LoginSessionHelper.getSession());
+            if (resultId > 0) this.id.set(resultId);
+        }
+        return result || resultId > 0;
+    }
+
+    public boolean remove() {
+        boolean result = false;
+        if (this.id.get() > 0) {
+            AddressRepository repository = new AddressRepository();
+            if (repository.remove(this)) {
+                this.id.set(0);
+                result = true;
+            }
+        }
+        return result;
     }
 
     public String toString() {

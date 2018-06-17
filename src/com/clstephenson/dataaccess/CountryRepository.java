@@ -1,9 +1,9 @@
 package com.clstephenson.dataaccess;
 
-import com.clstephenson.datamodels.Country;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
+import com.clstephenson.datamodels.Country;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,12 +13,17 @@ public class CountryRepository implements Repository<Country> {
 
     private Connection dbConnection;
 
-    public CountryRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public CountryRepository() {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exception
+        }
     }
 
     @Override
-    public int add(Country country, LoginSession session) throws SQLException {
+    public int add(Country country, LoginSession session) {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO country (country, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?)";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -34,12 +39,13 @@ public class CountryRepository implements Repository<Country> {
                 throw new SQLException();
             }
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.addingcountry"), e);
+            throw new RuntimeException(Localization.getString("error.db.addingcountry"), e);
+            //todo fix exceptions
         }
     }
 
     @Override
-    public boolean update(Country country, LoginSession session) throws SQLException {
+    public boolean update(Country country, LoginSession session) {
         String sql = "UPDATE country set country=?, lastUpdateBy=? WHERE countryid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, country.getName());
@@ -47,29 +53,30 @@ public class CountryRepository implements Repository<Country> {
             statement.setInt(3, country.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.updatingcountry"), e);
+            throw new RuntimeException(Localization.getString("error.db.updatingcountry"), e);
+            //todo fix exceptions
         }
     }
 
     @Override
-    public boolean removeById(int id) throws SQLException {
+    public boolean removeById(int id) {
         String sql = "DELETE FROM country WHERE countryid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcountry") + " = " + id;
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
     }
 
     @Override
-    public boolean remove(Country country) throws SQLException {
+    public boolean remove(Country country) {
         return removeById(country.getId());
     }
 
     @Override
-    public List<Country> findAll() throws SQLException {
+    public List<Country> findAll() {
         String query = "SELECT countryid, country FROM country";
         ArrayList<Country> countries = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -80,12 +87,12 @@ public class CountryRepository implements Repository<Country> {
             return countries;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.countryquery");
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
     }
 
     @Override
-    public Country findById(int id) throws SQLException {
+    public Country findById(int id) {
         return findSingle(country -> country.getId() == id);
     }
 

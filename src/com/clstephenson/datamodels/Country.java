@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.dataaccess.CountryRepository;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,6 +10,10 @@ import javafx.beans.property.StringProperty;
 public class Country {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
+
+    public static Country getCountryById(int id) {
+        return new CountryRepository().findById(id);
+    }
 
     public Country() {
         this.name.set("");
@@ -49,6 +55,32 @@ public class Country {
     public boolean hasId() {
         return this.id.get() > 0;
     }
+
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        CountryRepository repository = new CountryRepository();
+        if (this.id.get() > 0) {
+            result = repository.update(this, LoginSessionHelper.getSession());
+        } else {
+            resultId = repository.add(this, LoginSessionHelper.getSession());
+            if (resultId > 0) this.id.set(resultId);
+        }
+        return result || resultId > 0;
+    }
+
+    public boolean remove() {
+        boolean result = false;
+        if (this.id.get() > 0) {
+            CountryRepository repository = new CountryRepository();
+            if (repository.remove(this)) {
+                this.id.set(0);
+                result = true;
+            }
+        }
+        return result;
+    }
+
 
     public String toString() {
         return String.format("[%d, %s]", this.id.get(), this.name.get());
