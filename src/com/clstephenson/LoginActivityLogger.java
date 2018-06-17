@@ -7,13 +7,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Handles logging login attempts to a log file.  Both successful, and failed attempts are logged.  There will only be
+ * one instance of the logger created.  The logger is accessed through the logNewActivity static method.
  */
 public class LoginActivityLogger {
     private static LoginActivityLogger loginActivityLoggerInstance = null;
     private static Logger logger = null;
 
-    private LoginActivityLogger() throws IOException {
+    private LoginActivityLogger() {
         logger = Logger.getLogger("com.clstephenson.activitylogger");
         String filePath = getLogFileNameFromAppConfiguration();
         try {
@@ -21,17 +22,24 @@ public class LoginActivityLogger {
             fileHandler.setFormatter(new LogFormatter());
             logger.addHandler(fileHandler);
             logger.setLevel(Level.INFO);
-        } catch (IOException ex) {
+        } catch (IOException e) {
             String message = Localization.getString("error.io.filenotfound")
                     + ": " + Paths.get(filePath).toAbsolutePath().normalize() + ".";
-            throw new RuntimeException(message);
+            throw new RuntimeException(message, e);
         }
     }
 
+    private String getLogFileNameFromAppConfiguration() {
+        return AppConfiguration.getConfigurationProperty("logging.activity.filename");
+    }
+
     /**
-     * @param message
+     * Add a new login event entry to the log file.  If there is not a current instance of the LoginActivityLogger,
+     * then one is created.
+     * @param userName The username entered, if present.
+     * @param isSuccessful Was the attempt successful or not
      */
-    public static void logNewActivity(String userName, boolean isSuccessful) throws IOException {
+    public static void logNewActivity(String userName, boolean isSuccessful) {
         if (loginActivityLoggerInstance == null) {
             loginActivityLoggerInstance = new LoginActivityLogger();
         }
@@ -42,11 +50,6 @@ public class LoginActivityLogger {
         message.append("\t");
         message.append(Localization.getString("log.loginattempted") + " ");
         message.append(userName.isEmpty() ? "[not entered]" : userName);
-        //message.append(": ");
         logger.info(message.toString());
-    }
-
-    private String getLogFileNameFromAppConfiguration() throws IOException {
-        return AppConfiguration.getConfigurationProperty("logging.activity.filename");
     }
 }
