@@ -132,8 +132,8 @@ public class AppointmentRepository implements Repository<Appointment> {
         appointment.setAppointmentLocation(AppointmentLocation.valueOf(rs.getString("location")));
         appointment.setConsultant(rs.getString("contact"));
         appointment.setUrl(rs.getString("url"));
-        appointment.setStart(DateTimeUtil.getZonedDateTimeFromTimestamp(rs.getTimestamp("start")));
-        appointment.setEnd(DateTimeUtil.getZonedDateTimeFromTimestamp(rs.getTimestamp("end")));
+        appointment.setStart(DateTimeUtil.getLocalDateTimeFromTimestamp(rs.getTimestamp("start")));
+        appointment.setEnd(DateTimeUtil.getLocalDateTimeFromTimestamp(rs.getTimestamp("end")));
         return appointment;
     }
 
