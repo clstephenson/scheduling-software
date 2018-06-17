@@ -245,26 +245,14 @@ public class MainController {
         appointment.setUrl(urlInput.getText());
         appointment.setAppointmentType(typeInput.getValue());
         appointment.setAppointmentLocation(locationInput.getValue());
-        appointment.setStart(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(startInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-        appointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
+        appointment.setStart(getLocalDateTimeFromDetails(startInput.getText()));
+        appointment.setEnd(getLocalDateTimeFromDetails(endInput.getText()));
 
         return appointment.save();
     }
 
-    private boolean validateAppointmentFields() {
-        Validator v = new Validator();
-        v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
-        v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
-        v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
-        v.getValidations().add(new UrlNotRequiredValidation(urlInput, "URL", validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
-
-        if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
-            Dialog.showValidationError(v.getMessage());
-            return false;
-        }
-        return true;
+    private LocalDateTime getLocalDateTimeFromDetails(String formattedTime) {
+        return LocalDateTime.of(dateInput.getValue(), LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern("HH:mm")));
     }
 
     private void addDetailsFormListeners() {
@@ -479,6 +467,39 @@ public class MainController {
     private void clearData() {
         appointmentTable.setItems(FXCollections.observableArrayList());
         initializeDetailsFields();
+    }
+
+    private boolean validateAppointmentFields() {
+        Validator v = new Validator();
+        v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
+        v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
+        v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
+        v.getValidations().add(new UrlNotRequiredValidation(urlInput, "URL", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
+
+        boolean isValid = false;
+        if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
+            Dialog.showValidationError(v.getMessage());
+        } else {
+            //valid so far... now check if appt times follow business rules
+            LocalDateTime start = getLocalDateTimeFromDetails(startInput.getText());
+            LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
+            User currentUser = LoginSessionHelper.getCurrentUser();
+            try {
+                if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end)) {
+                    if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
+                        isValid = true;
+                    }
+                }
+            } catch (AppointmentOutsideBusinessHoursException e) {
+                Dialog.showValidationError("The appointment falls outside the standard business hours for this location.");
+            } catch (OverlappingAppointmentException e) {
+                Dialog.showValidationError("The appointment overlaps with another scheduled appointment.");
+            }
+        }
+        return isValid;
+
     }
 
     private void formatDateCell(TableColumn column) {
