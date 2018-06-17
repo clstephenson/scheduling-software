@@ -1,15 +1,25 @@
+*********************************
+**  Assumptions and Decisions  **
+*********************************
+1. using contact field on appointments table for user/consultant
 
-using contact field on appointments table for user/consultant
-using title field on appointments table for appointment type
+2. using title field on appointments table for appointment type
 
-Assuming appointments can be held at the office locations in Phoenix, New York, or London, or can also be held online.
+3. Assume appointments can be held at the office locations in Phoenix, New York, or London
 
-Assuming "overlapping appointments" refers to appointments for the same user / consultant.
+4. Assume "overlapping appointments" refers to appointments for the same user / consultant
 
-Assuming business hours is 8-5 in the office's timezone.
+5. Assume business hours is 9-5 in the office's timezone
 
-----
-**working on
+********************
+**  Rubric Items  **
+********************
+F. Exception Controls
+    1. Incorrect username/password - AccessControlException is thrown from LoginSession.java and caught in
+       LoginController.java.  A message is then displayed to the user.
 
-still need to fix dates and times / timezones
-might try moving mapresultsettoobject to a static method
+    2. Appointment outside business hours -
+
+    3. Overlapping appointments -
+
+    4. Non-existent/invalid customer data -
