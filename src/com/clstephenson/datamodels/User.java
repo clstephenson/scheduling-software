@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
@@ -23,17 +22,12 @@ public class User {
     private ObservableList<Appointment> userAppointments;
 
     public static User getActiveUser(String username, String password) {
-        try {
-            UserRepository userRepository = new UserRepository();
-            return userRepository.findSingle(u ->
-                    u.getUserName().equalsIgnoreCase(username) &&
-                            u.getPassword().equals(password) &&
-                            u.isActive()
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exceptions
-        }
+        UserRepository userRepository = new UserRepository();
+        return userRepository.findSingle(u ->
+                u.getUserName().equalsIgnoreCase(username) &&
+                        u.getPassword().equals(password) &&
+                        u.isActive()
+        );
     }
 
     public User() {
@@ -91,14 +85,9 @@ public class User {
     }
 
     public ObservableList<Appointment> getUserAppointments() {
-        try {
-            userAppointments = FXCollections.observableArrayList(
-                    new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //todo fix exception
-        }
+        userAppointments = FXCollections.observableArrayList(
+                new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
+        );
         return userAppointments;
     }
 

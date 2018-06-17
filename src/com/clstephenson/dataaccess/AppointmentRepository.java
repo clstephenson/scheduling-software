@@ -12,12 +12,17 @@ public class AppointmentRepository implements Repository<Appointment> {
 
     private Connection dbConnection;
 
-    public AppointmentRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public AppointmentRepository() {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exception
+        }
     }
 
     @Override
-    public int add(Appointment appointment, LoginSession session) throws SQLException {
+    public int add(Appointment appointment, LoginSession session) {
         Customer customer = Customer.getCustomerById(appointment.getCustomer().getId());
         if(customer == null) {
             //add the customer to the DB
@@ -48,16 +53,17 @@ public class AppointmentRepository implements Repository<Appointment> {
                     throw new SQLException();
                 }
             } catch (SQLException e) {
-                throw new SQLException(Localization.getString("error.db.addingappointment"), e);
+                throw new RuntimeException(Localization.getString("error.db.addingappointment"), e);
             }
         } else {
             // error - customer could not be added, therefore appointment could not be added
-            throw new SQLException(Localization.getString("error.db.addingappointment"));
+            throw new RuntimeException(Localization.getString("error.db.addingappointment"));
+            // TODO: change to return 0 instead.
         }
     }
 
     @Override
-    public boolean update(Appointment appointment, LoginSession session) throws SQLException {
+    public boolean update(Appointment appointment, LoginSession session) {
         String sql = "UPDATE appointment set customerId=?, title=?, description=?, location=?, contact=?, url=?," +
                 "start=?, end=?, lastUpdateBy=? WHERE appointmentid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
@@ -73,29 +79,30 @@ public class AppointmentRepository implements Repository<Appointment> {
             statement.setInt(10, appointment.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.updatingappointment"), e);
+            throw new RuntimeException(Localization.getString("error.db.updatingappointment"), e);
+            //todo fix exceptions
         }
     }
 
     @Override
-    public boolean removeById(int id) throws SQLException {
+    public boolean removeById(int id) {
         String sql = "DELETE FROM appointment WHERE appointmentid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingappointment") + " = " + id;
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
     }
 
     @Override
-    public boolean remove(Appointment appointment) throws SQLException {
+    public boolean remove(Appointment appointment) {
         return removeById(appointment.getId());
     }
 
     @Override
-    public List<Appointment> findAll() throws SQLException {
+    public List<Appointment> findAll() {
         String query = "SELECT * FROM appointment_view";
         ArrayList<Appointment> appointments = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -106,12 +113,12 @@ public class AppointmentRepository implements Repository<Appointment> {
             return appointments;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.appointmentquery");
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
     }
 
     @Override
-    public Appointment findById(int id) throws SQLException {
+    public Appointment findById(int id) {
         return findSingle(appointment -> appointment.getId() == id);
     }
 

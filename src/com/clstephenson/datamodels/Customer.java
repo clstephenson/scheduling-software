@@ -4,8 +4,6 @@ import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.beans.property.*;
 
-import java.sql.SQLException;
-
 public class Customer {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
@@ -93,17 +91,12 @@ public class Customer {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        try {
-            CustomerRepository repository = new CustomerRepository();
-            if(this.id.get() > 0) {
-                result = repository.update(this, LoginSessionHelper.getSession());
-            } else {
-                resultId = repository.add(this, LoginSessionHelper.getSession());
-                if(resultId > 0) this.id.set(resultId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //todo do something with exception
+        CustomerRepository repository = new CustomerRepository();
+        if (this.id.get() > 0) {
+            result = repository.update(this, LoginSessionHelper.getSession());
+        } else {
+            resultId = repository.add(this, LoginSessionHelper.getSession());
+            if (resultId > 0) this.id.set(resultId);
         }
         return result || resultId > 0;
     }
@@ -111,15 +104,10 @@ public class Customer {
     public boolean remove() {
         boolean result = false;
         if(this.id.get() > 0) {
-            try {
-                CustomerRepository repository = new CustomerRepository();
-                if(repository.remove(this)) {
-                    this.id.set(0);
-                    result = true;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //todo do something with exception
+            CustomerRepository repository = new CustomerRepository();
+            if (repository.remove(this)) {
+                this.id.set(0);
+                result = true;
             }
         }
         return result;

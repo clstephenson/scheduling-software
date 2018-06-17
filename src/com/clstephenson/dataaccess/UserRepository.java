@@ -13,12 +13,17 @@ public class UserRepository implements Repository<User> {
 
     private Connection dbConnection;
 
-    public UserRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public UserRepository() {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+            //todo fix exception
+        }
     }
 
     @Override
-    public int add(User user, LoginSession session) throws SQLException {
+    public int add(User user, LoginSession session) {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO user (userName, password, active, createDate, createBy, lastUpdatedBy) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -37,34 +42,41 @@ public class UserRepository implements Repository<User> {
                 throw new SQLException();
             }
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.addinguser"), e);
+            throw new RuntimeException(Localization.getString("error.db.addinguser"), e);
+            //todo: fix exceptions
         }
     }
 
     @Override
-    public boolean update(User entity, LoginSession session) throws SQLException {
+    public boolean update(User entity, LoginSession session) {
+        //todo: implement this method if needed
         return false;
     }
 
     @Override
-    public boolean removeById(int id) throws SQLException {
+    public boolean removeById(int id) {
         String sql = "DELETE FROM user WHERE userid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removinguser") + " = " + id;
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
     }
 
     @Override
-    public boolean remove(User user) throws SQLException {
+    public boolean remove(User user) {
         return removeById(user.getId());
     }
 
     @Override
-    public List<User> findAll() throws SQLException {
+    public User findById(int id) {
+        return findSingle(user -> user.getId() == id);
+    }
+
+    @Override
+    public List<User> findAll() {
         String query = "SELECT userId, userName, password, active FROM user";
         ArrayList<User> users = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -75,13 +87,8 @@ public class UserRepository implements Repository<User> {
             return users;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.userquery");
-            throw new SQLException(message, e);
+            throw new RuntimeException(message, e); //todo fix exception handling
         }
-    }
-
-    @Override
-    public User findById(int id) throws SQLException {
-        return findSingle(user -> user.getId() == id);
     }
 
     private User mapResultSetToObject(ResultSet rs) throws SQLException {
