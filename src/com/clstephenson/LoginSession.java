@@ -2,7 +2,6 @@ package com.clstephenson;
 
 import com.clstephenson.datamodels.User;
 
-import java.io.IOException;
 import java.security.AccessControlException;
 
 /**
@@ -29,11 +28,7 @@ public class LoginSession {
     }
 
     private void logAttempt(String userName, boolean isSuccessful) {
-        try {
-            LoginActivityLogger.logNewActivity(userName, isSuccessful);
-        } catch (IOException e) {
-            throw new RuntimeException("Login attempt entry could not be written to the log file.", e);
-        }
+        LoginActivityLogger.logNewActivity(userName, isSuccessful);
     }
 
     /**

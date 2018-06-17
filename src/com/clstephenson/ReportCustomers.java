@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -34,8 +33,6 @@ public class ReportCustomers {
             }
             showReport(f);
         } catch (IOException e) {
-            e.printStackTrace(); //todo handle exception
-        } catch (SQLException e) {
             e.printStackTrace(); //todo handle exception
         }
     }
