@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 public class MainController {
@@ -453,9 +454,18 @@ public class MainController {
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-        for (Appointment appt :
-                LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15)) {
-            message.append(appt.toString());
+
+        List<Appointment> list =
+                LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15);
+
+        for (Appointment appt : list) {
+            String msg = String.format(
+                    "You have a %s with %s today from %s to %s.",
+                    appt.getAppointmentType().toString(),
+                    appt.getCustomer().getName(),
+                    appt.getStart().format(DateTimeFormatter.ofPattern("h:mm a")),
+                    appt.getEnd().format(DateTimeFormatter.ofPattern("h:mm a")));
+            message.append(msg);
         }
         String header;
         if (message.length() == 0) {
