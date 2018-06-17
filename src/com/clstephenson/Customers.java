@@ -12,16 +12,16 @@ public class Customers {
 
     private SimpleListProperty<Customer> customers;
 
-    public Customers() throws SQLException {
+    public Customers() {
         customers = new SimpleListProperty<>(FXCollections.observableArrayList());
         updateCustomersFromRepository();
     }
 
-    private void updateCustomersFromRepository() throws SQLException {
+    private void updateCustomersFromRepository() {
         setCustomers(FXCollections.observableArrayList(new CustomerRepository().findAll()));
     }
 
-    public ObservableList<Customer> getCustomers() throws SQLException {
+    public ObservableList<Customer> getCustomers() {
         updateCustomersFromRepository();
         return customers.get();
     }

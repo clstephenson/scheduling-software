@@ -328,11 +328,10 @@ public class MainController {
     }
 
     private void reloadCustomersList() {
-        try {
-            customerInput.setItems(customers.getCustomers().sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName())));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        customerInput.setItems(
+                customers.getCustomers()
+                        .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+        );
     }
 
     private void populateDetailsForm(Appointment appt) {
