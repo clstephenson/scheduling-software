@@ -483,40 +483,46 @@ public class MainController {
             Dialog.showValidationError(v.getMessage());
         } else {
             //valid so far... now check if appt times follow business rules
-            LocalDateTime start = getLocalDateTimeFromDetails(startInput.getText());
-            LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
-            User currentUser = LoginSessionHelper.getCurrentUser();
-            try {
-                if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end)) {
-                    if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
-                        isValid = true;
-                    }
+            isValid = validateAppointmentBusinessRules();
+        }
+        return isValid;
+    }
+
+    private boolean validateAppointmentBusinessRules() {
+        boolean isValid = false;
+        LocalDateTime start = getLocalDateTimeFromDetails(startInput.getText());
+        LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
+        User currentUser = LoginSessionHelper.getCurrentUser();
+        try {
+            if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end)) {
+                if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
+                    isValid = true;
                 }
-            } catch (AppointmentOutsideBusinessHoursException e) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("Your appointment from %s to %s falls outside the standard business hours.",
-                        DateTimeUtil.getPrettyTime(e.getAppointmentStartTime()),
-                        DateTimeUtil.getPrettyTime(e.getAppointmentEndTime())
-                ));
-                sb.append(System.lineSeparator());
-                sb.append(System.lineSeparator());
-                sb.append(String.format("Business hours are from %s to %s, seven days per week.",
-                        DateTimeUtil.getPrettyTime(e.getBusinessHoursStart()),
-                        DateTimeUtil.getPrettyTime(e.getBusinessHoursEnd())));
-                Dialog.showValidationError(sb.toString());
-            } catch (OverlappingAppointmentException e) {
-                Appointment a = e.getOverlappedAppointment();
-                StringBuilder sb = new StringBuilder();
-                sb.append("The appointment overlaps with another scheduled appointment:");
-                sb.append(System.lineSeparator());
-                sb.append(System.lineSeparator());
-                sb.append(String.format("An appointment with %s is scheduled from %s to %s",
-                        a.getCustomer().getName(),
-                        DateTimeUtil.getPrettyTime(a.getStart().toLocalTime()),
-                        DateTimeUtil.getPrettyTime(a.getEnd().toLocalTime())
-                ));
-                Dialog.showValidationError(sb.toString());
             }
+        } catch (AppointmentOutsideBusinessHoursException e) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Your appointment from %s to %s falls outside the standard business hours.",
+                    DateTimeUtil.getPrettyTime(e.getAppointmentStartTime()),
+                    DateTimeUtil.getPrettyTime(e.getAppointmentEndTime())
+            ));
+            sb.append(System.lineSeparator());
+            sb.append(System.lineSeparator());
+            sb.append(String.format("Business hours are from %s to %s, seven days per week.",
+                    DateTimeUtil.getPrettyTime(e.getBusinessHoursStart()),
+                    DateTimeUtil.getPrettyTime(e.getBusinessHoursEnd())));
+            Dialog.showValidationError(sb.toString());
+        } catch (OverlappingAppointmentException e) {
+            Appointment a = e.getOverlappedAppointment();
+            StringBuilder sb = new StringBuilder();
+            sb.append("The appointment overlaps with another scheduled appointment:");
+            sb.append(System.lineSeparator());
+            sb.append(System.lineSeparator());
+            sb.append(String.format("An appointment with %s is scheduled from %s to %s",
+                    a.getCustomer().getName(),
+                    DateTimeUtil.getPrettyTime(a.getStart().toLocalTime()),
+                    DateTimeUtil.getPrettyTime(a.getEnd().toLocalTime())
+            ));
+            Dialog.showValidationError(sb.toString());
         }
         return isValid;
     }
