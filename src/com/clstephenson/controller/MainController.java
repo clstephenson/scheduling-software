@@ -493,13 +493,32 @@ public class MainController {
                     }
                 }
             } catch (AppointmentOutsideBusinessHoursException e) {
-                Dialog.showValidationError("The appointment falls outside the standard business hours for this location.");
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("Your appointment from %s to %s falls outside the standard business hours.",
+                        DateTimeUtil.getPrettyTime(e.getAppointmentStartTime()),
+                        DateTimeUtil.getPrettyTime(e.getAppointmentEndTime())
+                ));
+                sb.append(System.lineSeparator());
+                sb.append(System.lineSeparator());
+                sb.append(String.format("Business hours are from %s to %s, seven days per week.",
+                        DateTimeUtil.getPrettyTime(e.getBusinessHoursStart()),
+                        DateTimeUtil.getPrettyTime(e.getBusinessHoursEnd())));
+                Dialog.showValidationError(sb.toString());
             } catch (OverlappingAppointmentException e) {
-                Dialog.showValidationError("The appointment overlaps with another scheduled appointment.");
+                Appointment a = e.getOverlappedAppointment();
+                StringBuilder sb = new StringBuilder();
+                sb.append("The appointment overlaps with another scheduled appointment:");
+                sb.append(System.lineSeparator());
+                sb.append(System.lineSeparator());
+                sb.append(String.format("An appointment with %s is scheduled from %s to %s",
+                        a.getCustomer().getName(),
+                        DateTimeUtil.getPrettyTime(a.getStart().toLocalTime()),
+                        DateTimeUtil.getPrettyTime(a.getEnd().toLocalTime())
+                ));
+                Dialog.showValidationError(sb.toString());
             }
         }
         return isValid;
-
     }
 
     private void formatDateCell(TableColumn column) {

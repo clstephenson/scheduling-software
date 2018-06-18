@@ -37,7 +37,7 @@ public class ScheduleValidator {
         */
         if (apptStartAtLocation.toLocalTime().isBefore(businessHoursStart)
                 || apptEndAtLocation.toLocalTime().isAfter(businessHoursEnd)) {
-            throw new AppointmentOutsideBusinessHoursException();
+            throw new AppointmentOutsideBusinessHoursException(start, end);
         } else {
             return true;
         }
@@ -65,6 +65,7 @@ public class ScheduleValidator {
                 a -> a.getStart().toLocalDate().isEqual(start.toLocalDate())
         );
 
+        Appointment overlappedAppointment = null;
         for (Appointment userAppointment : userAppointments) {
             LocalTime userAppointmentStart = userAppointment.getStart().toLocalTime();
             LocalTime userAppointmentEnd = userAppointment.getEnd().toLocalTime();
@@ -73,6 +74,8 @@ public class ScheduleValidator {
                     start.toLocalTime().isBefore(userAppointmentEnd);
             boolean endIsBetweenStartAndEnd = end.toLocalTime().isAfter(userAppointmentStart) &&
                     end.toLocalTime().isBefore(userAppointmentEnd);
+            boolean startAndEndAreEqual = start.toLocalTime().equals(userAppointmentStart) &&
+                    end.toLocalTime().equals(userAppointmentEnd);
 
             /* fixme:
             do not check userAppointment if the id matches the appointment to validate.  This means it's an edit
@@ -83,12 +86,14 @@ public class ScheduleValidator {
 //                    && (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd)) {
 //                isOverlapping = true;
 //            }
-            if (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd) {
+            if (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd || startAndEndAreEqual) {
                 isOverlapping = true;
+                overlappedAppointment = userAppointment;
+                break;
             }
         }
         if (isOverlapping) {
-            throw new OverlappingAppointmentException();
+            throw new OverlappingAppointmentException(start, end, overlappedAppointment);
         } else {
             return true;
         }

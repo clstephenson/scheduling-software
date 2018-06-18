@@ -1,10 +1,7 @@
 package com.clstephenson;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
@@ -45,6 +42,14 @@ public class DateTimeUtil {
 
     public static int getWeekOfYear(LocalDate date) {
         return date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+    }
+
+    public static String getPrettyTime(LocalTime lt) {
+        return lt.format(getPrintableTimeFormatter());
+    }
+
+    private static DateTimeFormatter getPrintableTimeFormatter() {
+        return DateTimeFormatter.ofPattern("h:mm a");
     }
 
     private static DateTimeFormatter getDateTimeFormatter() {
