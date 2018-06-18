@@ -77,15 +77,6 @@ public class ScheduleValidator {
             boolean startAndEndAreEqual = start.toLocalTime().equals(userAppointmentStart) &&
                     end.toLocalTime().equals(userAppointmentEnd);
 
-            /* fixme:
-            do not check userAppointment if the id matches the appointment to validate.  This means it's an edit
-            rather than a new appointment and we're comparing the appointment to itself with changes.  This would
-            be a false positive.
-            */
-//            if(appointment.getId() != userAppointment.getId()
-//                    && (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd)) {
-//                isOverlapping = true;
-//            }
             if (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd || startAndEndAreEqual) {
                 isOverlapping = true;
                 overlappedAppointment = userAppointment;
