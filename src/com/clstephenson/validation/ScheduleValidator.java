@@ -58,7 +58,7 @@ public class ScheduleValidator {
      * @return True is returned if the appointment is not overlapping with another in the user's schedule.
      * @throws OverlappingAppointmentException Thrown if an overlapping appointment is found in the user's schedule.
      */
-    public static boolean isAppointmentNotOverlapping(User user, LocalDateTime start, LocalDateTime end)
+    public static boolean isAppointmentNotOverlapping(User user, LocalDateTime start, LocalDateTime end, int apptId)
             throws OverlappingAppointmentException {
         boolean isOverlapping = false;
         List<Appointment> userAppointments = user.getUserAppointments(
@@ -77,10 +77,17 @@ public class ScheduleValidator {
             boolean startAndEndAreEqual = start.toLocalTime().equals(userAppointmentStart) &&
                     end.toLocalTime().equals(userAppointmentEnd);
 
-            if (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd || startAndEndAreEqual) {
-                isOverlapping = true;
-                overlappedAppointment = userAppointment;
-                break;
+            /*
+            do not check userAppointment if the id matches the appointment to validate.  This means it's an edit
+            rather than a new appointment and we're comparing the appointment to itself with changes.  This would
+            be a false positive.
+            */
+            if (apptId != userAppointment.getId()) {
+                if (startIsBetweenStartAndEnd || endIsBetweenStartAndEnd || startAndEndAreEqual) {
+                    isOverlapping = true;
+                    overlappedAppointment = userAppointment;
+                    break;
+                }
             }
         }
         if (isOverlapping) {

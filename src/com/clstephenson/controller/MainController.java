@@ -494,7 +494,8 @@ public class MainController {
         LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
         User currentUser = LoginSessionHelper.getCurrentUser();
         try {
-            if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end)) {
+            int id = isNewAppointment ? 0 : getSelectedAppointment().getId();
+            if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end, id)) {
                 if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
                     isValid = true;
                 }
