@@ -189,8 +189,8 @@ public class Appointment {
 
     public String toString() {
         return String.format("[%d, %s, %s, %s, %s, %s, %s, %s, %s]", this.id.get(), this.customer.get().getName(),
-                this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(), this.consultant.get(),
-                this.url.get(), this.start.get(), this.end.get());
+                this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(),
+                this.consultant.get(), this.url.get(), this.start.get(), this.end.get());
         //todo change format string for start and end dates/times
     }
 }

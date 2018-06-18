@@ -13,6 +13,7 @@ public class DateTimeUtil {
     /**
      * Used for saving a date/time to the DB.  Adds default timezone information before converting to UTC,
      * and ultimately returns a timestamp for data persistence.
+     *
      * @param localDateTime
      * @return timestamp that can be persisted to a database
      */
@@ -26,10 +27,11 @@ public class DateTimeUtil {
     /**
      * Used for getting a date from the DB.  Converts a timestamp (e.g. from DB) to a ZonedDateTime using the
      * system default timezone.
+     *
      * @param timestamp
      * @return date and time with default timezone information added
      */
-    public static LocalDateTime getZonedDateTimeFromTimestamp(Timestamp timestamp) {
+    public static LocalDateTime getLocalDateTimeFromTimestamp(Timestamp timestamp) {
         ZonedDateTime utc = timestamp.toLocalDateTime().atZone(ZoneId.of("UTC"));
         return utc.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
     }
@@ -40,6 +42,14 @@ public class DateTimeUtil {
 
     public static int getWeekOfYear(LocalDate date) {
         return date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+    }
+
+    public static String getPrettyTime(LocalTime lt) {
+        return lt.format(getPrintableTimeFormatter());
+    }
+
+    private static DateTimeFormatter getPrintableTimeFormatter() {
+        return DateTimeFormatter.ofPattern("h:mm a");
     }
 
     private static DateTimeFormatter getDateTimeFormatter() {
