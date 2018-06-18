@@ -50,6 +50,10 @@ public class MainController {
     @FXML
     private ToggleGroup viewToggleGroup;
     @FXML
+    private ToggleButton viewUpcomingButton;
+    @FXML
+    private ToggleButton viewAllButton;
+    @FXML
     private DatePicker dateInput;
     @FXML
     private TextField startInput;
@@ -180,6 +184,8 @@ public class MainController {
         menuItemViewMonth.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewMonth.getId()));
         menuItemViewWeek.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewWeek.getId()));
         menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
+        viewUpcomingButton.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
+        viewAllButton.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if (newValue != null) {
@@ -347,7 +353,7 @@ public class MainController {
         if (isNewCustomer) {
             FXHelper.showCustomerDetails(this, null);
         } else {
-            Customer customer = customerInput.getValue(); // getSelectedAppointment().getCustomer();
+            Customer customer = customerInput.getValue();
             FXHelper.showCustomerDetails(this, customer);
         }
         if (isCustomerChanged) {
@@ -403,6 +409,9 @@ public class MainController {
         }
     }
 
+    /**
+     * @return Sorted list of appointments filtered according to the selected view options.
+     */
     private SortedList<Appointment> getAppointmentsByView() {
         User user = LoginSessionHelper.getCurrentUser();
         ObservableList<Appointment> appointments;
@@ -416,7 +425,12 @@ public class MainController {
         } else {
             appointments = user.getUserAppointments();
         }
-        return new SortedList<>(appointments);
+
+        if (viewUpcomingButton.isSelected()) {
+            return new SortedList<Appointment>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
+        } else {
+            return new SortedList<>(appointments);
+        }
     }
 
     private void handleLogout() {

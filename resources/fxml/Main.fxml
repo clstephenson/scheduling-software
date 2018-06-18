@@ -92,6 +92,18 @@
                                  <children>
                                     <ProgressIndicator fx:id="progressIndicator" visible="false" />
                                  </children></Pane>
+                               <ToggleButton fx:id="viewUpcomingButton" mnemonicParsing="false" prefWidth="71.0"
+                                             selected="true" text="Upcoming">
+                                   <toggleGroup>
+                                       <ToggleGroup fx:id="pastAppointmentToggleGroup"/>
+                                   </toggleGroup>
+                               </ToggleButton>
+                               <ToggleButton fx:id="viewAllButton" mnemonicParsing="false" prefWidth="71.0" text="All"
+                                             toggleGroup="$pastAppointmentToggleGroup">
+                                   <HBox.margin>
+                                       <Insets right="20.0"/>
+                                   </HBox.margin>
+                               </ToggleButton>
                               <Label id="dateTimeLabel" fx:id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
                                  <font>
                                     <Font size="18.0" fx:id="x12" />
