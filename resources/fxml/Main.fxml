@@ -114,7 +114,7 @@
                               </Label>
                            </children>
                            <padding>
-                              <Insets left="15.0" right="15.0" />
+                               <Insets left="15.0" right="15.0" top="10" bottom="10"/>
                            </padding>
                         </HBox>
                         <TableView fx:id="appointmentTable" VBox.vgrow="ALWAYS" />
@@ -143,7 +143,7 @@
                               </Label>
                            </children>
                            <padding>
-                              <Insets left="15.0" />
+                               <Insets left="15.0" top="10"/>
                            </padding>
                         </HBox>
                         <GridPane vgap="5.0" VBox.vgrow="NEVER">

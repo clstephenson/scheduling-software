@@ -139,6 +139,7 @@ public class MainController {
     }
 
     private void initializeTableColumns() {
+        //create the columns
         customerColumn = new TableColumn<>("Customer");
         typeColumn = new TableColumn<>("Type");
         descriptionColumn = new TableColumn<>("Description");
@@ -147,8 +148,19 @@ public class MainController {
         dateColumn = new TableColumn<>("Date");
         startColumn = new TableColumn<>("Start");
         endColumn = new TableColumn<>("End");
+
+        //give each column an id (if needed for css styling)
+        customerColumn.setId("customer-column");
+        typeColumn.setId("type-column");
+        descriptionColumn.setId("description-column");
+        locationColumn.setId("location-column");
+        urlColumn.setId("url-column");
+        dateColumn.setId("date-column");
+        startColumn.setId("start-column");
+        endColumn.setId("end-column");
+
         appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn,
-                descriptionColumn, locationColumn, urlColumn);
+                locationColumn, /*urlColumn,*/ descriptionColumn);
     }
 
     private void setupTableCellDataBindings() {
