@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,8 +28,21 @@ public class Main extends Application {
     private static ScheduledExecutorService executorService;
 
     public static void main(String[] args) throws SQLException {
+
+        /*
+        Change the default system time zone.
+        */
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Phoenix"));
         //TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+
+
+        /*
+        Change the default locale to Italy or French Canadian
+        */
         //Locale.setDefault(Locale.ITALY);
+        Locale.setDefault(Locale.CANADA_FRENCH);
+
+
         Platform.setImplicitExit(true);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> cleanupResources()));
         launch(args);
@@ -55,7 +69,6 @@ public class Main extends Application {
             String fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
             loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             root = loader.load();
-            //root = FXMLLoader.load(Paths.get(fxmlPath).toUri().toURL());
         } catch (Exception e) {
             throw new RuntimeException("Could not load Main.fxml", e);
             //todo fix this exception handling
@@ -88,6 +101,11 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Runs a separate thread to show the current time in the UI.
+     *
+     * @param loader
+     */
     private static void startDateTimeThread(FXMLLoader loader) {
         Label targetLabel = (Label) loader.getNamespace().get("dateTimeLabel");
         executorService = Executors.newScheduledThreadPool(1);
