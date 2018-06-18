@@ -14,6 +14,8 @@
 ********************
 **  Rubric Items  **
 ********************
+A. Login form is localized to it_IT, and fr_CA.
+
 F. Exception Controls
     1. Incorrect username/password - AccessControlException is thrown from LoginSession.java and caught in
        LoginController.java.  A message is then displayed to the user.

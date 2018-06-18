@@ -39,8 +39,8 @@ public class Main extends Application {
         /*
         Change the default locale to Italy or French Canadian
         */
-        //Locale.setDefault(Locale.ITALY);
-        Locale.setDefault(Locale.CANADA_FRENCH);
+        Locale.setDefault(Locale.ITALY);
+        //Locale.setDefault(Locale.CANADA_FRENCH);
 
 
         Platform.setImplicitExit(true);
