@@ -30,7 +30,7 @@ public class CityRepository implements Repository <City> {
             //add the country to the DB
             city.getCountry().save();
         }
-        int countryId = country.getId();
+        int countryId = city.getCountry().getId();
         if(countryId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO city (city, countryId, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?, ?)";

@@ -28,7 +28,7 @@ public class AppointmentRepository implements Repository<Appointment> {
             //add the customer to the DB
             appointment.getCustomer().save();
         }
-        int customerId = customer.getId();
+        int customerId = appointment.getCustomer().getId();
         if(customerId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO appointment (customerId, title, description, location, contact, " +

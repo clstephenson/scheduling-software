@@ -32,7 +32,7 @@ public class CustomerRepository implements Repository<Customer> {
             //add the address to the DB
             customer.getAddress().save();
         }
-        int addressId = address.getId();
+        int addressId = customer.getAddress().getId();
         if(addressId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO customer (customerName, addressid, active, createDate, createdBy, lastUpdateBy) " +

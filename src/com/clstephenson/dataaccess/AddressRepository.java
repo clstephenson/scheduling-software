@@ -31,7 +31,7 @@ public class AddressRepository implements Repository<Address> {
             //add the city to the DB
             address.getCity().save();
         }
-        int cityId = city.getId();
+        int cityId = address.getCity().getId();
         if(cityId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO address " +
