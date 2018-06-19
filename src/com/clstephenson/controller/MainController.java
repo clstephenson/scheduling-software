@@ -6,7 +6,6 @@ import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
 import com.clstephenson.validation.*;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,9 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.util.Duration;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +24,7 @@ import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainController {
 
@@ -109,10 +107,10 @@ public class MainController {
     private TableColumn<Appointment, LocalDateTime> endColumn;
 
     private Customers customers;
-    private boolean isNewAppointment = false;
-    private boolean isDirtyAppointmentDetails = false;
-    private boolean isNewSelection = false;
-    private boolean isCustomerChanged = false;
+    private AtomicBoolean isNewAppointment = new AtomicBoolean(false);
+    private AtomicBoolean isDirtyAppointmentDetails = new AtomicBoolean(false);
+    private AtomicBoolean isNewSelection = new AtomicBoolean(false);
+    private AtomicBoolean isCustomerChanged = new AtomicBoolean(false);
     private String validationErrorCssClass;
 
     /**
@@ -122,11 +120,11 @@ public class MainController {
      * @param isCustomerChanged
      */
     public void setIsCustomerChanged(boolean isCustomerChanged) {
-        this.isCustomerChanged = isCustomerChanged;
+        this.isCustomerChanged.set(isCustomerChanged);
     }
 
     @FXML
-    private void initialize() throws SQLException {
+    private void initialize() {
         validationErrorCssClass = AppConfiguration.getConfigurationProperty("form.validation.error.css");
         customers = new Customers();
         setUpAppointmentsTableView();
@@ -140,7 +138,7 @@ public class MainController {
         setupTableCellDataBindings();
         formatDateCell(dateColumn);
         formatTimeCell(startColumn);
-        //formatTimeCell(endColumn);
+        formatTimeCell(endColumn);
     }
 
     private void initializeTableColumns() {
@@ -165,7 +163,7 @@ public class MainController {
         endColumn.setId("end-column");
 
         appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn,
-                locationColumn, /*urlColumn,*/ descriptionColumn);
+                locationColumn, descriptionColumn);
     }
 
     private void setupTableCellDataBindings() {
@@ -177,22 +175,6 @@ public class MainController {
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endProperty());
-
-        endColumn.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            public void updateItem(final LocalDateTime item, final boolean empty) {
-                super.updateItem(item, empty);
-                if (this.getTableRow().getStyleClass().contains("completedAppointment")) {
-                    this.getTableRow().getStyleClass().remove("completedAppointment");
-                }
-                if (item != null) {
-                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
-                    if (item.compareTo(LocalDateTime.now()) < 0) {
-                        this.getTableRow().getStyleClass().add("completedAppointment");
-                    }
-                }
-            }
-        });
     }
 
     private void setUpEventHandlers() {
@@ -206,10 +188,10 @@ public class MainController {
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if (newValue != null) {
-                        isNewSelection = true; //keeps listeners from firing when details form populates on new selection
+                        isNewSelection.set(true); //keeps listeners from firing when details form populates on new selection
                         populateDetailsForm(newValue);
-                        isNewAppointment = false;
-                        isNewSelection = false;
+                        isNewAppointment.set(false);
+                        isNewSelection.set(false);
                     }
                 })
         );
@@ -231,15 +213,12 @@ public class MainController {
         if (validateAppointmentFields()) {
             saveAppointment();
         }
-//        if (validateAppointmentFields() && saveAppointment()) {
-//            reloadAppointmentAndCustomerData();
-//        }
     }
 
     private void createNewAppointment() {
         initializeDetailsFields();
         setIsAppointmentChanged(true);
-        isNewAppointment = true;
+        isNewAppointment.set(true);
     }
 
     private void deleteAppointment() {
@@ -258,24 +237,19 @@ public class MainController {
         }
     }
 
-    private void saveAppointment() {
-        Appointment appointment;
-        if (isNewAppointment) {
-            appointment = new Appointment();
-            appointment.setConsultant(LoginSessionHelper.getUsername());
-        } else {
-            appointment = getSelectedAppointment();
-        }
-        appointment.setCustomer(customerInput.getValue());
-        appointment.setDescription(descriptionInput.getText());
-        appointment.setUrl(urlInput.getText());
-        appointment.setAppointmentType(typeInput.getValue());
-        appointment.setAppointmentLocation(locationInput.getValue());
-        appointment.setStart(getLocalDateTimeFromDetails(startInput.getText()));
-        appointment.setEnd(getLocalDateTimeFromDetails(endInput.getText()));
-
-        if (appointment.save()) {
-            reloadAppointmentAndCustomerData(appointment);
+    private void setIsAppointmentChanged(boolean isChanged) {
+        if (!isChanged) {
+            // no changes to save
+            isDirtyAppointmentDetails.set(false);
+            showNeedsSavingMessage(false);
+            revertButton.setDisable(true);
+            saveButton.setDisable(true);
+        } else if (!isNewSelection.get() && isChanged && !isDirtyAppointmentDetails.get()) {
+            // new changes need saving
+            isDirtyAppointmentDetails.set(true);
+            showNeedsSavingMessage(true);
+            revertButton.setDisable(false);
+            saveButton.setDisable(false);
         }
     }
 
@@ -302,30 +276,20 @@ public class MainController {
 //        }));
     }
 
-    private void setIsAppointmentChanged(boolean isChanged) {
-        if (!isChanged) {
-            // no changes to save
-            isDirtyAppointmentDetails = false;
-            showNeedsSavingMessage(false);
-            revertButton.setDisable(true);
-            saveButton.setDisable(true);
-        } else if (!isNewSelection && isChanged && !isDirtyAppointmentDetails) {
-            // new changes need saving
-            isDirtyAppointmentDetails = true;
-            showNeedsSavingMessage(true);
-            revertButton.setDisable(false);
-            saveButton.setDisable(false);
-        }
+    private void showNeedsSavingMessage(boolean show) {
+        changeStatusLabel.setVisible(show);
     }
 
-    private void showNeedsSavingMessage(boolean show) {
-        if (show) {
-            FadeTransition ft = new FadeTransition(Duration.millis(500), changeStatusLabel);
-            ft.setFromValue(0.0);
-            ft.setToValue(1.0);
-            ft.play();
+    private void requestCustomerDetails(boolean isNewCustomer) {
+        if (isNewCustomer) {
+            FXHelper.showCustomerDetails(this, null);
         } else {
-            changeStatusLabel.setOpacity(0.0);
+            Customer customer = customerInput.getValue();
+            FXHelper.showCustomerDetails(this, customer);
+        }
+        if (isCustomerChanged.get()) {
+            reloadAppointmentAndCustomerData();
+            isCustomerChanged.set(false);
         }
     }
 
@@ -341,7 +305,6 @@ public class MainController {
         dateInput.setValue(LocalDate.now());
         startInput.clear();
         endInput.clear();
-        setIsAppointmentChanged(false);
     }
 
     private void reloadCustomersList() {
@@ -382,17 +345,17 @@ public class MainController {
         setAppointmentView("menuItemViewAll");
     }
 
-    private void requestCustomerDetails(boolean isNewCustomer) {
-        if (isNewCustomer) {
-            FXHelper.showCustomerDetails(this, null);
+    private void setAppointmentView(String selectedView) {
+        if (selectedView.equals("menuItemViewMonth")) {
+            viewLabel.setText("This Month's Appointments");
+        } else if (selectedView.equals("menuItemViewWeek")) {
+            viewLabel.setText("This Weeks's Appointments");
         } else {
-            Customer customer = customerInput.getValue();
-            FXHelper.showCustomerDetails(this, customer);
+            viewLabel.setText("All Appointments");
         }
-        if (isCustomerChanged) {
-            reloadAppointmentAndCustomerData();
-            isCustomerChanged = false;
-        }
+
+        //so the UI/mouse doesn't freeze during the update.
+        Platform.runLater(this::reloadAppointmentAndCustomerData);
     }
 
     private Appointment getSelectedAppointment() {
@@ -407,22 +370,25 @@ public class MainController {
         }
     }
 
-    private void setAppointmentView(String selectedView) { //View view) {
-        if (selectedView.equals("menuItemViewMonth")) {
-            viewLabel.setText("This Month's Appointments");
-        } else if (selectedView.equals("menuItemViewWeek")) {
-            viewLabel.setText("This Weeks's Appointments");
+    private void saveAppointment() {
+        Appointment appointment;
+        if (isNewAppointment.get()) {
+            appointment = new Appointment();
+            appointment.setConsultant(LoginSessionHelper.getUsername());
         } else {
-            viewLabel.setText("All Appointments");
+            appointment = getSelectedAppointment();
         }
+        appointment.setCustomer(customerInput.getValue());
+        appointment.setDescription(descriptionInput.getText());
+        appointment.setUrl(urlInput.getText());
+        appointment.setAppointmentType(typeInput.getValue());
+        appointment.setAppointmentLocation(locationInput.getValue());
+        appointment.setStart(getLocalDateTimeFromDetails(startInput.getText()));
+        appointment.setEnd(getLocalDateTimeFromDetails(endInput.getText()));
 
-        //reload the table data using a different thread so the UI/mouse doesn't freeze during the update.
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                reloadAppointmentAndCustomerData();
-            }
-        });
+        if (appointment.save()) {
+            reloadAppointmentAndCustomerData(appointment);
+        }
     }
 
     private void reloadAppointmentAndCustomerData() {
@@ -555,7 +521,7 @@ public class MainController {
         LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
         User currentUser = LoginSessionHelper.getCurrentUser();
         try {
-            int id = isNewAppointment ? 0 : getSelectedAppointment().getId();
+            int id = isNewAppointment.get() ? 0 : getSelectedAppointment().getId();
             if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end, id)) {
                 if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
                     isValid = true;
