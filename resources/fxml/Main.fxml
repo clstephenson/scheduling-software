@@ -146,7 +146,7 @@
                                <Insets left="15.0" top="10"/>
                            </padding>
                         </HBox>
-                        <GridPane vgap="5.0" VBox.vgrow="NEVER">
+                         <GridPane fx:id="detailsFormGridPane" id="details-form" vgap="5.0" VBox.vgrow="NEVER">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="225.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

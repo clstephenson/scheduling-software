@@ -12,7 +12,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
 import java.sql.SQLException;
@@ -91,6 +94,8 @@ public class MainController {
     private Label dateTimeLabel;
     @FXML
     private Label viewLabel;
+    @FXML
+    private GridPane detailsFormGridPane;
     @FXML
     private ProgressIndicator progressIndicator;
 
@@ -350,7 +355,18 @@ public class MainController {
         dateInput.setValue(appt.getStart().toLocalDate());
         startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
         endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        clearValidationErrors();
         setIsAppointmentChanged(false);
+    }
+
+    private void clearValidationErrors() {
+        for (Node hbox : detailsFormGridPane.getChildren()) {
+            for (Node control : ((HBox) hbox).getChildren()) {
+                if (control.getStyleClass().contains(validationErrorCssClass)) {
+                    control.getStyleClass().remove(validationErrorCssClass);
+                }
+            }
+        }
     }
 
     private void requestUserLogin() {
