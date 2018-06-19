@@ -228,9 +228,12 @@ public class MainController {
     }
 
     private void handleSaveAppointment() {
-        if (validateAppointmentFields() && saveAppointment()) {
-            reloadAppointmentAndCustomerData();
+        if (validateAppointmentFields()) {
+            saveAppointment();
         }
+//        if (validateAppointmentFields() && saveAppointment()) {
+//            reloadAppointmentAndCustomerData();
+//        }
     }
 
     private void createNewAppointment() {
@@ -255,7 +258,7 @@ public class MainController {
         }
     }
 
-    private boolean saveAppointment() {
+    private void saveAppointment() {
         Appointment appointment;
         if (isNewAppointment) {
             appointment = new Appointment();
@@ -271,7 +274,9 @@ public class MainController {
         appointment.setStart(getLocalDateTimeFromDetails(startInput.getText()));
         appointment.setEnd(getLocalDateTimeFromDetails(endInput.getText()));
 
-        return appointment.save();
+        if (appointment.save()) {
+            reloadAppointmentAndCustomerData(appointment);
+        }
     }
 
     private LocalDateTime getLocalDateTimeFromDetails(String formattedTime) {
@@ -422,6 +427,20 @@ public class MainController {
 
     private void reloadAppointmentAndCustomerData() {
         populateAppointments(getAppointmentsByView());
+        reloadCustomersList();
+        populateDetailsForm(getSelectedAppointment());
+    }
+
+    private void reloadAppointmentAndCustomerData(Appointment appointmentToSelect) {
+        populateAppointments(getAppointmentsByView());
+        int indexToSelect = appointmentTable.getItems().indexOf(
+                appointmentTable.getItems()
+                        .stream()
+                        .filter(a -> a.getId() == appointmentToSelect.getId())
+                        .findFirst().get()
+        );
+        appointmentTable.getSelectionModel().clearAndSelect(indexToSelect);
+        appointmentTable.scrollTo(indexToSelect);
         reloadCustomersList();
         populateDetailsForm(getSelectedAppointment());
     }
