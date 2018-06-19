@@ -82,7 +82,8 @@ public class CustomerRepository implements Repository<Customer> {
     public boolean removeById(int id) {
         try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
             statement.setInt(1, id);
-            return statement.executeUpdate() > 0;
+            statement.executeUpdate();
+            return this.findById(id) == null;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcustomer") + " = " + id;
             throw new RuntimeException(message, e); //todo fix exception handling
