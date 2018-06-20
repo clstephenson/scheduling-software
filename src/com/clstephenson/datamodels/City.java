@@ -94,6 +94,22 @@ public class City {
         return result;
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        City city = (City) o;
+
+        return id.equals(city.id);
+    }
+
+    @Override
     public String toString() {
         return String.format("[%d, %s, %s]", this.id.get(), this.name.get(), this.country.get());
     }

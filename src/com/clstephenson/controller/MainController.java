@@ -308,10 +308,7 @@ public class MainController {
     }
 
     private void reloadCustomersList() {
-        customerInput.setItems(
-                customers.getCustomers()
-                        .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-        );
+        customerInput.setItems(customers.getCustomers());
     }
 
     private void populateDetailsForm(Appointment appt) {
