@@ -1,10 +1,13 @@
 package com.clstephenson.controller;
 
 import com.clstephenson.AppConfiguration;
+import com.clstephenson.Customers;
 import com.clstephenson.Dialog;
 import com.clstephenson.FXHelper;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.validation.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -23,7 +26,14 @@ public class CustomerController {
     @FXML private TextField countryInput;
     @FXML private TextField phoneInput;
     @FXML private CheckBox activeInput;
+    @FXML
+    private ComboBox<Customer> customerComboBox;
+    @FXML
+    private Label customerLabel;
+    @FXML
+    private Label headerLabel;
 
+    private Customer initialCustomer;
     private Customer customer;
     private static MainController mainController;
     private String validationErrorCssClass;
@@ -34,30 +44,44 @@ public class CustomerController {
 
     @FXML
     private void initialize() {
-        if(customer == null) {
-            customer = new Customer();
+        if (initialCustomer == null) {
             deleteButton.setVisible(false);
+            showCustomerList(false);
         }
+        customer = new Customer();
         validationErrorCssClass = AppConfiguration.getConfigurationProperty("form.validation.error.css");
-        setFieldBindings();
         setUpEventHandlers();
     }
 
+    private void showCustomerList(boolean showList) {
+        customerComboBox.setVisible(showList);
+        customerLabel.setVisible(showList);
+        if (showList) {
+            headerLabel.setText("Edit Customers");
+        } else {
+            headerLabel.setText("Add New Customer");
+        }
+    }
+
     public void initData(Customer customer) {
-        this.customer = customer;
+        this.initialCustomer = customer;
         deleteButton.setVisible(true);
-        setFieldBindings();
+        showCustomerList(true);
+        ObservableList<Customer> customers = FXCollections.observableArrayList(new Customers().getCustomers());
+        customerComboBox.setItems(customers);
+        customerComboBox.getSelectionModel().selectedItemProperty().addListener(observable -> setFieldBindings());
+        customerComboBox.getSelectionModel().select(initialCustomer);
     }
 
     private void setFieldBindings() {
-        nameInput.textProperty().bindBidirectional(customer.nameProperty());
-        address1Input.textProperty().bindBidirectional(customer.getAddress().addressLine1Property());
-        address2Input.textProperty().bindBidirectional(customer.getAddress().addressLine2Property());
-        cityInput.textProperty().bindBidirectional(customer.getAddress().getCity().nameProperty());
-        postalCodeInput.textProperty().bindBidirectional(customer.getAddress().zipCodeProperty());
-        countryInput.textProperty().bindBidirectional(customer.getAddress().getCity().getCountry().nameProperty());
-        phoneInput.textProperty().bindBidirectional(customer.getAddress().phoneNumberProperty());
-        activeInput.selectedProperty().bindBidirectional(customer.isActiveProperty());
+        nameInput.textProperty().bindBidirectional(getSelectedCustomer().nameProperty());
+        address1Input.textProperty().bindBidirectional(getSelectedCustomer().getAddress().addressLine1Property());
+        address2Input.textProperty().bindBidirectional(getSelectedCustomer().getAddress().addressLine2Property());
+        cityInput.textProperty().bindBidirectional(getSelectedCustomer().getAddress().getCity().nameProperty());
+        postalCodeInput.textProperty().bindBidirectional(getSelectedCustomer().getAddress().zipCodeProperty());
+        countryInput.textProperty().bindBidirectional(getSelectedCustomer().getAddress().getCity().getCountry().nameProperty());
+        phoneInput.textProperty().bindBidirectional(getSelectedCustomer().getAddress().phoneNumberProperty());
+        activeInput.selectedProperty().bindBidirectional(getSelectedCustomer().isActiveProperty());
     }
 
     private void setUpEventHandlers() {
@@ -70,6 +94,10 @@ public class CustomerController {
         FXHelper.getStageFromNode(cancelButton).close();
     }
 
+    private Customer getSelectedCustomer() {
+        return customerComboBox.getSelectionModel().getSelectedItem();
+    }
+
     private void deleteCustomer() {
         Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
         dialog.setTitle("Delete Confirmation");
@@ -78,19 +106,13 @@ public class CustomerController {
                 "Are you sure you want to do this?");
         Optional<ButtonType> optResult = dialog.showDialog(true);
         if(optResult.get() == ButtonType.OK) {
-            if (customer.remove()) {
+            if (Customer.getCustomerById(getSelectedCustomer().getId()).remove()) {
                 mainController.setIsCustomerChanged(true);
                 close();
             } else {
-                //todo customer could not be deleted
+                new Dialog(Alert.AlertType.ERROR, "Error", "We've encountered a problem...",
+                        "The customer was unable to be deleted.").showDialog(true);
             }
-        }
-    }
-
-    private void saveCustomer() {
-        if(validateCustomer() && customer.save()) {
-            mainController.setIsCustomerChanged(true);
-            close();
         }
     }
 
@@ -114,5 +136,24 @@ public class CustomerController {
             return false;
         }
         return true;
+    }
+
+    private void saveCustomer() {
+        if (customerComboBox.isVisible()) {
+            customer.setId(getSelectedCustomer().getId());
+        }
+        customer.setName(nameInput.getText());
+        customer.getAddress().setAddressLine1(address1Input.getText());
+        customer.getAddress().setAddressLine2(address2Input.getText());
+        customer.getAddress().getCity().setName(cityInput.getText());
+        customer.getAddress().setZipCode(postalCodeInput.getText());
+        customer.getAddress().getCity().getCountry().setName(countryInput.getText());
+        customer.getAddress().setPhoneNumber(phoneInput.getText());
+        customer.setActive(activeInput.isSelected());
+
+        if (validateCustomer() && customer.save()) {
+            mainController.setIsCustomerChanged(true);
+            close();
+        }
     }
 }
