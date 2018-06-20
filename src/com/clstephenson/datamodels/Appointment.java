@@ -187,10 +187,25 @@ public class Appointment {
         return result;
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Appointment that = (Appointment) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
     public String toString() {
         return String.format("[%d, %s, %s, %s, %s, %s, %s, %s, %s]", this.id.get(), this.customer.get().getName(),
                 this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(),
                 this.consultant.get(), this.url.get(), this.start.get(), this.end.get());
-        //todo change format string for start and end dates/times
     }
 }

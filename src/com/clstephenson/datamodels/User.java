@@ -100,6 +100,22 @@ public class User {
         return getUserAppointments(a -> a.getStart().isAfter(LocalDateTime.now()) && a.getStart().isBefore(end));
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return id.equals(user.id);
+    }
+
+    @Override
     public String toString() {
         return this.userName.get();
     }
