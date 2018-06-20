@@ -112,6 +112,7 @@ public class MainController {
     private AtomicBoolean isNewSelection = new AtomicBoolean(false);
     private AtomicBoolean isCustomerChanged = new AtomicBoolean(false);
     private String validationErrorCssClass;
+    private final String TIME_DISPLAY_FORMAT = "HHmm";
 
     /**
      * public method is exposed to allow the CustomerController to specify whether the customer data
@@ -254,11 +255,11 @@ public class MainController {
     }
 
     private LocalDateTime getLocalDateTimeFromDetails(String formattedTime) {
-        return LocalDateTime.of(dateInput.getValue(), LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern("HH:mm")));
+        return LocalDateTime.of(dateInput.getValue(), LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
     }
 
     private void addDetailsFormListeners() {
-        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
+        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue));
         customerInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         descriptionInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
         typeInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
@@ -267,13 +268,6 @@ public class MainController {
         dateInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
         startInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
         endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-//        endInput.setTextFormatter(new TextFormatter<>(change -> {
-//            if(change.getControlText()change.getCaretPosition() == 2) {
-//                change.setText(change.getText() + ":");
-//                change.setCaretPosition(3);
-//            }
-//            return change;
-//        }));
     }
 
     private void showNeedsSavingMessage(boolean show) {
@@ -318,8 +312,8 @@ public class MainController {
         typeInput.setValue(appt.getAppointmentType());
         locationInput.setValue(appt.getAppointmentLocation());
         dateInput.setValue(appt.getStart().toLocalDate());
-        startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+        endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
         clearValidationErrors();
         setIsAppointmentChanged(false);
     }
@@ -574,7 +568,7 @@ public class MainController {
                 if (empty) {
                     setText(null);
                 } else {
-                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
+                    setText(item.format(DateTimeFormatter.ofPattern("h:mm a")));
                 }
             }
         });

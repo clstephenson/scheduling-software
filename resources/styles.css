@@ -21,11 +21,11 @@ TableRow .text {
 }
 
 #start-column {
-    -fx-pref-width: 60px;
+    -fx-pref-width: 70px;
 }
 
 #end-column {
-    -fx-pref-width: 60px;
+    -fx-pref-width: 70px;
 }
 
 #customer-column {
@@ -55,13 +55,6 @@ TableRow .text {
     -fx-background-color: lightpink;
     -fx-effect: dropshadow(gaussian, red, 10, .1, 0, 0);
 }
-
-/*Button {
-    -fx-border-color: gray;
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 3;
-}*/
 
 .completedAppointment .text {
     -fx-strikethrough: true;
