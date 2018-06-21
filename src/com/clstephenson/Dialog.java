@@ -8,20 +8,37 @@ import java.util.Optional;
 public class Dialog {
     private Alert alert;
 
+    public Dialog(Alert.AlertType type, String header, String message) {
+        alert = new Alert(type);
+        setTitle(Localization.getString("ui.application.title"));
+        setMessage(message);
+        setHeaderText(header);
+    }
+
     public static void showDBError(String msg) {
-        String title = "Database Error";
-        String header = "An error occurred while attempting to get or save the data to the database.";
+        String header = "A database error occurred.";
         String message = "Details: " + msg;
-        Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, header, message);
         dialog.setSize(500, 300);
         dialog.showDialog(true);
     }
 
+    public Optional<ButtonType> showDialog(boolean wait) {
+        if (alert.getTitle().isEmpty()) {
+            alert.setTitle(Localization.getString("ui.application.title"));
+        }
+        if (wait) {
+            return alert.showAndWait();
+        } else {
+            alert.show();
+        }
+        return Optional.empty();
+    }
+
     public static void showValidationError(String msg) {
-        String title = "Data Validation Error";
-        String header = "Please correct the following errors.";
+        String header = "Please correct the following fields.";
         String message = msg == null || msg.isEmpty() ? "All fields are required." : msg;
-        Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, header, message);
         dialog.setSize(500, 300);
         dialog.showDialog(true);
     }
@@ -30,11 +47,11 @@ public class Dialog {
         alert = new Alert(type);
     }
 
-    public Dialog(Alert.AlertType type, String title, String header, String message) {
-        alert = new Alert(type);
-        setTitle(title);
-        setMessage(message);
-        setHeaderText(header);
+    public static void showSimpleError(String msg) {
+        String header = "An error occurred. Please try again.";
+        String message = "Details: " + msg;
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, header, message);
+        dialog.showDialog(true);
     }
 
     public void setTitle(String title) {
@@ -54,12 +71,9 @@ public class Dialog {
         alert.getDialogPane().setPrefSize(width, height);
     }
 
-    public Optional<ButtonType> showDialog(boolean wait) {
-        if(wait) {
-            return alert.showAndWait();
-        } else {
-            alert.show();
-        }
-        return Optional.empty();
+    public static void showSimpleMessage(String msg) {
+        String message = "Details: " + msg;
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, "", message);
+        dialog.showDialog(true);
     }
 }

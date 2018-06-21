@@ -76,7 +76,7 @@ public class Main extends Application {
         final int APP_WIDTH = 1000;
         final int APP_HEIGHT = 600;
         Scene scene = new Scene(root, APP_WIDTH, APP_HEIGHT);
-        primaryStage.setTitle("Scheduling Application");
+        primaryStage.setTitle(Localization.getString("ui.application.title"));
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         FXHelper.addStylesheet(scene);
@@ -92,11 +92,13 @@ public class Main extends Application {
         try {
             socket = new ServerSocket(56284);
         } catch (IOException e) {
-            String msg = "Application is already running.  Exiting...";
-            Dialog dialog = new Dialog(Alert.AlertType.ERROR);
-            dialog.setTitle("Application Error");
-            dialog.setMessage(msg);
-            dialog.showDialog(true);
+            String msg = "Application is already running.  Please close running application and try again.";
+            new Dialog(Alert.AlertType.ERROR, "Application Error", msg).showDialog(true);
+//            todo delete these comments
+// Dialog dialog = new Dialog(Alert.AlertType.ERROR);
+//            dialog.setHeaderText("Application Error");
+//            dialog.setMessage(msg);
+//            dialog.showDialog(true);
             System.exit(0);
         }
     }

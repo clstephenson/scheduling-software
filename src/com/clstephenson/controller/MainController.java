@@ -224,7 +224,6 @@ public class MainController {
 
     private void deleteAppointment() {
         Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
-        dialog.setTitle("Delete Confirmation");
         dialog.setHeaderText("ARE YOU SURE?");
         dialog.setMessage("This will delete the currently selected appointment.  " +
                 "Are you sure you want to do this?");
@@ -233,7 +232,7 @@ public class MainController {
             if (getSelectedAppointment().remove()) {
                 reloadAppointmentAndCustomerData();
             } else {
-                //todo customer could not be deleted
+                Dialog.showSimpleError("Unable to delete appointment.");
             }
         }
     }
@@ -406,8 +405,11 @@ public class MainController {
 
     private void populateAppointments(SortedList<Appointment> appointments) {
         if (appointments.isEmpty()) {
-            //todo message about no appointments for user
-            System.out.println("appointments is empty...");
+            new Dialog(
+                    Alert.AlertType.INFORMATION,
+                    "Information:",
+                    "There are no appointments for the current view."
+            ).showDialog(true);
         } else {
             appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
             appointmentTable.setItems(appointments);
@@ -481,7 +483,7 @@ public class MainController {
         } else {
             header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
         }
-        new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
+        new Dialog(Alert.AlertType.INFORMATION, header, message.toString()).showDialog(true);
     }
 
     private void clearData() {

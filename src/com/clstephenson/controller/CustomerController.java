@@ -100,7 +100,6 @@ public class CustomerController {
 
     private void deleteCustomer() {
         Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
-        dialog.setTitle("Delete Confirmation");
         dialog.setHeaderText("ARE YOU SURE?");
         dialog.setMessage("Deleting this customer will also delete all appointments associated with the customer.  " +
                 "Are you sure you want to do this?");
@@ -110,7 +109,7 @@ public class CustomerController {
                 mainController.setIsCustomerChanged(true);
                 close();
             } else {
-                new Dialog(Alert.AlertType.ERROR, "Error", "We've encountered a problem...",
+                new Dialog(Alert.AlertType.ERROR, "We've encountered a problem...",
                         "The customer was unable to be deleted.").showDialog(true);
             }
         }
