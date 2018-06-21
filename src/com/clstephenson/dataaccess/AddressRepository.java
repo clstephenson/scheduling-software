@@ -1,5 +1,6 @@
 package com.clstephenson.dataaccess;
 
+import com.clstephenson.DataRepositoryException;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
@@ -15,17 +16,17 @@ public class AddressRepository implements Repository<Address> {
 
     private Connection dbConnection;
 
-    public AddressRepository() {
+    public AddressRepository() throws DataRepositoryException {
         try {
             dbConnection = DBManager.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exception handling
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public int add(Address address, LoginSession session) {
+    public int add(Address address, LoginSession session) throws DataRepositoryException {
         City city = City.getCityById(address.getCity().getId());
         if(city == null) {
             //add the city to the DB
@@ -54,17 +55,18 @@ public class AddressRepository implements Repository<Address> {
                     throw new SQLException();
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(Localization.getString("error.db.addingaddress"), e);
+                String message = Localization.getString("error.db.addingaddress");
+                throw new DataRepositoryException(e, message);
             }
         } else {
             // error - city could not be added, therefore address could not be added
-            throw new RuntimeException(Localization.getString("error.db.addingaddress"));
-            //todo change this to return 0 instead of throwing exception
+            String message = Localization.getString("error.db.addingaddress");
+            throw new DataRepositoryException(new SQLException(), message);
         }
     }
 
     @Override
-    public boolean update(Address address, LoginSession session) {
+    public boolean update(Address address, LoginSession session) throws DataRepositoryException {
         new CityRepository().update(address.getCity(), session);
         String sql = "UPDATE address set address=?, address2=?, cityId=?, postalCode=?, phone=?, lastUpdateBy=? " +
                 "WHERE addressid=?";
@@ -78,30 +80,35 @@ public class AddressRepository implements Repository<Address> {
             statement.setInt(7, address.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(Localization.getString("error.db.updatingaddress"), e);
-            //todo handle exceptions
+            String message = Localization.getString("error.db.updatingaddress");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean removeById(int id) {
+    public boolean removeById(int id) throws DataRepositoryException {
         String sql = "DELETE FROM address WHERE addressid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingaddress") + " = " + id;
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(Address address) {
+    public boolean remove(Address address) throws DataRepositoryException {
         return removeById(address.getId());
     }
 
     @Override
-    public List<Address> findAll() {
+    public Address findById(int id) throws DataRepositoryException {
+        return findSingle(address -> address.getId() == id);
+    }
+
+    @Override
+    public List<Address> findAll() throws DataRepositoryException {
         String query = "SELECT * FROM address_view";
         ArrayList<Address> addresses = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -112,13 +119,8 @@ public class AddressRepository implements Repository<Address> {
             return addresses;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.addressquery");
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public Address findById(int id) {
-        return findSingle(address -> address.getId() == id);
     }
 
     private Address mapResultSetToObject(ResultSet rs) throws SQLException {

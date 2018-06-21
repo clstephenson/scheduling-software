@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CityRepository;
 import javafx.beans.property.*;
@@ -10,7 +12,14 @@ public class City {
     private ObjectProperty<Country> country = new SimpleObjectProperty<>(this, "country");
 
     public static City getCityById(int id) {
-        return new CityRepository().findById(id);
+        City city = new City();
+        try {
+            city = new CityRepository().findById(id);
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return city;
+        }
     }
     
     public City() {
@@ -72,12 +81,16 @@ public class City {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        CityRepository repository = new CityRepository();
-        if (this.id.get() > 0) {
-            result = repository.update(this, LoginSessionHelper.getSession());
-        } else {
-            resultId = repository.add(this, LoginSessionHelper.getSession());
-            if (resultId > 0) this.id.set(resultId);
+        try {
+            CityRepository repository = new CityRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -85,10 +98,14 @@ public class City {
     public boolean remove() {
         boolean result = false;
         if (this.id.get() > 0) {
-            CityRepository repository = new CityRepository();
-            if (repository.remove(this)) {
-                this.id.set(0);
-                result = true;
+            try {
+                CityRepository repository = new CityRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;

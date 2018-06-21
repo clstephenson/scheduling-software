@@ -8,6 +8,15 @@ import java.util.Optional;
 public class Dialog {
     private Alert alert;
 
+    public static void showDBError(String msg) {
+        String title = "Database Error";
+        String header = "An error occurred while attempting to get or save the data to the database.";
+        String message = "Details: " + msg;
+        Dialog dialog = new Dialog(Alert.AlertType.ERROR, title, header, message);
+        dialog.setSize(500, 300);
+        dialog.showDialog(true);
+    }
+
     public static void showValidationError(String msg) {
         String title = "Data Validation Error";
         String header = "Please correct the following errors.";

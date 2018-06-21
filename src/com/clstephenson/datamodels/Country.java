@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CountryRepository;
 import javafx.beans.property.IntegerProperty;
@@ -12,7 +14,14 @@ public class Country {
     private StringProperty name = new SimpleStringProperty(this, "name");
 
     public static Country getCountryById(int id) {
-        return new CountryRepository().findById(id);
+        Country country = new Country();
+        try {
+            country = new CountryRepository().findById(id);
+        } catch (Exception e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return country;
+        }
     }
 
     public Country() {
@@ -59,12 +68,16 @@ public class Country {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        CountryRepository repository = new CountryRepository();
-        if (this.id.get() > 0) {
-            result = repository.update(this, LoginSessionHelper.getSession());
-        } else {
-            resultId = repository.add(this, LoginSessionHelper.getSession());
-            if (resultId > 0) this.id.set(resultId);
+        try {
+            CountryRepository repository = new CountryRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -72,10 +85,14 @@ public class Country {
     public boolean remove() {
         boolean result = false;
         if (this.id.get() > 0) {
-            CountryRepository repository = new CountryRepository();
-            if (repository.remove(this)) {
-                this.id.set(0);
-                result = true;
+            try {
+                CountryRepository repository = new CountryRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;

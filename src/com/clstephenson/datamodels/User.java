@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import com.clstephenson.dataaccess.UserRepository;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,15 +21,20 @@ public class User {
     private SimpleStringProperty password = new SimpleStringProperty(this, "password");
     private SimpleBooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
-    private ObservableList<Appointment> userAppointments;
+    private ObservableList<Appointment> userAppointments = FXCollections.observableArrayList();
 
     public static User getActiveUser(String username, String password) {
-        UserRepository userRepository = new UserRepository();
-        return userRepository.findSingle(u ->
-                u.getUserName().equalsIgnoreCase(username) &&
-                        u.getPassword().equals(password) &&
-                        u.isActive()
-        );
+        try {
+            UserRepository userRepository = new UserRepository();
+            return userRepository.findSingle(u ->
+                    u.getUserName().equalsIgnoreCase(username) &&
+                            u.getPassword().equals(password) &&
+                            u.isActive()
+            );
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+            return null;
+        }
     }
 
     public User() {
@@ -85,9 +92,13 @@ public class User {
     }
 
     public ObservableList<Appointment> getUserAppointments() {
-        userAppointments = FXCollections.observableArrayList(
-                new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
-        );
+        try {
+            userAppointments = FXCollections.observableArrayList(
+                    new AppointmentRepository().find(appt -> appt.getConsultant().equalsIgnoreCase(this.getUserName()))
+            );
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        }
         return userAppointments;
     }
 

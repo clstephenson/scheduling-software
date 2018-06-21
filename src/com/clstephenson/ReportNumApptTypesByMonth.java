@@ -11,7 +11,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -31,8 +30,9 @@ public class ReportNumApptTypesByMonth {
         ObservableList<NumApptType> list;
         try {
             list = new ReportData().getNumApptTypesByMonth(LocalDate.now().getYear(), LoginSessionHelper.getSession());
-        } catch (SQLException e) {
-            throw new RuntimeException(e); //todo handle error
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+            return;
         }
 
         for(AppointmentType type : AppointmentType.values()) {

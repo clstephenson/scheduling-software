@@ -1,5 +1,6 @@
 package com.clstephenson.dataaccess;
 
+import com.clstephenson.DataRepositoryException;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
@@ -14,17 +15,17 @@ public class CityRepository implements Repository <City> {
 
     private Connection dbConnection;
 
-    public CityRepository() {
+    public CityRepository() throws DataRepositoryException {
         try {
             dbConnection = DBManager.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exception handling
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public int add(City city, LoginSession session) {
+    public int add(City city, LoginSession session) throws DataRepositoryException {
         Country country = Country.getCountryById(city.getCountry().getId());
         if(country == null) {
             //add the country to the DB
@@ -48,17 +49,19 @@ public class CityRepository implements Repository <City> {
                     throw new SQLException();
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(Localization.getString("error.db.addingcity"), e);
+                String message = Localization.getString("error.db.addingcity");
+                throw new DataRepositoryException(e, message);
             }
         } else {
             // error - country could not be added, therefore city could not be added
-            throw new RuntimeException(Localization.getString("error.db.addingcity"));
+            String message = Localization.getString("error.db.addingcity");
+            throw new DataRepositoryException(new SQLException(), message);
             //todo change to return 0
         }
     }
 
     @Override
-    public boolean update(City city, LoginSession session) {
+    public boolean update(City city, LoginSession session) throws DataRepositoryException {
         new CountryRepository().update(city.getCountry(), session);
         String sql = "UPDATE city set city=?, countryId=?, lastUpdateBy=? WHERE cityid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
@@ -68,30 +71,35 @@ public class CityRepository implements Repository <City> {
             statement.setInt(4, city.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(Localization.getString("error.db.updatingcity"), e);
-            //todo fix exceptions
+            String message = Localization.getString("error.db.updatingcity");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean removeById(int id) {
+    public boolean removeById(int id) throws DataRepositoryException {
         String sql = "DELETE FROM city WHERE cityid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcity") + " = " + id;
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(City city) {
+    public boolean remove(City city) throws DataRepositoryException {
         return removeById(city.getId());
     }
 
     @Override
-    public List<City> findAll() {
+    public City findById(int id) throws DataRepositoryException {
+        return findSingle(city -> city.getId() == id);
+    }
+
+    @Override
+    public List<City> findAll() throws DataRepositoryException {
         String query = "SELECT cityid, city, countryid, country FROM city_view";
         ArrayList<City> cities = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -102,13 +110,8 @@ public class CityRepository implements Repository <City> {
             return cities;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.cityquery");
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public City findById(int id) {
-        return findSingle(city -> city.getId() == id);
     }
 
     private City mapResultSetToObject(ResultSet rs) throws SQLException {

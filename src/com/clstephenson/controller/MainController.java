@@ -306,16 +306,18 @@ public class MainController {
     }
 
     private void populateDetailsForm(Appointment appt) {
-        customerInput.setValue(appt.getCustomer());
-        descriptionInput.setText(appt.getDescription());
-        urlInput.setText(appt.getUrl());
-        typeInput.setValue(appt.getAppointmentType());
-        locationInput.setValue(appt.getAppointmentLocation());
-        dateInput.setValue(appt.getStart().toLocalDate());
-        startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
-        endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
-        clearValidationErrors();
-        setIsAppointmentChanged(false);
+        if (appt != null) {
+            customerInput.setValue(appt.getCustomer());
+            descriptionInput.setText(appt.getDescription());
+            urlInput.setText(appt.getUrl());
+            typeInput.setValue(appt.getAppointmentType());
+            locationInput.setValue(appt.getAppointmentLocation());
+            dateInput.setValue(appt.getStart().toLocalDate());
+            startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            clearValidationErrors();
+            setIsAppointmentChanged(false);
+        }
     }
 
     private void clearValidationErrors() {

@@ -1,5 +1,6 @@
 package com.clstephenson.dataaccess;
 
+import com.clstephenson.DataRepositoryException;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
@@ -13,17 +14,17 @@ public class CountryRepository implements Repository<Country> {
 
     private Connection dbConnection;
 
-    public CountryRepository() {
+    public CountryRepository() throws DataRepositoryException {
         try {
             dbConnection = DBManager.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exception
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public int add(Country country, LoginSession session) {
+    public int add(Country country, LoginSession session) throws DataRepositoryException {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO country (country, createDate, createdBy, lastUpdateBy) VALUES (?, ?, ?, ?)";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,13 +40,13 @@ public class CountryRepository implements Repository<Country> {
                 throw new SQLException();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(Localization.getString("error.db.addingcountry"), e);
-            //todo fix exceptions
+            String message = Localization.getString("error.db.addingcountry");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean update(Country country, LoginSession session) {
+    public boolean update(Country country, LoginSession session) throws DataRepositoryException {
         String sql = "UPDATE country set country=?, lastUpdateBy=? WHERE countryid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, country.getName());
@@ -53,30 +54,35 @@ public class CountryRepository implements Repository<Country> {
             statement.setInt(3, country.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(Localization.getString("error.db.updatingcountry"), e);
-            //todo fix exceptions
+            String message = Localization.getString("error.db.updatingcountry");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean removeById(int id) {
+    public boolean removeById(int id) throws DataRepositoryException {
         String sql = "DELETE FROM country WHERE countryid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcountry") + " = " + id;
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(Country country) {
+    public boolean remove(Country country) throws DataRepositoryException {
         return removeById(country.getId());
     }
 
     @Override
-    public List<Country> findAll() {
+    public Country findById(int id) throws DataRepositoryException {
+        return findSingle(country -> country.getId() == id);
+    }
+
+    @Override
+    public List<Country> findAll() throws DataRepositoryException {
         String query = "SELECT countryid, country FROM country";
         ArrayList<Country> countries = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -87,13 +93,8 @@ public class CountryRepository implements Repository<Country> {
             return countries;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.countryquery");
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public Country findById(int id) {
-        return findSingle(country -> country.getId() == id);
     }
 
     private Country mapResultSetToObject(ResultSet rs) throws SQLException {

@@ -76,7 +76,7 @@ public class Main extends Application {
         final int APP_WIDTH = 1000;
         final int APP_HEIGHT = 600;
         Scene scene = new Scene(root, APP_WIDTH, APP_HEIGHT);
-        primaryStage.setTitle("Scheduling Application"); //todo localize the title
+        primaryStage.setTitle("Scheduling Application");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         FXHelper.addStylesheet(scene);

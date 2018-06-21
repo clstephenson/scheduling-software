@@ -1,5 +1,6 @@
 package com.clstephenson.dataaccess;
 
+import com.clstephenson.DataRepositoryException;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
@@ -16,17 +17,17 @@ public class CustomerRepository implements Repository<Customer> {
 
     private Connection dbConnection;
 
-    public CustomerRepository() {
+    public CustomerRepository() throws DataRepositoryException {
         try {
             dbConnection = DBManager.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo fix exception
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public int add(Customer customer, LoginSession session) {
+    public int add(Customer customer, LoginSession session) throws DataRepositoryException {
         Address address = Address.getAddressById(customer.getAddress().getId());
         if(address == null) {
             //add the address to the DB
@@ -52,17 +53,18 @@ public class CustomerRepository implements Repository<Customer> {
                     throw new SQLException();
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(Localization.getString("error.db.addingcustomer"), e);
+                String message = Localization.getString("error.db.addingcustomer");
+                throw new DataRepositoryException(e, message);
             }
         } else {
             // error - address could not be added, therefore customer could not be added
-            throw new RuntimeException(Localization.getString("error.db.addingcustomer"));
-            //todo change to return 0 or Optional
+            String message = Localization.getString("error.db.addingcustomer");
+            throw new DataRepositoryException(new SQLException(), message);
         }
     }
 
     @Override
-    public boolean update(Customer customer, LoginSession session) {
+    public boolean update(Customer customer, LoginSession session) throws DataRepositoryException {
         customer.getAddress().save();
         String sql = "UPDATE customer set customerName=?, addressId=?, active=?, lastUpdateBy=? WHERE customerid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
@@ -73,30 +75,35 @@ public class CustomerRepository implements Repository<Customer> {
             statement.setInt(5, customer.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(Localization.getString("error.db.updatingcustomer"), e);
-            //todo fix exceptions
+            String message = Localization.getString("error.db.updatingcustomer");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean removeById(int id) {
+    public boolean removeById(int id) throws DataRepositoryException {
         try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
             statement.setInt(1, id);
             statement.executeUpdate();
             return this.findById(id) == null;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcustomer") + " = " + id;
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(Customer customer) {
+    public boolean remove(Customer customer) throws DataRepositoryException {
         return removeById(customer.getId());
     }
 
     @Override
-    public List<Customer> findAll() {
+    public Customer findById(int id) throws DataRepositoryException {
+        return findSingle(customer -> customer.getId() == id);
+    }
+
+    @Override
+    public List<Customer> findAll() throws DataRepositoryException {
         String query = "SELECT * FROM customer_view";
         ArrayList<Customer> customers = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -107,13 +114,8 @@ public class CustomerRepository implements Repository<Customer> {
             return customers;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.customerquery");
-            throw new RuntimeException(message, e); //todo fix exception handling
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public Customer findById(int id) {
-        return findSingle(customer -> customer.getId() == id);
     }
 
     private Customer mapResultSetToObject(ResultSet rs) throws SQLException {

@@ -1,9 +1,6 @@
 package com.clstephenson.dataaccess;
 
-import com.clstephenson.AppointmentType;
-import com.clstephenson.Localization;
-import com.clstephenson.LoginSession;
-import com.clstephenson.NumApptType;
+import com.clstephenson.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,11 +13,16 @@ public class ReportData {
 
     private Connection dbConnection;
 
-    public ReportData() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public ReportData() throws DataRepositoryException {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
+        }
     }
 
-    public ObservableList<NumApptType> getNumApptTypesByMonth(int year, LoginSession session) {
+    public ObservableList<NumApptType> getNumApptTypesByMonth(int year, LoginSession session) throws DataRepositoryException {
         try (CallableStatement statement = dbConnection.prepareCall("{CALL reportNumApptTypesByMonth(?, ?)}")) {
             statement.setString(1, session.getLoggedInUser().getUserName());
             statement.setInt(2, year);
@@ -34,10 +36,8 @@ public class ReportData {
             }
             return list;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-            //todo handle exception
-            //String message = Localization.getString("error.db.removingcustomer") + " = " + id;
-            //throw new SQLException(message, e);
+            String message = "Unable to get number of appointment types by month data.";
+            throw new DataRepositoryException(e, message);
         }
     }
 }

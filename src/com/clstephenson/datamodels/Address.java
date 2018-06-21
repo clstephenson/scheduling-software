@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.AddressRepository;
 import javafx.beans.property.*;
@@ -13,7 +15,14 @@ public class Address {
     private StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
 
     public static Address getAddressById(int id) {
-        return new AddressRepository().findById(id);
+        Address address = new Address();
+        try {
+            address = new AddressRepository().findById(id);
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return address;
+        }
     }
 
     public Address() {
@@ -122,12 +131,16 @@ public class Address {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        AddressRepository repository = new AddressRepository();
-        if (this.id.get() > 0) {
-            result = repository.update(this, LoginSessionHelper.getSession());
-        } else {
-            resultId = repository.add(this, LoginSessionHelper.getSession());
-            if (resultId > 0) this.id.set(resultId);
+        try {
+            AddressRepository repository = new AddressRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -135,10 +148,14 @@ public class Address {
     public boolean remove() {
         boolean result = false;
         if (this.id.get() > 0) {
-            AddressRepository repository = new AddressRepository();
-            if (repository.remove(this)) {
-                this.id.set(0);
-                result = true;
+            try {
+                AddressRepository repository = new AddressRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;

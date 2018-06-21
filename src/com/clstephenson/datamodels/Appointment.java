@@ -1,8 +1,6 @@
 package com.clstephenson.datamodels;
 
-import com.clstephenson.AppointmentLocation;
-import com.clstephenson.AppointmentType;
-import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.*;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.*;
 
@@ -165,12 +163,16 @@ public class Appointment {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        AppointmentRepository repository = new AppointmentRepository();
-        if (this.id.get() > 0) {
-            result = repository.update(this, LoginSessionHelper.getSession());
-        } else {
-            resultId = repository.add(this, LoginSessionHelper.getSession());
-            if (resultId > 0) this.id.set(resultId);
+        try {
+            AppointmentRepository repository = new AppointmentRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -178,10 +180,14 @@ public class Appointment {
     public boolean remove() {
         boolean result = false;
         if(this.id.get() > 0) {
-            AppointmentRepository repository = new AppointmentRepository();
-            if (repository.remove(this)) {
-                this.id.set(0);
-                result = true;
+            try {
+                AppointmentRepository repository = new AppointmentRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;

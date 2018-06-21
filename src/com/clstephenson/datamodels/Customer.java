@@ -1,5 +1,7 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.beans.property.*;
@@ -11,7 +13,14 @@ public class Customer {
     private BooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
 
     public static Customer getCustomerById(int id) {
-        return new CustomerRepository().findById(id);
+        Customer customer = new Customer();
+        try {
+            customer = new CustomerRepository().findById(id);
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return customer;
+        }
     }
 
     public Customer() {
@@ -91,12 +100,16 @@ public class Customer {
     public boolean save() {
         boolean result = false;
         int resultId = 0;
-        CustomerRepository repository = new CustomerRepository();
-        if (this.id.get() > 0) {
-            result = repository.update(this, LoginSessionHelper.getSession());
-        } else {
-            resultId = repository.add(this, LoginSessionHelper.getSession());
-            if (resultId > 0) this.id.set(resultId);
+        try {
+            CustomerRepository repository = new CustomerRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -104,10 +117,14 @@ public class Customer {
     public boolean remove() {
         boolean result = false;
         if(this.id.get() > 0) {
-            CustomerRepository repository = new CustomerRepository();
-            if (repository.remove(this)) {
-                this.id.set(0);
-                result = true;
+            try {
+                CustomerRepository repository = new CustomerRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;

@@ -18,11 +18,15 @@ public class Customers {
     }
 
     private void updateCustomersFromRepository() {
-        setCustomers(FXCollections.observableArrayList(
-                new CustomerRepository().findAll().stream()
-                        .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-                        .collect(Collectors.toList())
-        ));
+        try {
+            setCustomers(FXCollections.observableArrayList(
+                    new CustomerRepository().findAll().stream()
+                            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+                            .collect(Collectors.toList())
+            ));
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        }
     }
 
     public ObservableList<Customer> getCustomers() {
