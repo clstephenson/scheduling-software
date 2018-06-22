@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,7 +37,7 @@ public class Main extends Application {
         /*
         Change the default locale to Italy or French Canadian
         */
-        Locale.setDefault(Locale.ITALY);
+        //Locale.setDefault(Locale.ITALY);
         //Locale.setDefault(Locale.CANADA_FRENCH);
 
 
