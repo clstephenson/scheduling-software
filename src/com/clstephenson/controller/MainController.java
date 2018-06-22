@@ -395,16 +395,19 @@ public class MainController {
                 appointmentTable.getItems()
                         .stream()
                         .filter(a -> a.getId() == appointmentToSelect.getId())
-                        .findFirst().get()
+                        .findFirst().orElseGet(Appointment::new)
         );
-        appointmentTable.getSelectionModel().clearAndSelect(indexToSelect);
-        appointmentTable.scrollTo(indexToSelect);
-        reloadCustomersList();
-        populateDetailsForm(getSelectedAppointment());
+        if (indexToSelect > 0) {
+            appointmentTable.getSelectionModel().clearAndSelect(indexToSelect);
+            appointmentTable.scrollTo(indexToSelect);
+            reloadCustomersList();
+            populateDetailsForm(getSelectedAppointment());
+        }
     }
 
     private void populateAppointments(SortedList<Appointment> appointments) {
         if (appointments.isEmpty()) {
+            clearTableViewData();
             Dialog.showInformationMessage("There are no appointments for the current view.");
         } else {
             appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
@@ -437,16 +440,9 @@ public class MainController {
         }
     }
 
-    private void handleLogout() {
-        try {
-            LoginSessionHelper.logout();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        clearData();
-        disableLogoutMenuItem();
-        updateStatusLabel("");
-        requestUserLogin();
+    private void clearTableViewData() {
+        appointmentTable.setItems(FXCollections.observableArrayList());
+        initializeDetailsFields();
     }
 
     private void enableLogoutMenuItem() {
@@ -482,9 +478,16 @@ public class MainController {
         new Dialog(Alert.AlertType.INFORMATION, header, message.toString()).showDialog(true);
     }
 
-    private void clearData() {
-        appointmentTable.setItems(FXCollections.observableArrayList());
-        initializeDetailsFields();
+    private void handleLogout() {
+        try {
+            LoginSessionHelper.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        clearTableViewData();
+        disableLogoutMenuItem();
+        updateStatusLabel("");
+        requestUserLogin();
     }
 
     private boolean validateAppointmentFields() {
