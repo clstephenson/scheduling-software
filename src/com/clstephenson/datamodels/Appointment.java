@@ -6,7 +6,7 @@ import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
 
-public class Appointment {
+public class Appointment implements Comparable {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private ObjectProperty<Customer> customer = new SimpleObjectProperty<>(this, "customer");
     private ObjectProperty<AppointmentType> appointmentType = new SimpleObjectProperty<>(this, "appointmentType"); //using title column in db
@@ -213,5 +213,11 @@ public class Appointment {
         return String.format("[%d, %s, %s, %s, %s, %s, %s, %s, %s]", this.id.get(), this.customer.get().getName(),
                 this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(),
                 this.consultant.get(), this.url.get(), this.start.get(), this.end.get());
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Appointment other = (Appointment) o;
+        return this.getStart().compareTo(other.getStart());
     }
 }
