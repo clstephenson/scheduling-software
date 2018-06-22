@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -63,15 +62,16 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         checkIfAppAlreadyRunning();
-        FXMLLoader loader;
+        FXMLLoader loader = null;
         Parent root = null;
+        String fxmlPath = "";
         try {
-            String fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
+            fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
             loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             root = loader.load();
         } catch (Exception e) {
-            throw new RuntimeException("Could not load Main.fxml", e);
-            //todo fix this exception handling
+            Dialog.showErrorMessage("Could not load FXML file: " + fxmlPath);
+            System.exit(0);
         }
         final int APP_WIDTH = 1000;
         final int APP_HEIGHT = 600;
@@ -93,12 +93,7 @@ public class Main extends Application {
             socket = new ServerSocket(56284);
         } catch (IOException e) {
             String msg = "Application is already running.  Please close running application and try again.";
-            new Dialog(Alert.AlertType.ERROR, "Application Error", msg).showDialog(true);
-//            todo delete these comments
-// Dialog dialog = new Dialog(Alert.AlertType.ERROR);
-//            dialog.setHeaderText("Application Error");
-//            dialog.setMessage(msg);
-//            dialog.showDialog(true);
+            Dialog.showErrorMessage(msg);
             System.exit(0);
         }
     }

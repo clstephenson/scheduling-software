@@ -50,7 +50,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public boolean update(User entity, LoginSession session) {
-        //todo: implement this method if needed
+        //todo: implement this method if/when needed
         return false;
     }
 

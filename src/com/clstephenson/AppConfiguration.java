@@ -33,14 +33,12 @@ public class AppConfiguration {
 
     private AppConfiguration() {
         this.properties = new Properties();
-
         try(FileReader inputReader = new FileReader(CONFIG_PATH)) {
             this.properties.load(inputReader);
         } catch (IOException e) {
             String message = Localization.getString("error.io.filenotfound") +
                     ": " + Paths.get(CONFIG_PATH).toAbsolutePath().normalize();
-            throw new RuntimeException(message, e);
-            //todo check exception handling
+            Dialog.showErrorMessage(message);
         }
     }
 

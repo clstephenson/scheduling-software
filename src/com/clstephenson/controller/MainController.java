@@ -200,8 +200,8 @@ public class MainController {
         saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
         menuNumApptTypesByMonth.setOnAction(event -> ReportNumApptTypesByMonth.showReport());
-        menuUserSchedule.setOnAction(event -> new ReportUserSchedule(LoginSessionHelper.getCurrentUser()));
-        menuExportCustomers.setOnAction(event -> new ReportCustomers());
+        menuUserSchedule.setOnAction(event -> ReportUserSchedule.generateReport(LoginSessionHelper.getCurrentUser()));
+        menuExportCustomers.setOnAction(event -> ReportCustomers.generateReport(true));
         menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
         menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
@@ -232,7 +232,7 @@ public class MainController {
             if (getSelectedAppointment().remove()) {
                 reloadAppointmentAndCustomerData();
             } else {
-                Dialog.showSimpleError("Unable to delete appointment.");
+                Dialog.showErrorMessage("Unable to delete appointment.");
             }
         }
     }
@@ -405,11 +405,7 @@ public class MainController {
 
     private void populateAppointments(SortedList<Appointment> appointments) {
         if (appointments.isEmpty()) {
-            new Dialog(
-                    Alert.AlertType.INFORMATION,
-                    "Information:",
-                    "There are no appointments for the current view."
-            ).showDialog(true);
+            Dialog.showInformationMessage("There are no appointments for the current view.");
         } else {
             appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
             appointmentTable.setItems(appointments);

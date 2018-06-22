@@ -15,11 +15,13 @@ import java.util.stream.Collectors;
 
 public class ReportCustomers {
 
-    public ReportCustomers() {
-        generateReport();
-    }
-
-    private void generateReport() {
+    /**
+     * Create a CSV (comma-separated values) file, containing a list of all customers in the database.
+     *
+     * @param openAfterSaving Attempt to open the file in the systems default editor for CSV files after the
+     *                        report is generated and saved.
+     */
+    public static void generateReport(boolean openAfterSaving) {
         final String SEPARATOR = ",";
         File f = new File(String.format("customerList_%s.csv", LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)));
         try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
@@ -31,18 +33,19 @@ public class ReportCustomers {
                 out.write(sb.toString());
                 out.newLine();
             }
-            showReport(f);
+            if (openAfterSaving)
+                showReport(f);
         } catch (IOException e) {
-            e.printStackTrace(); //todo handle exception
+            Dialog.showErrorMessage("Customer report could not be generated. " + e.getMessage());
         }
     }
 
-    private String buildHeader(CharSequence separator) {
+    private static String buildHeader(CharSequence separator) {
         return Arrays.asList("Name", "Address 1", "Address 2", "City", "Country", "Postal Code", "Phone", "Active")
                 .stream().collect(Collectors.joining(separator));
     }
 
-    private StringBuilder buildCustomerString(Customer customer, CharSequence separator) {
+    private static StringBuilder buildCustomerString(Customer customer, CharSequence separator) {
         StringBuilder sb = new StringBuilder();
         sb.append(customer.getName())
                 .append(separator)
@@ -62,11 +65,11 @@ public class ReportCustomers {
         return sb;
     }
 
-    private void showReport(File file) throws IOException {
+    private static void showReport(File file) throws IOException {
         if (Desktop.isDesktopSupported()) {
             Desktop.getDesktop().open(file);
         } else {
-            //todo show error message or location of created file
+            throw new IOException("Unable to open " + file.getAbsolutePath());
         }
     }
 }

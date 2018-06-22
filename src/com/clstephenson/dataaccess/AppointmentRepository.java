@@ -60,7 +60,6 @@ public class AppointmentRepository implements Repository<Appointment> {
             // error - customer could not be added, therefore appointment could not be added
             String message = Localization.getString("error.db.addingappointment");
             throw new DataRepositoryException(new SQLException(), message);
-            // TODO: change to return 0 instead.
         }
     }
 

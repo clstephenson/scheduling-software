@@ -56,7 +56,6 @@ public class CityRepository implements Repository <City> {
             // error - country could not be added, therefore city could not be added
             String message = Localization.getString("error.db.addingcity");
             throw new DataRepositoryException(new SQLException(), message);
-            //todo change to return 0
         }
     }
 

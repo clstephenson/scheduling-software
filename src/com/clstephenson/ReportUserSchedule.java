@@ -10,29 +10,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 public class ReportUserSchedule {
 
-    private TemporalUnit timeframe;
-    private User user;
-
-    public ReportUserSchedule(User user) {
-        this.timeframe = ChronoUnit.DAYS;
-        this.user = user;
-        generateReport();
-    }
-
-    private void generateReport() {
+    /**
+     * Generate a text report of a user's schedule for the current day.  The report is saved as a txt file
+     * and automatically opened in the system's default text editor.
+     *
+     * @param user User for which the schedule should be created.
+     */
+    public static void generateReport(User user) {
         LocalDate now = LocalDate.now();
-        File f = new File(String.format("schedule_%s_%s.txt", this.user, now.format(DateTimeFormatter.ISO_LOCAL_DATE)));
+        File f = new File(String.format("schedule_%s_%s.txt", user, now.format(DateTimeFormatter.ISO_LOCAL_DATE)));
         try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
-            out.write(String.format("%s's Schedule for %s", this.user, now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"))));
+            out.write(String.format("%s's Schedule for %s", user, now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"))));
             out.newLine();
             out.newLine();
-            List<Appointment> appointments = this.user.getUserAppointments(a -> a.getStart().toLocalDate().equals(now));
+            List<Appointment> appointments = user.getUserAppointments(a -> a.getStart().toLocalDate().equals(now));
             for (Appointment appt : appointments) {
                 StringBuilder sb = buildAppointmentString(appt);
                 out.write(sb.toString());
@@ -42,11 +37,11 @@ public class ReportUserSchedule {
             }
             showReport(f);
         } catch (IOException e) {
-            e.printStackTrace(); //todo handle exception
+            Dialog.showErrorMessage("User's schedule could not be generated. " + e.getMessage());
         }
     }
 
-    private StringBuilder buildAppointmentString(Appointment appt) {
+    private static StringBuilder buildAppointmentString(Appointment appt) {
         StringBuilder sb = new StringBuilder();
         sb.append(appt.getStart().format(DateTimeFormatter.ofPattern("HH:mm")));
         sb.append(" - ");
@@ -59,11 +54,11 @@ public class ReportUserSchedule {
         return sb;
     }
 
-    private void showReport(File file) throws IOException {
+    private static void showReport(File file) throws IOException {
         if (Desktop.isDesktopSupported()) {
             Desktop.getDesktop().open(file);
         } else {
-            //todo show error message or location of created file
+            throw new IOException("Unable to open " + file.getAbsolutePath());
         }
     }
 }
