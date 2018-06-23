@@ -93,7 +93,7 @@ public class Dialog {
      * @param msg Customized message to display to the user.
      */
     public static void showInformationMessage(String msg) {
-        String message = "Details: " + msg;
+        String message = msg;
         Dialog dialog = new Dialog(Alert.AlertType.INFORMATION, "", message);
         dialog.showDialog(true);
     }

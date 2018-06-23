@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -28,6 +29,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainController {
 
+    private final String TIME_DISPLAY_FORMAT = "HHmm";
+    private final String MENU_VIEW_ID_MONTH = "menuItemViewMonth";
+    private final String MENU_VIEW_ID_WEEK = "menuItemViewWeek";
+    private final String MENU_VIEW_ID_ALL = "menuItemViewAll";
     @FXML
     private MenuItem menuItemNewAppointment;
     @FXML
@@ -96,7 +101,6 @@ public class MainController {
     private GridPane detailsFormGridPane;
     @FXML
     private ProgressIndicator progressIndicator;
-
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
     private TableColumn<Appointment, String> descriptionColumn;
@@ -105,14 +109,12 @@ public class MainController {
     private TableColumn<Appointment, LocalDateTime> dateColumn;
     private TableColumn<Appointment, LocalDateTime> startColumn;
     private TableColumn<Appointment, LocalDateTime> endColumn;
-
     private Customers customers;
     private AtomicBoolean isNewAppointment = new AtomicBoolean(false);
     private AtomicBoolean isDirtyAppointmentDetails = new AtomicBoolean(false);
     private AtomicBoolean isNewSelection = new AtomicBoolean(false);
     private AtomicBoolean isCustomerChanged = new AtomicBoolean(false);
     private String validationErrorCssClass;
-    private final String TIME_DISPLAY_FORMAT = "HHmm";
 
     /**
      * public method is exposed to allow the CustomerController to specify whether the customer data
@@ -181,11 +183,11 @@ public class MainController {
     private void setUpEventHandlers() {
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
-        menuItemViewMonth.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewMonth.getId()));
-        menuItemViewWeek.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewWeek.getId()));
-        menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
-        viewUpcomingButton.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
-        viewAllButton.selectedProperty().addListener(observable -> reloadAppointmentAndCustomerData());
+        menuItemViewMonth.setOnAction(this::handleViewChange);
+        menuItemViewWeek.setOnAction(this::handleViewChange);
+        menuItemViewAll.setOnAction(this::handleViewChange);
+        viewUpcomingButton.setOnAction(this::handleViewChange);
+        viewAllButton.setOnAction(this::handleViewChange);
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if (newValue != null) {
@@ -208,6 +210,158 @@ public class MainController {
         newCustomerButton.setOnAction(event -> requestCustomerDetails(true));
         editCustomerButton.setOnAction(event -> requestCustomerDetails(false));
         addDetailsFormListeners();
+    }
+
+    private void populateDetailsForm(Appointment appt) {
+        if (appt != null) {
+            customerInput.setValue(appt.getCustomer());
+            descriptionInput.setText(appt.getDescription());
+            urlInput.setText(appt.getUrl());
+            typeInput.setValue(appt.getAppointmentType());
+            locationInput.setValue(appt.getAppointmentLocation());
+            dateInput.setValue(appt.getStart().toLocalDate());
+            startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            clearValidationErrors();
+            setIsAppointmentChanged(false);
+        }
+    }
+
+    private Appointment getSelectedAppointment() {
+        return appointmentTable.getSelectionModel().getSelectedItem();
+    }
+
+    private void clearValidationErrors() {
+        for (Node hbox : detailsFormGridPane.getChildren()) {
+            for (Node control : ((HBox) hbox).getChildren()) {
+                if (control.getStyleClass().contains(validationErrorCssClass)) {
+                    control.getStyleClass().remove(validationErrorCssClass);
+                }
+            }
+        }
+    }
+
+    private void setIsAppointmentChanged(boolean isChanged) {
+        if (!isChanged) {
+            // no changes to save
+            isDirtyAppointmentDetails.set(false);
+            showNeedsSavingMessage(false);
+            revertButton.setDisable(true);
+            saveButton.setDisable(true);
+        } else if (!isNewSelection.get() && isChanged && !isDirtyAppointmentDetails.get()) {
+            // new changes need saving
+            isDirtyAppointmentDetails.set(true);
+            showNeedsSavingMessage(true);
+            revertButton.setDisable(false);
+            saveButton.setDisable(false);
+        }
+    }
+
+    private void showNeedsSavingMessage(boolean show) {
+        changeStatusLabel.setVisible(show);
+    }
+
+    private void handleViewChange(ActionEvent event) {
+        SortedList<Appointment> appointments = getAppointmentsByView();
+        if (appointments.isEmpty()) {
+            Dialog.showInformationMessage("There are no appointments for the requested view. Switching view to show all appointments.");
+            menuItemViewAll.setSelected(true);
+            setAppointmentView(menuItemViewAll.getId());
+        } else {
+            if (event.getSource() instanceof RadioMenuItem) {
+                setAppointmentView(((RadioMenuItem) event.getSource()).getId());
+            } else if (event.getSource() instanceof ToggleButton) {
+                setAppointmentView(getSelectedViewId());
+            }
+        }
+    }
+
+    /**
+     * @return Sorted list of appointments filtered according to the selected view options.
+     */
+    private SortedList<Appointment> getAppointmentsByView() {
+        User user = LoginSessionHelper.getCurrentUser();
+        ObservableList<Appointment> appointments;
+        LocalDate now = LocalDate.now();
+        if (menuItemViewWeek.isSelected()) {
+            appointments = user.getUserAppointments(a ->
+                    DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
+        } else if (menuItemViewMonth.isSelected()) {
+            appointments = user.getUserAppointments(a ->
+                    a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
+        } else {
+            appointments = user.getUserAppointments();
+        }
+
+        if (viewUpcomingButton.isSelected()) {
+            return new SortedList<Appointment>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
+        } else {
+            return new SortedList<>(appointments);
+        }
+    }
+
+    private void setAppointmentView(String selectedViewId) {
+        if (selectedViewId.equals(MENU_VIEW_ID_MONTH)) {
+            viewLabel.setText("This Month's Appointments");
+        } else if (selectedViewId.equals(MENU_VIEW_ID_WEEK)) {
+            viewLabel.setText("This Weeks's Appointments");
+        } else {
+            viewLabel.setText("All Appointments");
+        }
+
+        //so the UI/mouse doesn't freeze during the update.
+        Platform.runLater(() -> reloadAppointmentAndCustomerData());
+    }
+
+    private String getSelectedViewId() {
+        if (menuItemViewMonth.isSelected()) {
+            return MENU_VIEW_ID_MONTH;
+        } else if (menuItemViewWeek.isSelected()) {
+            return MENU_VIEW_ID_WEEK;
+        } else {
+            return MENU_VIEW_ID_ALL;
+        }
+
+    }
+
+    private void reloadAppointmentAndCustomerData() {
+        populateAppointments(getAppointmentsByView());
+        reloadCustomersList();
+        populateDetailsForm(getSelectedAppointment());
+    }
+
+    private void populateAppointments(SortedList<Appointment> appointments) {
+        if (appointments.isEmpty()) {
+            clearTableViewData();
+            Dialog.showInformationMessage("There are no appointments for the current view.");
+        } else {
+            appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
+            appointmentTable.setItems(appointments);
+            appointmentTable.getSelectionModel().select(0);
+        }
+    }
+
+    private void reloadCustomersList() {
+        customerInput.setItems(customers.getCustomers());
+    }
+
+    private void clearTableViewData() {
+        appointmentTable.setItems(FXCollections.observableArrayList());
+        initializeDetailsFields();
+    }
+
+    private void initializeDetailsFields() {
+        reloadCustomersList();
+        locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
+        typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
+        customerInput.getSelectionModel().selectFirst();
+        descriptionInput.clear();
+        urlInput.clear();
+        typeInput.getSelectionModel().selectFirst();
+        locationInput.getSelectionModel().selectFirst();
+        dateInput.setValue(LocalDate.now());
+        startInput.clear();
+        endInput.clear();
     }
 
     private void handleSaveAppointment() {
@@ -237,22 +391,6 @@ public class MainController {
         }
     }
 
-    private void setIsAppointmentChanged(boolean isChanged) {
-        if (!isChanged) {
-            // no changes to save
-            isDirtyAppointmentDetails.set(false);
-            showNeedsSavingMessage(false);
-            revertButton.setDisable(true);
-            saveButton.setDisable(true);
-        } else if (!isNewSelection.get() && isChanged && !isDirtyAppointmentDetails.get()) {
-            // new changes need saving
-            isDirtyAppointmentDetails.set(true);
-            showNeedsSavingMessage(true);
-            revertButton.setDisable(false);
-            saveButton.setDisable(false);
-        }
-    }
-
     private LocalDateTime getLocalDateTimeFromDetails(String formattedTime) {
         return LocalDateTime.of(dateInput.getValue(), LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
     }
@@ -269,10 +407,6 @@ public class MainController {
         endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
     }
 
-    private void showNeedsSavingMessage(boolean show) {
-        changeStatusLabel.setVisible(show);
-    }
-
     private void requestCustomerDetails(boolean isNewCustomer) {
         if (isNewCustomer) {
             FXHelper.showCustomerDetails(this, null);
@@ -286,72 +420,12 @@ public class MainController {
         }
     }
 
-    private void initializeDetailsFields() {
-        reloadCustomersList();
-        locationInput.setItems(FXCollections.observableArrayList(AppointmentLocation.values()));
-        typeInput.setItems(FXCollections.observableArrayList(AppointmentType.values()));
-        customerInput.getSelectionModel().selectFirst();
-        descriptionInput.clear();
-        urlInput.clear();
-        typeInput.getSelectionModel().selectFirst();
-        locationInput.getSelectionModel().selectFirst();
-        dateInput.setValue(LocalDate.now());
-        startInput.clear();
-        endInput.clear();
-    }
-
-    private void reloadCustomersList() {
-        customerInput.setItems(customers.getCustomers());
-    }
-
-    private void populateDetailsForm(Appointment appt) {
-        if (appt != null) {
-            customerInput.setValue(appt.getCustomer());
-            descriptionInput.setText(appt.getDescription());
-            urlInput.setText(appt.getUrl());
-            typeInput.setValue(appt.getAppointmentType());
-            locationInput.setValue(appt.getAppointmentLocation());
-            dateInput.setValue(appt.getStart().toLocalDate());
-            startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
-            endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
-            clearValidationErrors();
-            setIsAppointmentChanged(false);
-        }
-    }
-
-    private void clearValidationErrors() {
-        for (Node hbox : detailsFormGridPane.getChildren()) {
-            for (Node control : ((HBox) hbox).getChildren()) {
-                if (control.getStyleClass().contains(validationErrorCssClass)) {
-                    control.getStyleClass().remove(validationErrorCssClass);
-                }
-            }
-        }
-    }
-
     private void requestUserLogin() {
         FXHelper.showUserLogin();
         updateStatusLabel(LoginSessionHelper.getUsername());
         enableLogoutMenuItem();
         showUserAppointmentsDialog();  // shows appointment for the current user starting soon (i.e. within 15 minutes)
         setAppointmentView("menuItemViewAll");
-    }
-
-    private void setAppointmentView(String selectedView) {
-        if (selectedView.equals("menuItemViewMonth")) {
-            viewLabel.setText("This Month's Appointments");
-        } else if (selectedView.equals("menuItemViewWeek")) {
-            viewLabel.setText("This Weeks's Appointments");
-        } else {
-            viewLabel.setText("All Appointments");
-        }
-
-        //so the UI/mouse doesn't freeze during the update.
-        Platform.runLater(this::reloadAppointmentAndCustomerData);
-    }
-
-    private Appointment getSelectedAppointment() {
-        return appointmentTable.getSelectionModel().getSelectedItem();
     }
 
     private void updateStatusLabel(String username) {
@@ -383,12 +457,6 @@ public class MainController {
         }
     }
 
-    private void reloadAppointmentAndCustomerData() {
-        populateAppointments(getAppointmentsByView());
-        reloadCustomersList();
-        populateDetailsForm(getSelectedAppointment());
-    }
-
     private void reloadAppointmentAndCustomerData(Appointment appointmentToSelect) {
         populateAppointments(getAppointmentsByView());
         int indexToSelect = appointmentTable.getItems().indexOf(
@@ -403,46 +471,6 @@ public class MainController {
             reloadCustomersList();
             populateDetailsForm(getSelectedAppointment());
         }
-    }
-
-    private void populateAppointments(SortedList<Appointment> appointments) {
-        if (appointments.isEmpty()) {
-            clearTableViewData();
-            Dialog.showInformationMessage("There are no appointments for the current view.");
-        } else {
-            appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
-            appointmentTable.setItems(appointments);
-            appointmentTable.getSelectionModel().select(0);
-        }
-    }
-
-    /**
-     * @return Sorted list of appointments filtered according to the selected view options.
-     */
-    private SortedList<Appointment> getAppointmentsByView() {
-        User user = LoginSessionHelper.getCurrentUser();
-        ObservableList<Appointment> appointments;
-        LocalDate now = LocalDate.now();
-        if (menuItemViewWeek.isSelected()) {
-            appointments = user.getUserAppointments(a ->
-                    DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
-        } else if (menuItemViewMonth.isSelected()) {
-            appointments = user.getUserAppointments(a ->
-                    a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
-        } else {
-            appointments = user.getUserAppointments();
-        }
-
-        if (viewUpcomingButton.isSelected()) {
-            return new SortedList<Appointment>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
-        } else {
-            return new SortedList<>(appointments);
-        }
-    }
-
-    private void clearTableViewData() {
-        appointmentTable.setItems(FXCollections.observableArrayList());
-        initializeDetailsFields();
     }
 
     private void enableLogoutMenuItem() {
