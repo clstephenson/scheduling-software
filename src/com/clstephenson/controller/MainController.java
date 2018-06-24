@@ -54,8 +54,6 @@ public class MainController {
     @FXML
     private RadioMenuItem menuItemViewAll;
     @FXML
-    private ToggleGroup viewToggleGroup;
-    @FXML
     private ToggleButton viewUpcomingButton;
     @FXML
     private ToggleButton viewAllButton;
@@ -94,13 +92,10 @@ public class MainController {
     @FXML
     private Label changeStatusLabel;
     @FXML
-    private Label dateTimeLabel;
-    @FXML
     private Label viewLabel;
     @FXML
     private GridPane detailsFormGridPane;
-    @FXML
-    private ProgressIndicator progressIndicator;
+
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
     private TableColumn<Appointment, String> descriptionColumn;
@@ -181,6 +176,8 @@ public class MainController {
     }
 
     private void setUpEventHandlers() {
+        //using lambdas and method references to set event handlers helps with readability, making it very apparent
+        //what should happen when the event fires.
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
         menuItemViewMonth.setOnAction(this::handleViewChange);

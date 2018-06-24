@@ -42,7 +42,7 @@ public class Main extends Application {
 
 
         Platform.setImplicitExit(true);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> cleanupResources()));
+        Runtime.getRuntime().addShutdownHook(new Thread(Main::cleanupResources));
         launch(args);
     }
 
@@ -98,7 +98,7 @@ public class Main extends Application {
     }
 
     /**
-     * Runs a separate thread to show the current time in the UI.
+     * Schedule the current time in the UI to be updated every 1 second.
      *
      * @param loader
      */

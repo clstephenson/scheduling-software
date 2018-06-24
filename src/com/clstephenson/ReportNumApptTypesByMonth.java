@@ -38,6 +38,10 @@ public class ReportNumApptTypesByMonth {
         for(AppointmentType type : AppointmentType.values()) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName(type.toString());
+            // using stream and lambda here to filter the data down the the current iteration of "type",
+            // and mapping the month and numAppointment properties to the chart data property.  The data is then
+            // collected back into a observable arraylist that can be then added as a series to the barChart data.
+            // With streams and lambdas, this could be done with less code/additional methods making it more concise.
             series.setData(list.stream()
                     .filter(data -> data.getType().equals(type))
                     .map(data -> new XYChart.Data<String, Number>(
