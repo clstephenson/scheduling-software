@@ -1,5 +1,9 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
+import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.dataaccess.AddressRepository;
 import javafx.beans.property.*;
 
 public class Address {
@@ -9,6 +13,17 @@ public class Address {
     private ObjectProperty<City> city = new SimpleObjectProperty<>(this, "city");
     private StringProperty zipCode = new SimpleStringProperty(this, "zipCode");
     private StringProperty phoneNumber = new SimpleStringProperty(this, "phoneNumber");
+
+    public static Address getAddressById(int id) {
+        Address address = new Address();
+        try {
+            address = new AddressRepository().findById(id);
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return address;
+        }
+    }
 
     public Address() {
         this.addressLine1.set("");
@@ -82,7 +97,7 @@ public class Address {
     }
 
     public void setAddressLine2(String addressLine2) {
-        this.addressLine2.set(addressLine2.isEmpty() ? " " : addressLine2);
+        this.addressLine2.set(addressLine2.isEmpty() ? "" : addressLine2);
     }
 
     public City getCity() {
@@ -113,6 +128,55 @@ public class Address {
         return this.id.get() > 0;
     }
 
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        try {
+            AddressRepository repository = new AddressRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        }
+        return result || resultId > 0;
+    }
+
+    public boolean remove() {
+        boolean result = false;
+        if (this.id.get() > 0) {
+            try {
+                AddressRepository repository = new AddressRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+
+        return id.equals(address.id);
+    }
+
+    @Override
     public String toString() {
         return String.format("[%d, %s, %s, %s, %s, %s]", this.id.get(), this.addressLine1.get(), this.addressLine2.get(), this.city.get(), this.zipCode.get(), this.phoneNumber.get());
     }

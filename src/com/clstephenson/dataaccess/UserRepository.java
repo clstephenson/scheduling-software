@@ -1,5 +1,6 @@
 package com.clstephenson.dataaccess;
 
+import com.clstephenson.DataRepositoryException;
 import com.clstephenson.DateTimeUtil;
 import com.clstephenson.Localization;
 import com.clstephenson.LoginSession;
@@ -13,12 +14,17 @@ public class UserRepository implements Repository<User> {
 
     private Connection dbConnection;
 
-    public UserRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public UserRepository() throws DataRepositoryException {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
+        }
     }
 
     @Override
-    public int add(User user, LoginSession session) throws SQLException {
+    public int add(User user, LoginSession session) throws DataRepositoryException {
         String currentUserName = session.getLoggedInUser().getUserName();
         String sql = "INSERT INTO user (userName, password, active, createDate, createBy, lastUpdatedBy) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -37,34 +43,41 @@ public class UserRepository implements Repository<User> {
                 throw new SQLException();
             }
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.addinguser"), e);
+            String message = Localization.getString("error.db.addinguser");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean update(User entity, LoginSession session) throws SQLException {
+    public boolean update(User entity, LoginSession session) {
+        //todo: implement this method if/when needed
         return false;
     }
 
     @Override
-    public boolean removeById(int id) throws SQLException {
+    public boolean removeById(int id) throws DataRepositoryException {
         String sql = "DELETE FROM user WHERE userid=?";
         try (PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removinguser") + " = " + id;
-            throw new SQLException(message, e);
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(User user) throws SQLException {
+    public boolean remove(User user) throws DataRepositoryException {
         return removeById(user.getId());
     }
 
     @Override
-    public List<User> findAll() throws SQLException {
+    public User findById(int id) throws DataRepositoryException {
+        return findSingle(user -> user.getId() == id);
+    }
+
+    @Override
+    public List<User> findAll() throws DataRepositoryException {
         String query = "SELECT userId, userName, password, active FROM user";
         ArrayList<User> users = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -75,13 +88,8 @@ public class UserRepository implements Repository<User> {
             return users;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.userquery");
-            throw new SQLException(message, e);
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public User findById(int id) throws SQLException {
-        return findSingle(user -> user.getId() == id);
     }
 
     private User mapResultSetToObject(ResultSet rs) throws SQLException {

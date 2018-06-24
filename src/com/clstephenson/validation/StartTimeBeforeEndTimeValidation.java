@@ -22,8 +22,8 @@ public class StartTimeBeforeEndTimeValidation extends Validation {
             LocalTime start = null;
             LocalTime end = null;
             try {
-                start = LocalTime.parse(super.getInputToValidate().getText(), DateTimeFormatter.ofPattern("HH:mm"));
-                end = LocalTime.parse(endTimeControl.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+                start = LocalTime.parse(super.getInputToValidate().getText(), DateTimeFormatter.ofPattern("HHmm"));
+                end = LocalTime.parse(endTimeControl.getText(), DateTimeFormatter.ofPattern("HHmm"));
                 if (start.isAfter(end)) {
                     super.setMessage("The end time must be after the start time");
                 }

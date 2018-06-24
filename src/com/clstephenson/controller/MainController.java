@@ -6,26 +6,33 @@ import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
 import com.clstephenson.validation.*;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.util.Duration;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainController {
 
+    private final String TIME_DISPLAY_FORMAT = "HHmm";
+    private final String MENU_VIEW_ID_MONTH = "menuItemViewMonth";
+    private final String MENU_VIEW_ID_WEEK = "menuItemViewWeek";
+    private final String MENU_VIEW_ID_ALL = "menuItemViewAll";
     @FXML
     private MenuItem menuItemNewAppointment;
     @FXML
@@ -47,7 +54,9 @@ public class MainController {
     @FXML
     private RadioMenuItem menuItemViewAll;
     @FXML
-    private ToggleGroup viewToggleGroup;
+    private ToggleButton viewUpcomingButton;
+    @FXML
+    private ToggleButton viewAllButton;
     @FXML
     private DatePicker dateInput;
     @FXML
@@ -83,11 +92,9 @@ public class MainController {
     @FXML
     private Label changeStatusLabel;
     @FXML
-    private Label dateTimeLabel;
-    @FXML
     private Label viewLabel;
     @FXML
-    private ProgressIndicator progressIndicator;
+    private GridPane detailsFormGridPane;
 
     private TableColumn<Appointment, Customer> customerColumn;
     private TableColumn<Appointment, AppointmentType> typeColumn;
@@ -97,12 +104,11 @@ public class MainController {
     private TableColumn<Appointment, LocalDateTime> dateColumn;
     private TableColumn<Appointment, LocalDateTime> startColumn;
     private TableColumn<Appointment, LocalDateTime> endColumn;
-
     private Customers customers;
-    private boolean isNewAppointment = false;
-    private boolean isDirtyAppointmentDetails = false;
-    private boolean isNewSelection = false;
-    private boolean isCustomerChanged = false;
+    private AtomicBoolean isNewAppointment = new AtomicBoolean(false);
+    private AtomicBoolean isDirtyAppointmentDetails = new AtomicBoolean(false);
+    private AtomicBoolean isNewSelection = new AtomicBoolean(false);
+    private AtomicBoolean isCustomerChanged = new AtomicBoolean(false);
     private String validationErrorCssClass;
 
     /**
@@ -112,11 +118,11 @@ public class MainController {
      * @param isCustomerChanged
      */
     public void setIsCustomerChanged(boolean isCustomerChanged) {
-        this.isCustomerChanged = isCustomerChanged;
+        this.isCustomerChanged.set(isCustomerChanged);
     }
 
     @FXML
-    private void initialize() throws SQLException {
+    private void initialize() {
         validationErrorCssClass = AppConfiguration.getConfigurationProperty("form.validation.error.css");
         customers = new Customers();
         setUpAppointmentsTableView();
@@ -130,10 +136,11 @@ public class MainController {
         setupTableCellDataBindings();
         formatDateCell(dateColumn);
         formatTimeCell(startColumn);
-        //formatTimeCell(endColumn);
+        formatTimeCell(endColumn);
     }
 
     private void initializeTableColumns() {
+        //create the columns
         customerColumn = new TableColumn<>("Customer");
         typeColumn = new TableColumn<>("Type");
         descriptionColumn = new TableColumn<>("Description");
@@ -142,8 +149,19 @@ public class MainController {
         dateColumn = new TableColumn<>("Date");
         startColumn = new TableColumn<>("Start");
         endColumn = new TableColumn<>("End");
+
+        //give each column an id (if needed for css styling)
+        customerColumn.setId("customer-column");
+        typeColumn.setId("type-column");
+        descriptionColumn.setId("description-column");
+        locationColumn.setId("location-column");
+        urlColumn.setId("url-column");
+        dateColumn.setId("date-column");
+        startColumn.setId("start-column");
+        endColumn.setId("end-column");
+
         appointmentTable.getColumns().addAll(dateColumn, startColumn, endColumn, customerColumn, typeColumn,
-                descriptionColumn, locationColumn, urlColumn);
+                locationColumn, descriptionColumn);
     }
 
     private void setupTableCellDataBindings() {
@@ -155,37 +173,25 @@ public class MainController {
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startProperty());
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endProperty());
-
-        endColumn.setCellFactory(col -> new TableCell<Appointment, LocalDateTime>() {
-            @Override
-            public void updateItem(final LocalDateTime item, final boolean empty) {
-                super.updateItem(item, empty);
-                if (this.getTableRow().getStyleClass().contains("completedAppointment")) {
-                    this.getTableRow().getStyleClass().remove("completedAppointment");
-                }
-                if (item != null) {
-                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
-                    if (item.compareTo(LocalDateTime.now()) < 0) {
-                        this.getTableRow().getStyleClass().add("completedAppointment");
-                    }
-                }
-            }
-        });
     }
 
     private void setUpEventHandlers() {
+        //using lambdas and method references to set event handlers helps with readability, making it very apparent
+        //what should happen when the event fires.
         menuItemExit.setOnAction(event -> FXHelper.exitApplication());
         menuItemLogout.setOnAction(event -> handleLogout());
-        menuItemViewMonth.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewMonth.getId()));
-        menuItemViewWeek.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewWeek.getId()));
-        menuItemViewAll.selectedProperty().addListener(observable -> setAppointmentView(menuItemViewAll.getId()));
+        menuItemViewMonth.setOnAction(this::handleViewChange);
+        menuItemViewWeek.setOnAction(this::handleViewChange);
+        menuItemViewAll.setOnAction(this::handleViewChange);
+        viewUpcomingButton.setOnAction(this::handleViewChange);
+        viewAllButton.setOnAction(this::handleViewChange);
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 ((observable, oldValue, newValue) -> {
                     if (newValue != null) {
-                        isNewSelection = true; //keeps listeners from firing when details form populates on new selection
+                        isNewSelection.set(true); //keeps listeners from firing when details form populates on new selection
                         populateDetailsForm(newValue);
-                        isNewAppointment = false;
-                        isNewSelection = false;
+                        isNewAppointment.set(false);
+                        isNewSelection.set(false);
                     }
                 })
         );
@@ -193,8 +199,8 @@ public class MainController {
         saveButton.setOnAction(event -> handleSaveAppointment());
         deleteAppointmentButton.setOnAction(event -> deleteAppointment());
         menuNumApptTypesByMonth.setOnAction(event -> ReportNumApptTypesByMonth.showReport());
-        menuUserSchedule.setOnAction(event -> new ReportUserSchedule(LoginSessionHelper.getCurrentUser()));
-        menuExportCustomers.setOnAction(event -> new ReportCustomers());
+        menuUserSchedule.setOnAction(event -> ReportUserSchedule.generateReport(LoginSessionHelper.getCurrentUser()));
+        menuExportCustomers.setOnAction(event -> ReportCustomers.generateReport(true));
         menuItemNewAppointment.setOnAction(event -> createNewAppointment());
         newAppointmentButton.setOnAction(event -> createNewAppointment());
         menuItemNewCustomer.setOnAction(event -> requestCustomerDetails(true));
@@ -203,98 +209,45 @@ public class MainController {
         addDetailsFormListeners();
     }
 
-    private void handleSaveAppointment() {
-        if (validateAppointmentFields() && saveAppointment()) {
-            reloadAppointmentAndCustomerData();
+    private void populateDetailsForm(Appointment appt) {
+        if (appt != null) {
+            customerInput.setValue(appt.getCustomer());
+            descriptionInput.setText(appt.getDescription());
+            urlInput.setText(appt.getUrl());
+            typeInput.setValue(appt.getAppointmentType());
+            locationInput.setValue(appt.getAppointmentLocation());
+            dateInput.setValue(appt.getStart().toLocalDate());
+            startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+            clearValidationErrors();
+            setIsAppointmentChanged(false);
         }
     }
 
-    private void createNewAppointment() {
-        initializeDetailsFields();
-        setIsAppointmentChanged(true);
-        isNewAppointment = true;
+    private Appointment getSelectedAppointment() {
+        return appointmentTable.getSelectionModel().getSelectedItem();
     }
 
-    private void deleteAppointment() {
-        Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
-        dialog.setTitle("Delete Confirmation");
-        dialog.setHeaderText("ARE YOU SURE?");
-        dialog.setMessage("This will delete the currently selected appointment.  " +
-                "Are you sure you want to do this?");
-        Optional<ButtonType> optResult = dialog.showDialog(true);
-        if (optResult.get() == ButtonType.OK) {
-            if (getSelectedAppointment().remove()) {
-                reloadAppointmentAndCustomerData();
-            } else {
-                //todo customer could not be deleted
+    private void clearValidationErrors() {
+        for (Node hbox : detailsFormGridPane.getChildren()) {
+            for (Node control : ((HBox) hbox).getChildren()) {
+                if (control.getStyleClass().contains(validationErrorCssClass)) {
+                    control.getStyleClass().remove(validationErrorCssClass);
+                }
             }
         }
-    }
-
-    private boolean saveAppointment() {
-        Appointment appointment;
-        if (isNewAppointment) {
-            appointment = new Appointment();
-            appointment.setConsultant(LoginSessionHelper.getUsername());
-        } else {
-            appointment = getSelectedAppointment();
-        }
-        appointment.setCustomer(customerInput.getValue());
-        appointment.setDescription(descriptionInput.getText());
-        appointment.setUrl(urlInput.getText());
-        appointment.setAppointmentType(typeInput.getValue());
-        appointment.setAppointmentLocation(locationInput.getValue());
-        appointment.setStart(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(startInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-        appointment.setEnd(LocalDateTime.of(dateInput.getValue(), LocalTime.parse(endInput.getText(), DateTimeFormatter.ofPattern("HH:mm"))));
-
-        return appointment.save();
-    }
-
-    private boolean validateAppointmentFields() {
-        Validator v = new Validator();
-        v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
-        v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
-        v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
-        v.getValidations().add(new UrlNotRequiredValidation(urlInput, "URL", validationErrorCssClass));
-        v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
-
-        if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
-            Dialog.showValidationError(v.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    private void addDetailsFormListeners() {
-        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue)); //todo check if this works
-        customerInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
-        descriptionInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        typeInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
-        locationInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
-        urlInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        dateInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
-        startInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-        endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
-//        endInput.setTextFormatter(new TextFormatter<>(change -> {
-//            if(change.getControlText()change.getCaretPosition() == 2) {
-//                change.setText(change.getText() + ":");
-//                change.setCaretPosition(3);
-//            }
-//            return change;
-//        }));
     }
 
     private void setIsAppointmentChanged(boolean isChanged) {
         if (!isChanged) {
             // no changes to save
-            isDirtyAppointmentDetails = false;
+            isDirtyAppointmentDetails.set(false);
             showNeedsSavingMessage(false);
             revertButton.setDisable(true);
             saveButton.setDisable(true);
-        } else if (!isNewSelection && isChanged && !isDirtyAppointmentDetails) {
+        } else if (!isNewSelection.get() && isChanged && !isDirtyAppointmentDetails.get()) {
             // new changes need saving
-            isDirtyAppointmentDetails = true;
+            isDirtyAppointmentDetails.set(true);
             showNeedsSavingMessage(true);
             revertButton.setDisable(false);
             saveButton.setDisable(false);
@@ -302,14 +255,96 @@ public class MainController {
     }
 
     private void showNeedsSavingMessage(boolean show) {
-        if (show) {
-            FadeTransition ft = new FadeTransition(Duration.millis(500), changeStatusLabel);
-            ft.setFromValue(0.0);
-            ft.setToValue(1.0);
-            ft.play();
+        changeStatusLabel.setVisible(show);
+    }
+
+    private void handleViewChange(ActionEvent event) {
+        SortedList<Appointment> appointments = getAppointmentsByView();
+        if (appointments.isEmpty()) {
+            Dialog.showInformationMessage("There are no appointments for the requested view. Switching view to show all appointments.");
+            menuItemViewAll.setSelected(true);
+            setAppointmentView(menuItemViewAll.getId());
         } else {
-            changeStatusLabel.setOpacity(0.0);
+            if (event.getSource() instanceof RadioMenuItem) {
+                setAppointmentView(((RadioMenuItem) event.getSource()).getId());
+            } else if (event.getSource() instanceof ToggleButton) {
+                setAppointmentView(getSelectedViewId());
+            }
         }
+    }
+
+    /**
+     * @return Sorted list of appointments filtered according to the selected view options.
+     */
+    private SortedList<Appointment> getAppointmentsByView() {
+        User user = LoginSessionHelper.getCurrentUser();
+        ObservableList<Appointment> appointments;
+        LocalDate now = LocalDate.now();
+        if (menuItemViewWeek.isSelected()) {
+            appointments = user.getUserAppointments(a ->
+                    DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
+        } else if (menuItemViewMonth.isSelected()) {
+            appointments = user.getUserAppointments(a ->
+                    a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
+        } else {
+            appointments = user.getUserAppointments();
+        }
+
+        if (viewUpcomingButton.isSelected()) {
+            return new SortedList<Appointment>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
+        } else {
+            return new SortedList<>(appointments);
+        }
+    }
+
+    private void setAppointmentView(String selectedViewId) {
+        if (selectedViewId.equals(MENU_VIEW_ID_MONTH)) {
+            viewLabel.setText("This Month's Appointments");
+        } else if (selectedViewId.equals(MENU_VIEW_ID_WEEK)) {
+            viewLabel.setText("This Weeks's Appointments");
+        } else {
+            viewLabel.setText("All Appointments");
+        }
+
+        //so the UI/mouse doesn't freeze during the update.
+        Platform.runLater(() -> reloadAppointmentAndCustomerData());
+    }
+
+    private String getSelectedViewId() {
+        if (menuItemViewMonth.isSelected()) {
+            return MENU_VIEW_ID_MONTH;
+        } else if (menuItemViewWeek.isSelected()) {
+            return MENU_VIEW_ID_WEEK;
+        } else {
+            return MENU_VIEW_ID_ALL;
+        }
+
+    }
+
+    private void reloadAppointmentAndCustomerData() {
+        populateAppointments(getAppointmentsByView());
+        reloadCustomersList();
+        populateDetailsForm(getSelectedAppointment());
+    }
+
+    private void populateAppointments(SortedList<Appointment> appointments) {
+        if (appointments.isEmpty()) {
+            clearTableViewData();
+            Dialog.showInformationMessage("There are no appointments for the current view.");
+        } else {
+            appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
+            appointmentTable.setItems(appointments);
+            appointmentTable.getSelectionModel().select(0);
+        }
+    }
+
+    private void reloadCustomersList() {
+        customerInput.setItems(customers.getCustomers());
+    }
+
+    private void clearTableViewData() {
+        appointmentTable.setItems(FXCollections.observableArrayList());
+        initializeDetailsFields();
     }
 
     private void initializeDetailsFields() {
@@ -324,27 +359,62 @@ public class MainController {
         dateInput.setValue(LocalDate.now());
         startInput.clear();
         endInput.clear();
-        setIsAppointmentChanged(false);
     }
 
-    private void reloadCustomersList() {
-        try {
-            customerInput.setItems(customers.getCustomers().sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName())));
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private void handleSaveAppointment() {
+        if (validateAppointmentFields()) {
+            saveAppointment();
         }
     }
 
-    private void populateDetailsForm(Appointment appt) {
-        customerInput.setValue(appt.getCustomer());
-        descriptionInput.setText(appt.getDescription());
-        urlInput.setText(appt.getUrl());
-        typeInput.setValue(appt.getAppointmentType());
-        locationInput.setValue(appt.getAppointmentLocation());
-        dateInput.setValue(appt.getStart().toLocalDate());
-        startInput.setText(appt.getStart().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        endInput.setText(appt.getEnd().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        setIsAppointmentChanged(false);
+    private void createNewAppointment() {
+        initializeDetailsFields();
+        setIsAppointmentChanged(true);
+        isNewAppointment.set(true);
+    }
+
+    private void deleteAppointment() {
+        Dialog dialog = new Dialog(Alert.AlertType.CONFIRMATION);
+        dialog.setHeaderText("ARE YOU SURE?");
+        dialog.setMessage("This will delete the currently selected appointment.  " +
+                "Are you sure you want to do this?");
+        Optional<ButtonType> optResult = dialog.showDialog(true);
+        if (optResult.get() == ButtonType.OK) {
+            if (getSelectedAppointment().remove()) {
+                reloadAppointmentAndCustomerData();
+            } else {
+                Dialog.showErrorMessage("Unable to delete appointment.");
+            }
+        }
+    }
+
+    private LocalDateTime getLocalDateTimeFromDetails(String formattedTime) {
+        return LocalDateTime.of(dateInput.getValue(), LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)));
+    }
+
+    private void addDetailsFormListeners() {
+        customers.customersProperty().addListener((observable, oldValue, newValue) -> customerInput.setItems(newValue));
+        customerInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        descriptionInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        typeInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        locationInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        urlInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        dateInput.valueProperty().addListener(observable -> setIsAppointmentChanged(true));
+        startInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+        endInput.textProperty().addListener(observable -> setIsAppointmentChanged(true));
+    }
+
+    private void requestCustomerDetails(boolean isNewCustomer) {
+        if (isNewCustomer) {
+            FXHelper.showCustomerDetails(this, null);
+        } else {
+            Customer customer = customerInput.getValue();
+            FXHelper.showCustomerDetails(this, customer);
+        }
+        if (isCustomerChanged.get()) {
+            reloadAppointmentAndCustomerData();
+            isCustomerChanged.set(false);
+        }
     }
 
     private void requestUserLogin() {
@@ -355,23 +425,6 @@ public class MainController {
         setAppointmentView("menuItemViewAll");
     }
 
-    private void requestCustomerDetails(boolean isNewCustomer) {
-        if (isNewCustomer) {
-            FXHelper.showCustomerDetails(this, null);
-        } else {
-            Customer customer = customerInput.getValue(); // getSelectedAppointment().getCustomer();
-            FXHelper.showCustomerDetails(this, customer);
-        }
-        if (isCustomerChanged) {
-            reloadAppointmentAndCustomerData();
-            isCustomerChanged = false;
-        }
-    }
-
-    private Appointment getSelectedAppointment() {
-        return appointmentTable.getSelectionModel().getSelectedItem();
-    }
-
     private void updateStatusLabel(String username) {
         if (username.length() > 0) {
             statusLabel.setText(String.format("Logged in as:  %s", username));
@@ -380,67 +433,41 @@ public class MainController {
         }
     }
 
-    private void setAppointmentView(String selectedView) { //View view) {
-        if (selectedView.equals("menuItemViewMonth")) {
-            viewLabel.setText("This Month's Appointments");
-        } else if (selectedView.equals("menuItemViewWeek")) {
-            viewLabel.setText("This Weeks's Appointments");
+    private void saveAppointment() {
+        Appointment appointment;
+        if (isNewAppointment.get()) {
+            appointment = new Appointment();
+            appointment.setConsultant(LoginSessionHelper.getUsername());
         } else {
-            viewLabel.setText("All Appointments");
+            appointment = getSelectedAppointment();
         }
+        appointment.setCustomer(customerInput.getValue());
+        appointment.setDescription(descriptionInput.getText());
+        appointment.setUrl(urlInput.getText());
+        appointment.setAppointmentType(typeInput.getValue());
+        appointment.setAppointmentLocation(locationInput.getValue());
+        appointment.setStart(getLocalDateTimeFromDetails(startInput.getText()));
+        appointment.setEnd(getLocalDateTimeFromDetails(endInput.getText()));
 
-        //reload the table data using a different thread so the UI/mouse doesn't freeze during the update.
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                reloadAppointmentAndCustomerData();
-            }
-        });
+        if (appointment.save()) {
+            reloadAppointmentAndCustomerData(appointment);
+        }
     }
 
-    private void reloadAppointmentAndCustomerData() {
+    private void reloadAppointmentAndCustomerData(Appointment appointmentToSelect) {
         populateAppointments(getAppointmentsByView());
-        reloadCustomersList();
-        populateDetailsForm(getSelectedAppointment());
-    }
-
-    private void populateAppointments(SortedList<Appointment> appointments) {
-        if (appointments.isEmpty()) {
-            //todo message about no appointments for user
-            System.out.println("appointments is empty...");
-        } else {
-            appointments.comparatorProperty().bind(appointmentTable.comparatorProperty());
-            appointmentTable.setItems(appointments);
-            appointmentTable.getSelectionModel().select(0);
+        int indexToSelect = appointmentTable.getItems().indexOf(
+                appointmentTable.getItems()
+                        .stream()
+                        .filter(a -> a.getId() == appointmentToSelect.getId())
+                        .findFirst().orElseGet(Appointment::new)
+        );
+        if (indexToSelect > 0) {
+            appointmentTable.getSelectionModel().clearAndSelect(indexToSelect);
+            appointmentTable.scrollTo(indexToSelect);
+            reloadCustomersList();
+            populateDetailsForm(getSelectedAppointment());
         }
-    }
-
-    private SortedList<Appointment> getAppointmentsByView() {
-        User user = LoginSessionHelper.getCurrentUser();
-        ObservableList<Appointment> appointments;
-        LocalDate now = LocalDate.now();
-        if (menuItemViewWeek.isSelected()) {
-            appointments = user.getUserAppointments(a ->
-                    DateTimeUtil.getWeekOfYear(a.getStart().toLocalDate()) == DateTimeUtil.getWeekOfYear(now));
-        } else if (menuItemViewMonth.isSelected()) {
-            appointments = user.getUserAppointments(a ->
-                    a.getStart().getYear() == now.getYear() && a.getStart().getMonthValue() == now.getMonthValue());
-        } else {
-            appointments = user.getUserAppointments();
-        }
-        return new SortedList<>(appointments);
-    }
-
-    private void handleLogout() {
-        try {
-            LoginSessionHelper.logout();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        clearData();
-        disableLogoutMenuItem();
-        updateStatusLabel("");
-        requestUserLogin();
     }
 
     private void enableLogoutMenuItem() {
@@ -454,9 +481,18 @@ public class MainController {
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-        for (Appointment appt :
-                LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15)) {
-            message.append(appt.toString());
+
+        List<Appointment> list =
+                LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15);
+
+        for (Appointment appt : list) {
+            String msg = String.format(
+                    "You have a %s with %s today from %s to %s.",
+                    appt.getAppointmentType().toString(),
+                    appt.getCustomer().getName(),
+                    appt.getStart().format(DateTimeFormatter.ofPattern("h:mm a")),
+                    appt.getEnd().format(DateTimeFormatter.ofPattern("h:mm a")));
+            message.append(msg);
         }
         String header;
         if (message.length() == 0) {
@@ -464,12 +500,78 @@ public class MainController {
         } else {
             header = Localization.getString("ui.dialog.upcomingappointmentsmessage");
         }
-        new Dialog(Alert.AlertType.INFORMATION, title, header, message.toString()).showDialog(true);
+        new Dialog(Alert.AlertType.INFORMATION, header, message.toString()).showDialog(true);
     }
 
-    private void clearData() {
-        appointmentTable.setItems(FXCollections.observableArrayList());
-        initializeDetailsFields();
+    private void handleLogout() {
+        try {
+            LoginSessionHelper.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        clearTableViewData();
+        disableLogoutMenuItem();
+        updateStatusLabel("");
+        requestUserLogin();
+    }
+
+    private boolean validateAppointmentFields() {
+        Validator v = new Validator();
+        v.getValidations().add(new TimeValidation(startInput, "Start Time", validationErrorCssClass));
+        v.getValidations().add(new TimeValidation(endInput, "End Time", validationErrorCssClass));
+        v.getValidations().add(new StartTimeBeforeEndTimeValidation(startInput, endInput, validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(urlInput, "URL", validationErrorCssClass, 0, 255));
+        v.getValidations().add(new UrlNotRequiredValidation(urlInput, "URL", validationErrorCssClass));
+        v.getValidations().add(new TextLengthValidation(descriptionInput, "Description", validationErrorCssClass, 1, 500));
+
+        boolean isValid = false;
+        if (v.validateAll().isPresent() && (v.getMessage().length() > 0)) {
+            Dialog.showValidationError(v.getMessage());
+        } else {
+            //valid so far... now check if appt times follow business rules
+            isValid = validateAppointmentBusinessRules();
+        }
+        return isValid;
+    }
+
+    private boolean validateAppointmentBusinessRules() {
+        boolean isValid = false;
+        LocalDateTime start = getLocalDateTimeFromDetails(startInput.getText());
+        LocalDateTime end = getLocalDateTimeFromDetails(endInput.getText());
+        User currentUser = LoginSessionHelper.getCurrentUser();
+        try {
+            int id = isNewAppointment.get() ? 0 : getSelectedAppointment().getId();
+            if (ScheduleValidator.isAppointmentNotOverlapping(currentUser, start, end, id)) {
+                if (ScheduleValidator.isAppointmentWithinBusinessHours(start, end, locationInput.getValue())) {
+                    isValid = true;
+                }
+            }
+        } catch (AppointmentOutsideBusinessHoursException e) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Your appointment from %s to %s falls outside the standard business hours.",
+                    DateTimeUtil.getPrettyTime(e.getAppointmentStartTime()),
+                    DateTimeUtil.getPrettyTime(e.getAppointmentEndTime())
+            ));
+            sb.append(System.lineSeparator());
+            sb.append(System.lineSeparator());
+            sb.append(String.format("Business hours are from %s to %s, seven days per week.",
+                    DateTimeUtil.getPrettyTime(e.getBusinessHoursStart()),
+                    DateTimeUtil.getPrettyTime(e.getBusinessHoursEnd())));
+            Dialog.showValidationError(sb.toString());
+        } catch (OverlappingAppointmentException e) {
+            Appointment a = e.getOverlappedAppointment();
+            StringBuilder sb = new StringBuilder();
+            sb.append("The appointment overlaps with another scheduled appointment:");
+            sb.append(System.lineSeparator());
+            sb.append(System.lineSeparator());
+            sb.append(String.format("An appointment with %s is scheduled from %s to %s",
+                    a.getCustomer().getName(),
+                    DateTimeUtil.getPrettyTime(a.getStart().toLocalTime()),
+                    DateTimeUtil.getPrettyTime(a.getEnd().toLocalTime())
+            ));
+            Dialog.showValidationError(sb.toString());
+        }
+        return isValid;
     }
 
     private void formatDateCell(TableColumn column) {
@@ -494,7 +596,7 @@ public class MainController {
                 if (empty) {
                     setText(null);
                 } else {
-                    setText(item.format(DateTimeFormatter.ofPattern("HH:mm")));
+                    setText(item.format(DateTimeFormatter.ofPattern("h:mm a")));
                 }
             }
         });

@@ -1,16 +1,59 @@
 
+TableColumnHeader .text {
+    -fx-font-size: 15px;
+}
+
+.table-row-cell {
+    -fx-cell-size: 40px;
+    -fx-alignment: center;
+}
+
+.table-column {
+    -fx-alignment: center-left;
+}
+
+TableRow .text {
+    -fx-font-size: 15px;
+}
+
+#date-column {
+    -fx-pref-width: 100px;
+}
+
+#start-column {
+    -fx-pref-width: 70px;
+}
+
+#end-column {
+    -fx-pref-width: 70px;
+}
+
+#customer-column {
+    -fx-pref-width: 150px;
+}
+
+#type-column {
+    -fx-pref-width: 150px;
+}
+
+#location-column {
+    -fx-pref-width: 150px;
+}
+
+#url-column {
+    -fx-pref-width: 150px;
+}
+
+#description-column {
+    -fx-pref-width: 330px;
+}
+
+
 .error {
     -fx-border-color: red;
     -fx-border-width: 1px;
     -fx-background-color: lightpink;
     -fx-effect: dropshadow(gaussian, red, 10, .1, 0, 0);
-}
-
-Button {
-    -fx-border-color: gray;
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 3;
 }
 
 .completedAppointment .text {
@@ -21,3 +64,4 @@ Button {
 .completedAppointment:selected .text {
     -fx-fill: white;
 }
+

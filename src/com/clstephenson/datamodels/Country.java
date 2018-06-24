@@ -1,5 +1,9 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
+import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.dataaccess.CountryRepository;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,6 +12,17 @@ import javafx.beans.property.StringProperty;
 public class Country {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
+
+    public static Country getCountryById(int id) {
+        Country country = new Country();
+        try {
+            country = new CountryRepository().findById(id);
+        } catch (Exception e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return country;
+        }
+    }
 
     public Country() {
         this.name.set("");
@@ -50,6 +65,55 @@ public class Country {
         return this.id.get() > 0;
     }
 
+    public boolean save() {
+        boolean result = false;
+        int resultId = 0;
+        try {
+            CountryRepository repository = new CountryRepository();
+            if (this.id.get() > 0) {
+                result = repository.update(this, LoginSessionHelper.getSession());
+            } else {
+                resultId = repository.add(this, LoginSessionHelper.getSession());
+                if (resultId > 0) this.id.set(resultId);
+            }
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        }
+        return result || resultId > 0;
+    }
+
+    public boolean remove() {
+        boolean result = false;
+        if (this.id.get() > 0) {
+            try {
+                CountryRepository repository = new CountryRepository();
+                if (repository.remove(this)) {
+                    this.id.set(0);
+                    result = true;
+                }
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Country country = (Country) o;
+
+        return id.equals(country.id);
+    }
+
+    @Override
     public String toString() {
         return String.format("[%d, %s]", this.id.get(), this.name.get());
     }

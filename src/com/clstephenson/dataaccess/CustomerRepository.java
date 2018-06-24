@@ -1,6 +1,9 @@
 package com.clstephenson.dataaccess;
 
-import com.clstephenson.*;
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.DateTimeUtil;
+import com.clstephenson.Localization;
+import com.clstephenson.LoginSession;
 import com.clstephenson.datamodels.Address;
 import com.clstephenson.datamodels.City;
 import com.clstephenson.datamodels.Country;
@@ -14,21 +17,23 @@ public class CustomerRepository implements Repository<Customer> {
 
     private Connection dbConnection;
 
-    public CustomerRepository() throws SQLException {
-        dbConnection = DBManager.getConnection();
+    public CustomerRepository() throws DataRepositoryException {
+        try {
+            dbConnection = DBManager.getConnection();
+        } catch (SQLException e) {
+            String message = Localization.getString("error.db.connection");
+            throw new DataRepositoryException(e, message);
+        }
     }
 
     @Override
-    public int add(Customer customer, LoginSession session) throws SQLException {
-        AddressRepository addressRepository = new AddressRepository();
-        Address address = addressRepository.findSingle(addr -> addr.getId() == customer.getAddress().getId());
-        int addressId;
+    public int add(Customer customer, LoginSession session) throws DataRepositoryException {
+        Address address = Address.getAddressById(customer.getAddress().getId());
         if(address == null) {
-            addressId = addressRepository.add(customer.getAddress(), session);
-            customer.getAddress().setId(addressId); //add the newly generated ID to the customer address
-        } else {
-            addressId = address.getId();
+            //add the address to the DB
+            customer.getAddress().save();
         }
+        int addressId = customer.getAddress().getId();
         if(addressId != 0) {
             String currentUserName = session.getLoggedInUser().getUserName();
             String sql = "INSERT INTO customer (customerName, addressid, active, createDate, createdBy, lastUpdateBy) " +
@@ -48,17 +53,19 @@ public class CustomerRepository implements Repository<Customer> {
                     throw new SQLException();
                 }
             } catch (SQLException e) {
-                throw new SQLException(Localization.getString("error.db.addingcustomer"), e);
+                String message = Localization.getString("error.db.addingcustomer");
+                throw new DataRepositoryException(e, message);
             }
         } else {
             // error - address could not be added, therefore customer could not be added
-            throw new SQLException(Localization.getString("error.db.addingcustomer"));
+            String message = Localization.getString("error.db.addingcustomer");
+            throw new DataRepositoryException(new SQLException(), message);
         }
     }
 
     @Override
-    public boolean update(Customer customer, LoginSession session) throws SQLException {
-        new AddressRepository().update(customer.getAddress(), session);
+    public boolean update(Customer customer, LoginSession session) throws DataRepositoryException {
+        customer.getAddress().save();
         String sql = "UPDATE customer set customerName=?, addressId=?, active=?, lastUpdateBy=? WHERE customerid=?";
         try(PreparedStatement statement = dbConnection.prepareStatement(sql)) {
             statement.setString(1, customer.getName());
@@ -68,28 +75,35 @@ public class CustomerRepository implements Repository<Customer> {
             statement.setInt(5, customer.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new SQLException(Localization.getString("error.db.updatingcustomer"), e);
+            String message = Localization.getString("error.db.updatingcustomer");
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean removeById(int id) throws SQLException {
+    public boolean removeById(int id) throws DataRepositoryException {
         try (CallableStatement statement = dbConnection.prepareCall("{CALL remove_customer(?)}")) {
             statement.setInt(1, id);
-            return statement.executeUpdate() > 0;
+            statement.executeUpdate();
+            return this.findById(id) == null;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.removingcustomer") + " = " + id;
-            throw new SQLException(message, e);
+            throw new DataRepositoryException(e, message);
         }
     }
 
     @Override
-    public boolean remove(Customer customer) throws SQLException {
+    public boolean remove(Customer customer) throws DataRepositoryException {
         return removeById(customer.getId());
     }
 
     @Override
-    public List<Customer> findAll() throws SQLException {
+    public Customer findById(int id) throws DataRepositoryException {
+        return findSingle(customer -> customer.getId() == id);
+    }
+
+    @Override
+    public List<Customer> findAll() throws DataRepositoryException {
         String query = "SELECT * FROM customer_view";
         ArrayList<Customer> customers = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -100,13 +114,8 @@ public class CustomerRepository implements Repository<Customer> {
             return customers;
         } catch (SQLException e) {
             String message = Localization.getString("error.db.customerquery");
-            throw new SQLException(message, e);
+            throw new DataRepositoryException(e, message);
         }
-    }
-
-    @Override
-    public Customer findById(int id) throws SQLException {
-        return findSingle(customer -> customer.getId() == id);
     }
 
     private Customer mapResultSetToObject(ResultSet rs) throws SQLException {

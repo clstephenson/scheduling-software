@@ -1,16 +1,27 @@
 package com.clstephenson.datamodels;
 
+import com.clstephenson.DataRepositoryException;
+import com.clstephenson.Dialog;
 import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.beans.property.*;
-
-import java.sql.SQLException;
 
 public class Customer {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
     private ObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
     private BooleanProperty isActive = new SimpleBooleanProperty(this, "isActive");
+
+    public static Customer getCustomerById(int id) {
+        Customer customer = new Customer();
+        try {
+            customer = new CustomerRepository().findById(id);
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        } finally {
+            return customer;
+        }
+    }
 
     public Customer() {
         this.name.set("");
@@ -91,15 +102,14 @@ public class Customer {
         int resultId = 0;
         try {
             CustomerRepository repository = new CustomerRepository();
-            if(this.id.get() > 0) {
+            if (this.id.get() > 0) {
                 result = repository.update(this, LoginSessionHelper.getSession());
             } else {
                 resultId = repository.add(this, LoginSessionHelper.getSession());
-                if(resultId > 0) this.id.set(resultId);
+                if (resultId > 0) this.id.set(resultId);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //todo do something with exception
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -109,15 +119,29 @@ public class Customer {
         if(this.id.get() > 0) {
             try {
                 CustomerRepository repository = new CustomerRepository();
-                if(repository.remove(this)) {
+                if (repository.remove(this)) {
                     this.id.set(0);
                     result = true;
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //todo do something with exception
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Customer customer = (Customer) o;
+
+        return id.equals(customer.id);
     }
 }

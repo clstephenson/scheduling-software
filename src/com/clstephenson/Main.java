@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -27,10 +26,23 @@ public class Main extends Application {
     private static ScheduledExecutorService executorService;
 
     public static void main(String[] args) throws SQLException {
+
+        /*
+        Change the default system time zone.
+        */
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Phoenix"));
         //TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+
+
+        /*
+        Change the default locale to Italy or French Canadian
+        */
         //Locale.setDefault(Locale.ITALY);
+        //Locale.setDefault(Locale.CANADA_FRENCH);
+
+
         Platform.setImplicitExit(true);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> cleanupResources()));
+        Runtime.getRuntime().addShutdownHook(new Thread(Main::cleanupResources));
         launch(args);
     }
 
@@ -49,21 +61,21 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         checkIfAppAlreadyRunning();
-        FXMLLoader loader;
+        FXMLLoader loader = null;
         Parent root = null;
+        String fxmlPath = "";
         try {
-            String fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
+            fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
             loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             root = loader.load();
-            //root = FXMLLoader.load(Paths.get(fxmlPath).toUri().toURL());
         } catch (Exception e) {
-            throw new RuntimeException("Could not load Main.fxml", e);
-            //todo fix this exception handling
+            Dialog.showErrorMessage("Could not load FXML file: " + fxmlPath);
+            System.exit(0);
         }
         final int APP_WIDTH = 1000;
         final int APP_HEIGHT = 600;
         Scene scene = new Scene(root, APP_WIDTH, APP_HEIGHT);
-        primaryStage.setTitle("Scheduling Application"); //todo localize the title
+        primaryStage.setTitle(Localization.getString("ui.application.title"));
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         FXHelper.addStylesheet(scene);
@@ -79,15 +91,17 @@ public class Main extends Application {
         try {
             socket = new ServerSocket(56284);
         } catch (IOException e) {
-            String msg = "Application is already running.  Exiting...";
-            Dialog dialog = new Dialog(Alert.AlertType.ERROR);
-            dialog.setTitle("Application Error");
-            dialog.setMessage(msg);
-            dialog.showDialog(true);
+            String msg = "Application is already running.  Please close running application and try again.";
+            Dialog.showErrorMessage(msg);
             System.exit(0);
         }
     }
 
+    /**
+     * Schedule the current time in the UI to be updated every 1 second.
+     *
+     * @param loader
+     */
     private static void startDateTimeThread(FXMLLoader loader) {
         Label targetLabel = (Label) loader.getNamespace().get("dateTimeLabel");
         executorService = Executors.newScheduledThreadPool(1);

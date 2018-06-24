@@ -11,7 +11,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -31,13 +30,18 @@ public class ReportNumApptTypesByMonth {
         ObservableList<NumApptType> list;
         try {
             list = new ReportData().getNumApptTypesByMonth(LocalDate.now().getYear(), LoginSessionHelper.getSession());
-        } catch (SQLException e) {
-            throw new RuntimeException(e); //todo handle error
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+            return;
         }
 
         for(AppointmentType type : AppointmentType.values()) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName(type.toString());
+            // using stream and lambda here to filter the data down the the current iteration of "type",
+            // and mapping the month and numAppointment properties to the chart data property.  The data is then
+            // collected back into a observable arraylist that can be then added as a series to the barChart data.
+            // With streams and lambdas, this could be done with less code/additional methods making it more concise.
             series.setData(list.stream()
                     .filter(data -> data.getType().equals(type))
                     .map(data -> new XYChart.Data<String, Number>(

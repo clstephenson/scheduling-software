@@ -6,22 +6,30 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.sql.SQLException;
+import java.util.stream.Collectors;
 
 public class Customers {
 
     private SimpleListProperty<Customer> customers;
 
-    public Customers() throws SQLException {
+    public Customers() {
         customers = new SimpleListProperty<>(FXCollections.observableArrayList());
         updateCustomersFromRepository();
     }
 
-    private void updateCustomersFromRepository() throws SQLException {
-        setCustomers(FXCollections.observableArrayList(new CustomerRepository().findAll()));
+    private void updateCustomersFromRepository() {
+        try {
+            setCustomers(FXCollections.observableArrayList(
+                    new CustomerRepository().findAll().stream()
+                            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+                            .collect(Collectors.toList())
+            ));
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
+        }
     }
 
-    public ObservableList<Customer> getCustomers() throws SQLException {
+    public ObservableList<Customer> getCustomers() {
         updateCustomersFromRepository();
         return customers.get();
     }

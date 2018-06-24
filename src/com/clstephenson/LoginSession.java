@@ -1,55 +1,58 @@
 package com.clstephenson;
 
-import com.clstephenson.dataaccess.UserRepository;
 import com.clstephenson.datamodels.User;
 
-import java.io.IOException;
 import java.security.AccessControlException;
-import java.sql.SQLException;
 
+/**
+ * LoginSession constructor takes a username and password as inputs.  If the combination is valid, then the associated
+ * User is added to the session.
+ */
 public class LoginSession {
 
     private User loggedInUser;
 
-    public LoginSession() {
-
-    }
-
-    public LoginSession(String userName, String password) {
-        try {
-            UserRepository userRepository = new UserRepository();
-            loggedInUser = userRepository.findSingle(u ->
-                    u.getUserName().equalsIgnoreCase(userName) &&
-                            u.getPassword().equals(password) &&
-                            u.isActive()
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e); //todo fix exceptions
-        }
+    /**
+     * Checks if username/password combination is valid, and if so, creates a new login session.
+     *
+     * @param userName
+     * @param password
+     * @throws AccessControlException if the username/password combination is not valid.
+     */
+    public LoginSession(String userName, String password) throws AccessControlException {
+        loggedInUser = User.getActiveUser(userName, password);
         logAttempt(userName, isLoggedIn());
         if(loggedInUser == null) {
             throw new AccessControlException("Invalid login credentials");
         }
     }
 
-    public void logout() {
-        loggedInUser = null;
+    private void logAttempt(String userName, boolean isSuccessful) {
+        LoginActivityLogger.logNewActivity(userName, isSuccessful);
     }
 
+    /**
+     * Checks if the current session has a valid user logged in.
+     *
+     * @return true if a user is currently logged in, otherwise returns false.
+     */
     public boolean isLoggedIn() {
         return loggedInUser != null;
     }
 
-    public User getLoggedInUser() {
-        return loggedInUser;
+    /**
+     * Invalidates the current login session user.
+     */
+    public void logout() {
+        loggedInUser = null;
     }
 
-    private void logAttempt(String userName, boolean isSuccessful) {
-        try {
-            LoginActivityLogger.logNewActivity(userName, isSuccessful);
-        } catch (IOException e) {
-            throw new RuntimeException("Log entry could not be written to the file.", e);
-            //todo fix this exception
-        }
+    /**
+     * Get the current logged in user.
+     *
+     * @return the session's currently logged in user.
+     */
+    public User getLoggedInUser() {
+        return loggedInUser;
     }
 }

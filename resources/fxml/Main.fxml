@@ -92,6 +92,18 @@
                                  <children>
                                     <ProgressIndicator fx:id="progressIndicator" visible="false" />
                                  </children></Pane>
+                               <ToggleButton fx:id="viewUpcomingButton" mnemonicParsing="false" prefWidth="71.0"
+                                             selected="true" text="Upcoming">
+                                   <toggleGroup>
+                                       <ToggleGroup fx:id="pastAppointmentToggleGroup"/>
+                                   </toggleGroup>
+                               </ToggleButton>
+                               <ToggleButton fx:id="viewAllButton" mnemonicParsing="false" prefWidth="71.0" text="All"
+                                             toggleGroup="$pastAppointmentToggleGroup">
+                                   <HBox.margin>
+                                       <Insets right="20.0"/>
+                                   </HBox.margin>
+                               </ToggleButton>
                               <Label id="dateTimeLabel" fx:id="dateTimeLabel" alignment="CENTER" layoutX="25.0" layoutY="10.0" style="&#10;" text="Date/Time" textAlignment="CENTER" wrapText="false">
                                  <font>
                                     <Font size="18.0" fx:id="x12" />
@@ -102,7 +114,7 @@
                               </Label>
                            </children>
                            <padding>
-                              <Insets left="15.0" right="15.0" />
+                               <Insets left="15.0" right="15.0" top="10" bottom="10"/>
                            </padding>
                         </HBox>
                         <TableView fx:id="appointmentTable" VBox.vgrow="ALWAYS" />
@@ -131,10 +143,10 @@
                               </Label>
                            </children>
                            <padding>
-                              <Insets left="15.0" />
+                               <Insets left="15.0" top="10"/>
                            </padding>
                         </HBox>
-                        <GridPane vgap="5.0" VBox.vgrow="NEVER">
+                         <GridPane fx:id="detailsFormGridPane" id="details-form" vgap="5.0" VBox.vgrow="NEVER">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="225.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -155,14 +167,16 @@
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="1">
                                  <children>
-                                    <Label text="Start Time (hh:mm)" />
-                                    <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" promptText="HH:mm" />
+                                     <Label text="Start Time (HHmm)"/>
+                                     <TextField fx:id="startInput" minHeight="-Infinity" prefHeight="25.0"
+                                                prefWidth="100.0" promptText="HHmm"/>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.rowIndex="2">
                                  <children>
-                                    <Label text="End Time (hh:mm)" />
-                                    <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0" prefWidth="100.0" promptText="HH:mm" />
+                                     <Label text="End Time (HHmm)"/>
+                                     <TextField fx:id="endInput" minHeight="-Infinity" prefHeight="25.0"
+                                                prefWidth="100.0" promptText="HHmm"/>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="20.0" GridPane.columnIndex="1">

@@ -1,16 +1,12 @@
 package com.clstephenson.datamodels;
 
-import com.clstephenson.AppointmentLocation;
-import com.clstephenson.AppointmentType;
-import com.clstephenson.LoginSessionHelper;
+import com.clstephenson.*;
 import com.clstephenson.dataaccess.AppointmentRepository;
 import javafx.beans.property.*;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
-public class Appointment {
+public class Appointment implements Comparable {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private ObjectProperty<Customer> customer = new SimpleObjectProperty<>(this, "customer");
     private ObjectProperty<AppointmentType> appointmentType = new SimpleObjectProperty<>(this, "appointmentType"); //using title column in db
@@ -133,7 +129,7 @@ public class Appointment {
     }
 
     public void setUrl(String url) {
-        this.url.set(url.isEmpty() ? " " : url);
+        this.url.set(url.isEmpty() ? "" : url);
     }
 
     public ObjectProperty<LocalDateTime> startProperty() {
@@ -175,9 +171,8 @@ public class Appointment {
                 resultId = repository.add(this, LoginSessionHelper.getSession());
                 if (resultId > 0) this.id.set(resultId);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //todo do something with exception
+        } catch (DataRepositoryException e) {
+            Dialog.showDBError(e.getMessage());
         }
         return result || resultId > 0;
     }
@@ -187,22 +182,42 @@ public class Appointment {
         if(this.id.get() > 0) {
             try {
                 AppointmentRepository repository = new AppointmentRepository();
-                if(repository.remove(this)) {
+                if (repository.remove(this)) {
                     this.id.set(0);
                     result = true;
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                //todo do something with exception
+            } catch (DataRepositoryException e) {
+                Dialog.showDBError(e.getMessage());
             }
         }
         return result;
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Appointment that = (Appointment) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
     public String toString() {
         return String.format("[%d, %s, %s, %s, %s, %s, %s, %s, %s]", this.id.get(), this.customer.get().getName(),
-                this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(), this.consultant.get(),
-                this.url.get(), this.start.get(), this.end.get());
-        //todo change format string for start and end dates/times
+                this.appointmentType.get().toString(), this.description.get(), this.appointmentLocation.get().toString(),
+                this.consultant.get(), this.url.get(), this.start.get(), this.end.get());
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Appointment other = (Appointment) o;
+        return this.getStart().compareTo(other.getStart());
     }
 }
