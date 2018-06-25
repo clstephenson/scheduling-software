@@ -6,7 +6,6 @@ import com.clstephenson.datamodels.Appointment;
 import com.clstephenson.datamodels.Customer;
 import com.clstephenson.datamodels.User;
 import com.clstephenson.validation.*;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -291,7 +290,7 @@ public class MainController {
         }
 
         if (viewUpcomingButton.isSelected()) {
-            return new SortedList<Appointment>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
+            return new SortedList<>(appointments.filtered(a -> a.getEnd().isAfter(LocalDateTime.now())));
         } else {
             return new SortedList<>(appointments);
         }
@@ -306,8 +305,7 @@ public class MainController {
             viewLabel.setText("All Appointments");
         }
 
-        //so the UI/mouse doesn't freeze during the update.
-        Platform.runLater(() -> reloadAppointmentAndCustomerData());
+        reloadAppointmentAndCustomerData();
     }
 
     private String getSelectedViewId() {
@@ -318,7 +316,6 @@ public class MainController {
         } else {
             return MENU_VIEW_ID_ALL;
         }
-
     }
 
     private void reloadAppointmentAndCustomerData() {
@@ -481,10 +478,8 @@ public class MainController {
     private void showUserAppointmentsDialog() {
         String title = Localization.getString("ui.dialog.upcomingappointments");
         StringBuilder message = new StringBuilder();
-
         List<Appointment> list =
                 LoginSessionHelper.getCurrentUser().getUserFutureAppointments(ChronoUnit.MINUTES, 15);
-
         for (Appointment appt : list) {
             String msg = String.format(
                     "You have a %s with %s today from %s to %s.",

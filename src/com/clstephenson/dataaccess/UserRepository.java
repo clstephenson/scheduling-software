@@ -73,7 +73,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public User findById(int id) throws DataRepositoryException {
-        return findSingle(user -> user.getId() == id);
+        return findSingle(u -> u.getId() == id);
     }
 
     @Override

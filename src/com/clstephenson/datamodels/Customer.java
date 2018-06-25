@@ -6,7 +6,7 @@ import com.clstephenson.LoginSessionHelper;
 import com.clstephenson.dataaccess.CustomerRepository;
 import javafx.beans.property.*;
 
-public class Customer {
+public class Customer implements Comparable {
     private IntegerProperty id = new SimpleIntegerProperty(this, "id");
     private StringProperty name = new SimpleStringProperty(this, "name");
     private ObjectProperty<Address> address = new SimpleObjectProperty<>(this, "address");
@@ -143,5 +143,11 @@ public class Customer {
         Customer customer = (Customer) o;
 
         return id.equals(customer.id);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Customer other = (Customer) o;
+        return this.getName().compareTo(other.getName());
     }
 }

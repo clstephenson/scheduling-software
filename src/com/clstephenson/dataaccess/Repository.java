@@ -33,5 +33,4 @@ public interface Repository<T> {
     }
 
     List<T> findAll() throws DataRepositoryException;
-
 }

@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Customers {
@@ -36,6 +38,10 @@ public class Customers {
 
     public SimpleListProperty<Customer> customersProperty() {
         return customers;
+    }
+
+    public Map<Integer, Customer> getCustomersAsMap() {
+        return customers.get().stream().collect(Collectors.toMap(Customer::getId, Function.identity()));
     }
 
     private void setCustomers(ObservableList<Customer> customers) {

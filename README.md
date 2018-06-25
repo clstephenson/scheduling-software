@@ -19,17 +19,19 @@ Rubric Items
   * can be added, updated, and deleted.
 
 ## Calendar Views
-  * Selectable from "View" menu.  Can view all appointments, or view only current week or month.
-    Also added a filter to view only appointments that have not ended (default) or all, including past appointments.
+  * Selectable from "View" menu.  Can view all appointments, or view only current week or month. Also added a filter 
+    to view only appointments that have not ended (default) or all, including past appointments.
 
 ## Time Zones
-* Added line of code in main.java to change the default time zone.
+  * Added line of code in main.java to change the default time zone.
 
 ## Exception Controls
-  * Incorrect username/password - _AccessControlException_ is thrown from _LoginSession.java_ and     caught in _LoginController.java_.  A message is then displayed to the user.
-  * Appointment outside business hours - Custom exception thrown from _ScheduleValidator_ and         caught in *MainController*.
-  * Overlapping appointments - Custom exception thrown from _ScheduleValidator_ and caught in         _MainController_.
-  * Non-existent/invalid customer data - This should not happen.  When an appointment is added or     edited, the customer is selected from a populated list (non-editable).  Newly added customers     are auto-added to the list, and when a customer is deleted, all appointments for that customer    also get removed.
+  * Incorrect username/password - _AccessControlException_ is thrown from _LoginSession.java_ and caught in 
+    _LoginController.java_.  A message is then displayed to the user.
+  * Appointment outside business hours - Custom exception thrown from _ScheduleValidator_ and caught in *MainController*.
+  * Overlapping appointments - Custom exception thrown from _ScheduleValidator_ and caught in _MainController_.
+  * Non-existent/invalid customer data - This should not happen.  When an appointment is added or edited, the customer 
+    is selected from a populated list (non-editable).  Newly added customers     are auto-added to the list, and when a customer is deleted, all appointments for that customer    also get removed.
 
 ## Lambda Expressions
   * I used lambdas, streams and method references throughout the code.  Here are two examples...
@@ -37,20 +39,18 @@ Rubric Items
     2. _MainController.java_, line 178
 
 ## Alerts
-  * _showUserAppointmentsDialog()_ is called from _requestUserLogin()_ in _MainController.java_,      line 424. The dialog is displayed if the user has an appointment beginning within 15 minutes
-    from current time.
+  * _showUserAppointmentsDialog()_ is called from _requestUserLogin()_ in _MainController.java_, line 424. The dialog 
+    is displayed if the user has an appointment beginning within 15 minutes from current time.
 
 ## Reports
-  * Number of appointment types by month - I chose to implement this as a bar chart, showing months
-    on the x-axis, and number of appointments on the y-axis. Code to generate report is in
-    _ReportNumApptTypesByMonth.java_.
-  * Consultant Schedule - Gets the logged-in user's schedule for the current day.  Formats, and
-    outputs to a text document.  Automatically attempts to open the document in the system's
-    default editor. Code to generate report is in _ReportUserSchedule.java_.
-  * Customer List - Creates a list of all customer data as a comma-separated values (csv) file, and
-    attempts to open the document in the system's default editor. Code to generate report is in
-    _ReportCustomers.java_.
+  * Number of appointment types by month - I chose to implement this as a bar chart, showing months on the x-axis, 
+    and number of appointments on the y-axis. Code to generate report is in _ReportNumApptTypesByMonth.java_.
+  * Consultant Schedule - Gets the logged-in user's schedule for the current day.  Formats, and outputs to a text 
+    document.  Automatically attempts to open the document in the system's default editor. Code to generate report 
+    is in _ReportUserSchedule.java_.
+  * Customer List - Creates a list of all customer data as a comma-separated values (csv) file, and attempts to open 
+    the document in the system's default editor. Code to generate report is in _ReportCustomers.java_.
 
 ## Activity Log
-  * Writes evidence of each login attempt to _activityLog.txt_.  Sessions are logged from 
-    _LoginSession.java_, and the logging code is implemented in _LoginActivityLogger.java_.
+  * Writes evidence of each login attempt to _activityLog.txt_.  Sessions are logged from _LoginSession.java_, and 
+    the logging code is implemented in _LoginActivityLogger.java_.

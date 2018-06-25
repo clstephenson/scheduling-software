@@ -7,10 +7,12 @@ import com.clstephenson.datamodels.Customer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AppointmentRepository implements Repository<Appointment> {
 
     private Connection dbConnection;
+    private Map<Integer, Customer> customers;
 
     public AppointmentRepository() throws DataRepositoryException {
         try {
@@ -109,6 +111,7 @@ public class AppointmentRepository implements Repository<Appointment> {
 
     @Override
     public List<Appointment> findAll() throws DataRepositoryException {
+        customers = new Customers().getCustomersAsMap();
         String query = "SELECT * FROM appointment_view";
         ArrayList<Appointment> appointments = new ArrayList<>();
         try (Statement statement = dbConnection.createStatement()) {
@@ -126,7 +129,8 @@ public class AppointmentRepository implements Repository<Appointment> {
     private Appointment mapResultSetToObject(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setId(rs.getInt("appointmentid"));
-        appointment.setCustomer(Customer.getCustomerById(rs.getInt("customerId")));
+        int customerId = rs.getInt("customerId");
+        appointment.setCustomer(customers.get(customerId));
         appointment.setAppointmentType(AppointmentType.valueOf(rs.getString("title")));
         appointment.setDescription(rs.getString("description"));
         appointment.setAppointmentLocation(AppointmentLocation.valueOf(rs.getString("location")));
