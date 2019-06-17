@@ -1,3 +1,12 @@
+This was an application required for a Java-related software course. The overall requirement was to write an application 
+using Java FX and mySql that manages appointments for customers of a fictitious consulting company with three locations 
+(three time zones).
+
+Running the application:
+- MySQL server instance running (server information can be changed in app_config.properties)
+- Run sql scripts on the DB server in this order (1. Structure, 2. data)
+- Build and run the application with Intellij (login to application is test/test)
+
 Assumptions and Decisions
 ==========================
 1. using contact field on appointments table for user/consultant
