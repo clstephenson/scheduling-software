@@ -10,19 +10,19 @@ Running the application:
 
 # Screenshots
 
-## Login
+### Login
 
 ![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-login.png "login window")
 
-## Main
+### Main
 
 ![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-main.png "main window")
 
-## Edit Customer
+### Edit Customer
 
 ![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-editCustomer.png "edit customer window")
 
-## Appointment Types by Month Chart
+### Appointment Types by Month Chart
 
 ![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-apptsByMonthChart.png "appointment types by month chart")
 
@@ -36,28 +36,28 @@ Running the application:
 
 # Rubric Items
 
-## Login form
+### Login form
 
 - Localized to both it_IT and fr_CA. Added line of code in main.java to change the default locale.
 
-## Customer records
+### Customer records
 
 - can be added, updated, and deleted.
 
-## Appointments
+### Appointments
 
 - can be added, updated, and deleted.
 
-## Calendar Views
+### Calendar Views
 
 - Selectable from "View" menu. Can view all appointments, or view only current week or month. Also added a filter
   to view only appointments that have not ended (default) or all, including past appointments.
 
-## Time Zones
+### Time Zones
 
 - Added line of code in main.java to change the default time zone.
 
-## Exception Controls
+### Exception Controls
 
 - Incorrect username/password - _AccessControlException_ is thrown from _LoginSession.java_ and caught in
   _LoginController.java_. A message is then displayed to the user.
@@ -66,18 +66,18 @@ Running the application:
 - Non-existent/invalid customer data - This should not happen. When an appointment is added or edited, the customer
   is selected from a populated list (non-editable). Newly added customers are auto-added to the list, and when a customer is deleted, all appointments for that customer also get removed.
 
-## Lambda Expressions
+### Lambda Expressions
 
 - I used lambdas, streams and method references throughout the code. Here are two examples...
   1. _ReportNumApptTypesByMonth.java_, line 45
   2. _MainController.java_, line 178
 
-## Alerts
+### Alerts
 
 - _showUserAppointmentsDialog()_ is called from _requestUserLogin()_ in _MainController.java_, line 424. The dialog
   is displayed if the user has an appointment beginning within 15 minutes from current time.
 
-## Reports
+### Reports
 
 - Number of appointment types by month - I chose to implement this as a bar chart, showing months on the x-axis,
   and number of appointments on the y-axis. Code to generate report is in _ReportNumApptTypesByMonth.java_.
@@ -87,7 +87,7 @@ Running the application:
 - Customer List - Creates a list of all customer data as a comma-separated values (csv) file, and attempts to open
   the document in the system's default editor. Code to generate report is in _ReportCustomers.java_.
 
-## Activity Log
+### Activity Log
 
 - Writes evidence of each login attempt to _activityLog.txt_. Sessions are logged from _LoginSession.java_, and
   the logging code is implemented in _LoginActivityLogger.java_.
