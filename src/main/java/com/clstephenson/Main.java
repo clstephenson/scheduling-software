@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
-    public static LoginSession session;
+    public static com.clstephenson.LoginSession session;
     private static ServerSocket socket;
     private static ScheduledExecutorService executorService;
 
@@ -65,20 +65,20 @@ public class Main extends Application {
         Parent root = null;
         String fxmlPath = "";
         try {
-            fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
+            fxmlPath = com.clstephenson.AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
             loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             root = loader.load();
         } catch (Exception e) {
-            Dialog.showErrorMessage("Could not load FXML file: " + fxmlPath);
+            com.clstephenson.Dialog.showErrorMessage("Could not load FXML file: " + fxmlPath);
             System.exit(0);
         }
         final int APP_WIDTH = 1000;
         final int APP_HEIGHT = 600;
         Scene scene = new Scene(root, APP_WIDTH, APP_HEIGHT);
-        primaryStage.setTitle(Localization.getString("ui.application.title"));
+        primaryStage.setTitle(com.clstephenson.Localization.getString("ui.application.title"));
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
-        FXHelper.addStylesheet(scene);
+        com.clstephenson.FXHelper.addStylesheet(scene);
         startDateTimeThread(loader);
         primaryStage.show();
     }
@@ -89,10 +89,10 @@ public class Main extends Application {
      */
     private void checkIfAppAlreadyRunning() {
         try {
-            socket = new ServerSocket(56284);
+            socket = new ServerSocket(65248);
         } catch (IOException e) {
             String msg = "Application is already running.  Please close running application and try again.";
-            Dialog.showErrorMessage(msg);
+            com.clstephenson.Dialog.showErrorMessage(msg);
             System.exit(0);
         }
     }

@@ -2,14 +2,10 @@ package com.clstephenson.dataaccess;
 
 import com.clstephenson.AppConfiguration;
 import com.clstephenson.Localization;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The DBManager class is used to manage connections to a database.  After creating an instance of the

@@ -1,5 +1,4 @@
-/out/
-/.idea/
-/screenshots/
+/target
+/screenshots
 activityLog.txt*
 schedule_test*.txt*
