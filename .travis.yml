@@ -14,5 +14,5 @@ deploy:
     upload_dir: apps/scheduling-software
 #    local_dir: target
     cleanup: false
-    glob: target/*-shaded.jar
+    glob: '*-shaded.jar'
     edge: true
