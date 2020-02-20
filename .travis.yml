@@ -14,5 +14,5 @@ deploy:
     upload_dir: $AWS_UPLOAD_DIR
     local_dir: target
     cleanup: false
-    glob: ./**/*-shaded.jar
+    glob: *-shaded.jar
     edge: true
