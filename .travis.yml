@@ -2,16 +2,14 @@ language: java
 
 jdk: openjdk11
 
-script:
+before_deploy:
     - mvn clean package
-    - mv target/SchedulingSoftware-shaded.jar SchedulingSoftware.jar
+    - ls
 
 deploy:
     provider: s3
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: $AWS_BUCKET
-    glob: SchedulingSoftware.jar
+    glob: SchedulingSoftware-shaded.jar
     upload-dir: $AWS_UPLOAD_DIR
-
-
