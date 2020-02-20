@@ -13,5 +13,5 @@ deploy:
     region: us-west-2
     upload_dir: apps/scheduling-software
     cleanup: false
-    glob: target/*-shaded.jar
+    glob: target/*.jar
     edge: true
