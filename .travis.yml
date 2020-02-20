@@ -10,8 +10,9 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: $AWS_BUCKET
+    region: us-west-2
     upload_dir: $AWS_UPLOAD_DIR
-    local_dir: ./target
+    local_dir: target
     cleanup: false
     glob: ./**/*-shaded.jar
     edge: true
