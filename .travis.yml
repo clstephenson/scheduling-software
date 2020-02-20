@@ -4,7 +4,7 @@ jdk: openjdk11
 
 before_deploy:
     - mvn clean package
-    - ls target
+    - ls ./target
 
 deploy:
     provider: s3
