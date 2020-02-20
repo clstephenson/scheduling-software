@@ -12,19 +12,19 @@ Running the application:
 
 ### Login
 
-![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-login.png "login window")
+![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/apps/scheduling-software/scheduling-software-login.png "login window")
 
 ### Main
 
-![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-main.png "main window")
+![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/apps/scheduling-software/scheduling-software-main.png "main window")
 
 ### Edit Customer
 
-![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-editCustomer.png "edit customer window")
+![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/apps/scheduling-software/scheduling-software-editCustomer.png "edit customer window")
 
 ### Appointment Types by Month Chart
 
-![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/images/scheduling-software-apptsByMonthChart.png "appointment types by month chart")
+![alt text](https://clstephenson.s3-us-west-2.amazonaws.com/apps/scheduling-software/scheduling-software-apptsByMonthChart.png "appointment types by month chart")
 
 # Assumptions and Decisions
 
