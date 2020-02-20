@@ -12,7 +12,6 @@ deploy:
     bucket: $AWS_BUCKET
     region: us-west-2
     upload_dir: apps/scheduling-software
-#    local_dir: target
     cleanup: false
-    glob: '*-shaded.jar'
+    glob: target/*-shaded.jar
     edge: true
