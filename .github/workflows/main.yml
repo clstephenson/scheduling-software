@@ -25,4 +25,4 @@ jobs:
         with:
           java-version: ${{ matrix.java_version }}
       - name: Build with Maven
-        run: mvn clean pakage
+        run: mvn clean package
