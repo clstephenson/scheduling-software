@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/clstephenson/scheduling-software.svg?branch=master)](https://travis-ci.org/clstephenson/scheduling-software)
+
 This was an application required for a Java-related software course. The overall requirement was to write an application
 using Java FX and mySql that manages appointments for customers of a fictitious consulting company with three locations
 (three time zones).
