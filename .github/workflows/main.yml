@@ -24,8 +24,5 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java_version }}
-      - name: Make Maven Wrapper executable
-        if: contains(matrix.os, 'win') == false
-        run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw pakage --file pom.xml
+        run: mvn clean pakage
