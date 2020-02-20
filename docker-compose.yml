@@ -1,0 +1,6 @@
+version: '3'
+services: 
+    database:
+        image: clstephenson/scheduling-software-demo-db
+        ports:
+            - "3306:3306"
