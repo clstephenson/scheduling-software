@@ -12,7 +12,7 @@ deploy:
     bucket: $AWS_BUCKET
     region: us-west-2
     upload_dir: $AWS_UPLOAD_DIR
-    local_dir: target
+#    local_dir: target
     cleanup: false
-    glob: *-shaded.jar
+    glob: target/*-shaded.jar
     edge: true
