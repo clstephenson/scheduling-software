@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -25,7 +24,7 @@ public class Main extends Application {
     private static ServerSocket socket;
     private static ScheduledExecutorService executorService;
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
         /*
         Change the default system time zone.
@@ -33,13 +32,11 @@ public class Main extends Application {
         TimeZone.setDefault(TimeZone.getTimeZone("America/Phoenix"));
         //TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
 
-
         /*
         Change the default locale to Italy or French Canadian
         */
         //Locale.setDefault(Locale.ITALY);
         //Locale.setDefault(Locale.CANADA_FRENCH);
-
 
         Platform.setImplicitExit(true);
         Runtime.getRuntime().addShutdownHook(new Thread(Main::cleanupResources));
