@@ -11,5 +11,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: $AWS_BUCKET
     upload_dir: $AWS_UPLOAD_DIR
-    skip_cleanup: true
+    local_dir: ./target
+    cleanup: false
     glob: ./**/*-shaded.jar
+    edge: true
