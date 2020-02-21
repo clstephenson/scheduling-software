@@ -4,6 +4,10 @@ jdk: openjdk11
 
 before_deploy:
     - mvn clean package
+    - mkdir app
+    - cp ./docker-compose.yml ./app/docker-compose.yml
+    - mv ./target/SchedulingSoftware.jar ./app/SchedulingSoftware.jar
+    - zip -r SchedulingSoftware.zip ./app
 
 deploy:
     on:
@@ -15,5 +19,5 @@ deploy:
     region: us-west-2
     upload_dir: apps/scheduling-software
     cleanup: false
-    glob: target/*.jar
+    glob: SchedulingSoftware.zip
     edge: true
