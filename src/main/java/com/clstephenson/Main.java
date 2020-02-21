@@ -62,7 +62,6 @@ public class Main extends Application {
         String fxmlPath = "";
         try {
             fxmlPath = com.clstephenson.AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
-            //loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             loader = new FXMLLoader(getClass().getResource(fxmlPath));
             root = loader.load();
         } catch (Exception e) {

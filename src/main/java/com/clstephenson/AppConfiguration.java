@@ -11,7 +11,6 @@ import java.util.Properties;
  * generated, and properties are requested via a static method (getConfigurationProperty).
  */
 public class AppConfiguration {
-    //private final String CONFIG_PATH = "./resources/app_config.properties";
     private final String CONFIG_FILE = "/app_config.properties";
     private Properties properties = null;
     private static AppConfiguration appConfigurationInstance = null;
@@ -34,7 +33,6 @@ public class AppConfiguration {
 
     private AppConfiguration() {
         this.properties = new Properties();
-        //try(FileReader inputReader = new FileReader(CONFIG_PATH)) {
         try(InputStream inputStream = getClass().getResourceAsStream(CONFIG_FILE)) {
             this.properties.load(inputStream);
         } catch (IOException e) {

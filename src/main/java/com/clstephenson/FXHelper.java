@@ -18,7 +18,6 @@ public class FXHelper {
         String fxmlPath = "";
         try {
             fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Login.fxml";
-            //FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             loader.setResources(Localization.getResourceBundle());
             root = loader.load();
@@ -52,7 +51,6 @@ public class FXHelper {
         String fxmlPath = "";
         try {
             fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Customer.fxml";
-            //FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             loader.setResources(Localization.getResourceBundle());
             root = loader.load();
