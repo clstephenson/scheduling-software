@@ -1,4 +1,5 @@
 /target
 /screenshots
-activityLog.txt*
-schedule_test*.txt*
+activityLog.txt
+schedule_test*.txt
+dependency-reduced-pom.xml
