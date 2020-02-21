@@ -11,8 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.nio.file.Paths;
-
 public class FXHelper {
 
     public static void showUserLogin() {
@@ -20,7 +18,8 @@ public class FXHelper {
         String fxmlPath = "";
         try {
             fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Login.fxml";
-            FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            //FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             loader.setResources(Localization.getResourceBundle());
             root = loader.load();
         } catch (Exception e) {
@@ -53,7 +52,8 @@ public class FXHelper {
         String fxmlPath = "";
         try {
             fxmlPath = AppConfiguration.getConfigurationProperty("fxml.path") + "Customer.fxml";
-            FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            //FXMLLoader loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             loader.setResources(Localization.getResourceBundle());
             root = loader.load();
             CustomerController.injectMainController(mainController);

@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -63,9 +62,11 @@ public class Main extends Application {
         String fxmlPath = "";
         try {
             fxmlPath = com.clstephenson.AppConfiguration.getConfigurationProperty("fxml.path") + "Main.fxml";
-            loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            //loader = new FXMLLoader(Paths.get(fxmlPath).toUri().toURL());
+            loader = new FXMLLoader(getClass().getResource(fxmlPath));
             root = loader.load();
         } catch (Exception e) {
+            e.printStackTrace();
             com.clstephenson.Dialog.showErrorMessage("Could not load FXML file: " + fxmlPath);
             System.exit(0);
         }
