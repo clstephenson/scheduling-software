@@ -17,6 +17,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     bucket: $AWS_BUCKET
     region: us-west-2
+    acl: public_read
     upload_dir: apps/scheduling-software
     cleanup: false
     glob: SchedulingSoftware.zip
