@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <openjfx.version>11</openjfx.version>
-        <mysql.connector.version>8.0.19</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
     </properties>
 
     <dependencies>
